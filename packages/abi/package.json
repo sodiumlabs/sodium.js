@@ -1,0 +1,22 @@
+{
+  "name": "@0xsodium/abi",
+  "version": "0.42.9",
+  "description": "abi sub-package for Sequence",
+  "repository": "https://github.com/sodiumlabs/sodium.js/tree/main/packages/abi",
+  "source": "src/index.ts",
+  "main": "dist/0xsodium-abi.cjs.js",
+  "module": "dist/0xsodium-abi.esm.js",
+  "author": "Horizon Blockchain Games",
+  "license": "Apache-2.0",
+  "scripts": {
+    "test": "echo",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "devDependencies": {},
+  "files": [
+    "src",
+    "dist"
+  ]
+}

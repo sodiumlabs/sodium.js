@@ -1,0 +1,38 @@
+{
+  "name": "@0xsodium/auth",
+  "version": "0.42.9",
+  "description": "auth sub-package for Sequence",
+  "repository": "https://github.com/sodiumlabs/sodium.js/tree/main/packages/auth",
+  "source": "src/index.ts",
+  "main": "dist/0xsodium-auth.cjs.js",
+  "module": "dist/0xsodium-auth.esm.js",
+  "author": "Horizon Blockchain Games",
+  "license": "Apache-2.0",
+  "scripts": {
+    "test": "yarn test:concurrently 'yarn test:run'",
+    "test:run": "yarn test:file tests/**/*.spec.ts",
+    "test:file": "TS_NODE_PROJECT=../../tsconfig.test.json mocha -r ts-node/register --timeout 30000",
+    "test:concurrently": "concurrently -k --success first 'yarn start:hardhat > /dev/null' ",
+    "start:hardhat": "yarn run hardhat node --port 9546",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@0xsodium/abi": "^0.42.9",
+    "@0xsodium/config": "^0.42.9",
+    "@0xsequence/ethauth": "^0.7.0",
+    "@0xsodium/network": "^0.42.9",
+    "@0xsodium/wallet": "^0.42.9",
+    "@0xsodium/utils": "^0.42.9",
+    "ethers": "^5.5.2"
+  },
+  "peerDependencies": {},
+  "devDependencies": {
+    "concurrently": "^6.5.0",
+    "hardhat": "2.1.2",
+    "mockttp": "^2.4.0"
+  },
+  "files": [
+    "src",
+    "dist"
+  ]
+}

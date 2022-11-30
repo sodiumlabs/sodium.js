@@ -1,0 +1,81 @@
+{
+  "name": "0xsodium",
+  "version": "0.42.9",
+  "description": "Sequence: simple & powerful Ethereum development library and Web-based smart wallet",
+  "repository": "https://github.com/sodiumlabs/sodium.js",
+  "source": "src/index.ts",
+  "main": "dist/0xsodium.cjs.js",
+  "module": "dist/0xsodium.esm.js",
+  "umd:main": "dist/0xsodium.umd.min.js",
+  "license": "Apache-2.0",
+  "scripts": {
+    "test": "yarn test:concurrently 'yarn test:run'",
+    "test:run": "TS_NODE_PROJECT=../../tsconfig.test.json ava --serial --fail-fast --timeout 5m",
+    "test:only": "yarn test:run --match",
+    "test:watch": "yarn test:run --watch",
+    "test:server": "webpack serve --config tests/webpack.config.js",
+    "test:server2": "PORT=8888 webpack serve --config tests/webpack.config.js",
+    "test:concurrently": "concurrently -k --success first 'yarn test:server' 'yarn start:hardhat' 'yarn start:hardhat2'",
+    "start:hardhat": "yarn run hardhat node --hostname 0.0.0.0",
+    "start:hardhat:verbose": "yarn run hardhat --verbose node --hostname 0.0.0.0",
+    "start:hardhat2": "yarn run hardhat --config hardhat2.config.js node --hostname 0.0.0.0 --port 9545",
+    "start:hardhat2:verbose": "yarn run hardhat --config hardhat2.config.js --verbose node --hostname 0.0.0.0 --port 9545",
+    "start:ganache": "ganache-cli --chainId ${npm_package_config_ganacheChainID} --networkId ${npm_package_config_ganacheChainID} --port ${npm_package_config_ganachePort} --gasLimit ${npm_package_config_ganacheGasLimit} --gasPrice ${npm_package_config_ganacheGasPrice} --defaultBalanceEther ${npm_package_config_etherBalance} --deterministic --mnemonic \"${npm_package_config_mnemonic}\" ${npm_package_config_extra}",
+    "start:ganache:verbose": "yarn run start:ganache --verbose",
+    "start:ganache2": "ganache-cli --chainId 31338 --networkId 31338 --port 9545 --gasLimit ${npm_package_config_ganacheGasLimit} --gasPrice ${npm_package_config_ganacheGasPrice} --defaultBalanceEther ${npm_package_config_etherBalance} --deterministic --mnemonic \"${npm_package_config_mnemonic}\" ${npm_package_config_extra}",
+    "start:ganache2:verbose": "yarn run start:ganache2 --verbose",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@0xsodium/abi": "^0.42.9",
+    "@0xsodium/auth": "^0.42.9",
+    "@0xsodium/config": "^0.42.9",
+    "@0xsodium/guard": "^0.42.9",
+    "@0xsodium/multicall": "^0.42.9",
+    "@0xsodium/network": "^0.42.9",
+    "@0xsodium/provider": "^0.42.9",
+    "@0xsodium/transactions": "^0.42.9",
+    "@0xsodium/utils": "^0.42.9",
+    "@0xsodium/wallet": "^0.42.9",
+    "ethers": "^5.5.2"
+  },
+  "peerDependencies": {},
+  "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.16.10",
+    "babel-loader": "^8.2.3",
+    "hardhat": "2.1.2",
+    "html-webpack-plugin": "^5.3.1",
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.6.0",
+    "webpack-dev-server": "^3.11.2"
+  },
+  "keywords": [],
+  "preconstruct": {
+    "umdName": "sodium"
+  },
+  "files": [
+    "src",
+    "dist"
+  ],
+  "ava": {
+    "require": [
+      "ts-node/register"
+    ],
+    "files": [
+      "tests/**/*.spec.ts"
+    ],
+    "extensions": [
+      "ts"
+    ],
+    "verbose": true
+  },
+  "config": {
+    "mnemonic": "ripple axis someone ridge uniform wrist prosper there frog rate olympic knee",
+    "ganacheChainID": 31337,
+    "ganachePort": 8545,
+    "ganacheGasLimit": "0xfffffffffff",
+    "ganacheGasPrice": "0x200",
+    "etherBalance": "100000",
+    "extra": ""
+  }
+}

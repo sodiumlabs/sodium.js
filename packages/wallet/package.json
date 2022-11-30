@@ -1,0 +1,43 @@
+{
+  "name": "@0xsodium/wallet",
+  "version": "0.42.9",
+  "description": "wallet sub-package for sodium",
+  "repository": "https://github.com/sodiumlabs/sodium.js/tree/main/packages/wallet",
+  "source": "src/index.ts",
+  "main": "dist/0xsodium-wallet.cjs.js",
+  "module": "dist/0xsodium-wallet.esm.js",
+  "author": "Horizon Blockchain Games",
+  "license": "Apache-2.0",
+  "scripts": {
+    "test": "yarn test:concurrently 'yarn test:run'",
+    "test:run": "yarn test:file tests/**/*.spec.ts",
+    "test:file": "TS_NODE_PROJECT=../../tsconfig.test.json mocha -r ts-node/register --timeout 30000",
+    "test:concurrently": "concurrently -k --success first 'yarn start:hardhat2 > /dev/null'",
+    "start:hardhat2": "yarn run hardhat node --port 7047 --config ./hardhat2.config.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@0xsodium/abi": "^0.42.9",
+    "@0xsodium/config": "^0.42.9",
+    "@0xsodium/guard": "^0.42.9",
+    "@0xsodium/network": "^0.42.9",
+    "@0xsodium/transactions": "^0.42.9",
+    "@0xsodium/utils": "^0.42.9",
+    "@ethersproject/abi": "^5.5.0",
+    "@ethersproject/properties": "^5.5.0",
+    "@ethersproject/providers": "^5.5.1",
+    "ethers": "^5.5.2",
+    "fetch-ponyfill": "^7.1.0"
+  },
+  "peerDependencies": {},
+  "devDependencies": {
+    "@0xsodium/wallet-contracts": "0.0.2-beta",
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
+    "ganache-core": "^2.13.2",
+    "web3": "^1.7.0"
+  },
+  "files": [
+    "src",
+    "dist"
+  ]
+}
