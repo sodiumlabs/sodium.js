@@ -20,7 +20,7 @@
     "dev": "preconstruct build",
     "postinstall": "preconstruct build",
     "coverage": "rimraf ./coverage && rimraf ./.nyc_output && nyc yarn test",
-    "link-sodium": "./scripts/yarn-link.sh link",
+    "link-sodium": "./scripts/yarn-link.sh publish",
     "unlink-sodium": "./scripts/yarn-link.sh unlink",
     "start:bundler": "cd ./packages/bundler && yarn bundler",
     "prepare": "husky-run install"
@@ -65,7 +65,8 @@
     "ts-node": "^10.4.0",
     "typescript": "^4.5.5",
     "wait-on": "^6.0.0",
-    "wsrun": "^5.2.4"
+    "wsrun": "^5.2.4",
+    "yalc": "^1.0.0-pre.53"
   },
   "resolutions": {
     "node-fetch": "^2.6.7"
@@ -91,5 +92,6 @@
       "packages/wallet"
     ]
   },
-  "dependencies": {}
+  "dependencies": {},
+  "version": "0.0.1-beta"
 }
