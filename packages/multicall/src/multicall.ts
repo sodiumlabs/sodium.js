@@ -31,7 +31,7 @@ type QueueEntry = {
 const DefaultMulticallOptions = {
   batchSize: 50,
   timeWindow: 50,
-  contract: sodiumContext.modules.multicall!,
+  contract: sodiumContext.modules.multicall,
   verbose: false
 }
 

@@ -7,7 +7,7 @@ export interface WalletContext {
   walletCreatorAddress: string;
 
   modules: {
-
+    multicall: string
   };
 
   nonStrict?: boolean;
@@ -20,7 +20,7 @@ export const sodiumContext = {
   walletCreatorAddress: "0x34D0F455e9fC681ab9896CeeA5f1A5acbFb4497a",
 
   modules: {
-
+    multicall: ""
   },
 
   nonStrict: false
