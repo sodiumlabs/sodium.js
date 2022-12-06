@@ -15,7 +15,7 @@ export class GuardRemoteSigner extends RemoteSigner {
     public defaultChainId: number = ChainId.MAINNET
   ) {
     super()
-    this._guardd = new GuarddService(hostname, fetchPonyfill().fetch)
+    // this._guardd = new GuarddService(hostname, fetchPonyfill().fetch)
     this._address = address
   }
 
