@@ -17,8 +17,8 @@
     "format": "prettier --write packages/**/src/**/*.ts packages/**/tests/**/*.ts",
     "audit:fix": "npx yarn-audit-fix",
     "typecheck": "tsc --noEmit",
-    "dev": "preconstruct dev",
-    "postinstall": "preconstruct dev",
+    "dev": "preconstruct build",
+    "postinstall": "preconstruct build",
     "coverage": "rimraf ./coverage && rimraf ./.nyc_output && nyc yarn test",
     "link-sodium": "./scripts/yarn-link.sh link",
     "unlink-sodium": "./scripts/yarn-link.sh unlink",
@@ -75,7 +75,20 @@
   ],
   "preconstruct": {
     "packages": [
-      "packages/*"
+      "packages/0xsodium",
+      "packages/abi",
+      "packages/auth",
+      "packages/config",
+      "packages/estimator",
+      "packages/guard",
+      "packages/multicall",
+      "packages/network",
+      "packages/provider",
+      "packages/sdk4337",
+      "packages/simulator",
+      "packages/transactions",
+      "packages/utils",
+      "packages/wallet"
     ]
   },
   "dependencies": {}

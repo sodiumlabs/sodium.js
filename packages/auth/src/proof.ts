@@ -1,7 +1,7 @@
 import { ethers } from 'ethers'
 import { Proof, ValidatorFunc, IsValidSignatureBytes32MagicValue } from '@0xsequence/ethauth'
-import { sequenceContext, WalletContext } from '@0xsodium/network'
-import { isValidSequenceUndeployedWalletSignature } from '@0xsodium/wallet'
+import { sodiumContext, WalletContext } from '@0xsodium/network'
+import { isValidSodiumUndeployedWalletSignature } from '@0xsodium/wallet'
 
 export const ValidateSequenceDeployedWalletProof: ValidatorFunc = async (provider: ethers.providers.JsonRpcProvider, chainId: number, proof: Proof): Promise<{ isValid: boolean, address?: string }> => {
   if (!provider || provider === undefined || chainId === undefined) {
@@ -52,11 +52,11 @@ export const ValidateSequenceUndeployedWalletProof = (context?: WalletContext): 
     // hash the message digest as required by isValidSignature
     const digest = ethers.utils.arrayify(ethers.utils.keccak256(message))
 
-    const isValid = await isValidSequenceUndeployedWalletSignature(
+    const isValid = await isValidSodiumUndeployedWalletSignature(
       proof.address,
       digest,
       proof.signature,
-      context ? context : sequenceContext,
+      context ? context : sodiumContext,
       provider,
       chainId
     )

@@ -4,7 +4,7 @@ export {
   isValidSignature,
   isValidMessageSignature,
   isValidTypedDataSignature,
-  recoverWalletConfig,
+  // recoverWalletConfig,
   isWalletUpToDate
 } from '@0xsodium/provider'
 

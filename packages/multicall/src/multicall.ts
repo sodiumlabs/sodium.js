@@ -3,7 +3,7 @@ import { walletContracts } from '@0xsodium/abi'
 import { JsonRpcMethod } from './constants'
 import { BlockTag, eqBlockTag, parseBlockTag, partition, safeSolve } from './utils'
 import { promisify, getRandomInt } from '@0xsodium/utils'
-import { JsonRpcVersion, JsonRpcRequest, JsonRpcResponseCallback, JsonRpcHandlerFunc, sequenceContext } from "@0xsodium/network"
+import { JsonRpcVersion, JsonRpcRequest, JsonRpcResponseCallback, JsonRpcHandlerFunc, sodiumContext } from "@0xsodium/network"
 
 export type MulticallOptions = {
   // number of calls to enqueue before calling.
@@ -31,7 +31,7 @@ type QueueEntry = {
 const DefaultMulticallOptions = {
   batchSize: 50,
   timeWindow: 50,
-  contract: sequenceContext.sequenceUtils!,
+  contract: sodiumContext.modules.multicall!,
   verbose: false
 }
 

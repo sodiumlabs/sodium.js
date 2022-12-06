@@ -1,11 +1,11 @@
 // import { SequenceAPIClient } from '@0xsodium/api'
 import {
   ConfigFinder,
-  SequenceUtilsFinder,
+  // SequenceUtilsFinder,
   WalletConfig,
   decodeSignature,
-  editConfig,
-  genConfig,
+  // editConfig,
+  // genConfig,
   isDecodedSigner
 } from '@0xsodium/config'
 import { ETHAuth, Proof } from '@0xsequence/ethauth'
@@ -242,65 +242,69 @@ export class Session {
   // }
 
   private getProofString(key: string): ProofStringPromise {
-    // check if we already have or are waiting for a proof string
-    if (this.proofStrings.has(key)) {
-      const proofString = this.proofStrings.get(key)!
+    return {
+      proofString: Promise.resolve(""),
+      expiration: 1
+    };
+    // // check if we already have or are waiting for a proof string
+    // if (this.proofStrings.has(key)) {
+    //   const proofString = this.proofStrings.get(key)!
 
-      if (this.now() < proofString.expiration) {
-        return proofString
-      }
+    //   if (this.now() < proofString.expiration) {
+    //     return proofString
+    //   }
 
-      // proof string expired, delete it and make a new one
-      this.proofStrings.delete(key)
-    }
+    //   // proof string expired, delete it and make a new one
+    //   this.proofStrings.delete(key)
+    // }
 
-    const proof = new Proof({
-      address: this.account.address
-    })
-    proof.claims.app = this.name
-    proof.setExpiryIn(this.expiration)
+    // const proof = new Proof({
+    //   address: this.account.address
+    // })
+    // proof.claims.app = this.name
+    // proof.setExpiryIn(this.expiration)
 
-    const ethAuth = new ETHAuth()
-    const configFinder = new SequenceUtilsFinder(this.authProvider)
-    const authWallet = this.account.authWallet()
-    const expiration = this.now() + this.expiration - EXPIRATION_JWT_MARGIN
+    // const ethAuth = new ETHAuth()
+    // const configFinder = new SequenceUtilsFinder(this.authProvider)
+    // const authWallet = this.account.authWallet()
+    // const expiration = this.now() + this.expiration - EXPIRATION_JWT_MARGIN
 
-    const proofString = {
-      // Fetch latest config
-      // TODO: Should only search for latest config if necessary to be more efficient.
-      //       Perhaps compare local config hash with on-chain hash before doing
-      //       the search through the logs. Should do this accross sequence.js
-      proofString: configFinder
-        .findCurrentConfig({
-          address: authWallet.wallet.address,
-          provider: this.authProvider,
-          context: authWallet.wallet.context,
-          knownConfigs: [authWallet.wallet.config]
-        })
-        .then(val => {
-          if (!val.config) throw Error("Can't find latest config")
-          return authWallet.wallet
-            .useConfig(val.config!)
-            .sign(proof.messageDigest())
-            .then(signature => {
-              const decodedSignature = decodeSignature(signature)
-              const totalWeight = decodedSignature.signers.filter(isDecodedSigner).reduce((totalWeight, signer) => totalWeight + signer.weight, 0)
-              if (totalWeight < decodedSignature.threshold) {
-                throw Error(`insufficient signing power, need ${decodedSignature.threshold}, have ${totalWeight}`)
-              }
+    // const proofString = {
+    //   // Fetch latest config
+    //   // TODO: Should only search for latest config if necessary to be more efficient.
+    //   //       Perhaps compare local config hash with on-chain hash before doing
+    //   //       the search through the logs. Should do this accross sequence.js
+    //   proofString: configFinder
+    //     .findCurrentConfig({
+    //       address: authWallet.wallet.address,
+    //       provider: this.authProvider,
+    //       context: authWallet.wallet.context,
+    //       knownConfigs: [authWallet.wallet.config]
+    //     })
+    //     .then(val => {
+    //       if (!val.config) throw Error("Can't find latest config")
+    //       return authWallet.wallet
+    //         .useConfig(val.config!)
+    //         .sign(proof.messageDigest())
+    //         .then(signature => {
+    //           const decodedSignature = decodeSignature(signature)
+    //           const totalWeight = decodedSignature.signers.filter(isDecodedSigner).reduce((totalWeight, signer) => totalWeight + signer.weight, 0)
+    //           if (totalWeight < decodedSignature.threshold) {
+    //             throw Error(`insufficient signing power, need ${decodedSignature.threshold}, have ${totalWeight}`)
+    //           }
 
-              proof.signature = signature
-              return ethAuth.encodeProof(proof, true)
-            })
-        })
-        .catch(reason => {
-          this.proofStrings.delete(key)
-          throw reason
-        }),
-      expiration
-    }
-    this.proofStrings.set(key, proofString)
-    return proofString
+    //           proof.signature = signature
+    //           return ethAuth.encodeProof(proof, true)
+    //         })
+    //     })
+    //     .catch(reason => {
+    //       this.proofStrings.delete(key)
+    //       throw reason
+    //     }),
+    //   expiration
+    // }
+    // this.proofStrings.set(key, proofString)
+    // return proofString
   }
 
   private getProofStringKey(): string {
