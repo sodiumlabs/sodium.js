@@ -22,7 +22,6 @@ const CONFIG_FILE_NAME = 'workdir/bundler.config.json'
 export let showStackTraces = false
 export function resolveConfiguration (programOpts: any): BundlerConfig {
   let fileConfig: Partial<BundlerConfig> = {}
-
   const commandLineParams = getCommandLineParams(programOpts)
   const configFileName = programOpts.config
   if (fs.existsSync(configFileName)) {
@@ -48,7 +47,7 @@ function getCommandLineParams (programOpts: any): Partial<BundlerConfig> {
 export async function connectContracts (
   wallet: Wallet,
   entryPointAddress: string,
-  bundlerHelperAddress: string): Promise<{ entryPoint: EntryPoint }> {
+): Promise<{ entryPoint: EntryPoint }> {
   const entryPoint = EntryPoint__factory.connect(entryPointAddress, wallet)
   return {
     entryPoint,
@@ -84,7 +83,7 @@ export async function runBundler (argv: string[], overrideExit = true): Promise<
     .option('--mnemonic <file>', 'mnemonic/private-key file of signer account')
     .option('--helper <string>', 'address of the BundlerHelper contract')
     .option('--entryPoint <string>', 'address of the supported EntryPoint contract')
-    .option('--port <number>', 'server listening port', '3000')
+    .option('--port <number>', 'server listening port', undefined)
     .option('--config <string>', 'path to config file)', CONFIG_FILE_NAME)
     .option('--show-stack-traces', 'Show stack traces.')
     .option('--createMnemonic', 'create the mnemonic file')
@@ -122,7 +121,7 @@ export async function runBundler (argv: string[], overrideExit = true): Promise<
 
   const {
     entryPoint
-  } = await connectContracts(wallet, config.entryPoint, config.helper)
+  } = await connectContracts(wallet, config.entryPoint)
 
   const methodHandler = new UserOpMethodHandler(
     provider,

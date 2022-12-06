@@ -162,11 +162,10 @@ export class Wallet implements WalletProvider {
 
     // .....
     this.transport.allowProvider = allowProviderMiddleware((request: JsonRpcRequest): boolean => {
-      if (request.method === 'sequence_setDefaultNetwork') return true
-
+      if (request.method === 'sodium_setDefaultNetwork') return true
       const isConnected = this.isConnected()
       if (!isConnected) {
-        throw new Error('Sequence: wallet not connected')
+        throw new Error('Sodium: wallet not connected')
       }
       return isConnected
     })

@@ -17,11 +17,11 @@ export interface LoggerConfig {
 }
 
 export class Logger {
-  logLevel: logLevel
-
   constructor(private config: LoggerConfig) {
     this.configure(config)
   }
+
+  logLevel: logLevel = logLevel.ERROR
 
   configure(config: Partial<LoggerConfig>) {
     this.config = { ...this.config, ...config}

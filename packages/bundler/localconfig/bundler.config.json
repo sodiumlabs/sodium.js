@@ -1,10 +1,9 @@
 {
   "gasFactor": "1",
-  "port": "3000",
-  "network": "http://localhost:8545",
-  "entryPoint": "0x674DF207855CE0d9eaB7B000FbBE997a2451d24f",
-  "beneficiary": "0xd21934eD8eAf27a67f0A70042Af50A1D6d195E81",
+  "port": "3002",
+  "network": "https://polygon-mumbai.g.alchemy.com/v2/fIbA8DRSTQXPAhcHKiPFo19SPqhHNHam",
+  "entryPoint": "0xC8Ddd44bB33BBC2c8DCcB0BB958DdE47363D5C28",
+  "beneficiary": "0xb3F9D1614E806e9C47C93f13B838124eC05bFFD0",
   "minBalance": "1",
-  "mnemonic": "./localconfig/mnemonic.txt",
-  "helper": "0x780EcF3a794E9eb2b8C9baA6d8C4Ff36EFba770C"
+  "mnemonic": "./localconfig/mnemonic.txt"
 }

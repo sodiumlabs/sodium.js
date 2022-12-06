@@ -8,7 +8,7 @@ import { Signer } from '@ethersproject/abstract-signer'
 import { BaseApiParams, BaseWalletAPI } from './BaseWalletAPI'
 import { TransactionDetailsForUserOp } from './TransactionDetailsForUserOp';
 import { TransactionRequest, flattenAuxTransactions, sodiumTxAbiEncode } from '@0xsodium/transactions';
-import { getWalletInitCode, WalletConfig } from '@0xsodium/config'; 
+import { getWalletInitCode, WalletConfig } from '@0xsodium/config';
 
 /**
  * constructor params, added no top of base params:
@@ -49,7 +49,7 @@ export class WalletAPI extends BaseWalletAPI {
   }
 
   async getWalletInitCode(): Promise<string> {
-    return getWalletInitCode(this.walletConfig, this.walletContext);
+    return getWalletInitCode(this.signer, this.walletConfig, this.walletContext);
   }
 
   async getNonce(): Promise<BigNumber> {

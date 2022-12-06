@@ -11,7 +11,7 @@ import { hexValue, resolveProperties } from 'ethers/lib/utils';
 import { PaymasterAPI } from './PaymasterAPI';
 import { getRequestId, NotPromise, packUserOp } from '@0xsodium/utils';
 import { calcPreVerificationGas, GasOverheads } from './calcPreVerificationGas';
-import { getFeeData, SignedTransaction } from '@0xsodium/transactions';
+import { getFeeData, SignedTransaction, flattenAuxTransactions } from '@0xsodium/transactions';
 import { HttpRpcClient } from './HttpRpcClient';
 import { WalletConfig } from '@0xsodium/config';
 import { WalletContext } from '@0xsodium/network';
@@ -173,10 +173,6 @@ export abstract class BaseWalletAPI {
   }
 
   async encodeUserOpCallDataAndGasLimit(detailsForUserOp: TransactionDetailsForUserOp): Promise<{ callData: string, callGasLimit: BigNumber }> {
-    function parseNumber(a: any): BigNumber | null {
-      if (a == null || a === '') return null
-      return BigNumber.from(a.toString())
-    }
     const callData = await this.encodeExecute(detailsForUserOp)
     const callGasLimit = await this.encodeGasLimit(detailsForUserOp);
     return {
@@ -271,6 +267,18 @@ export abstract class BaseWalletAPI {
     return {
       ...userOp,
       signature
+    }
+  }
+  
+  async signTransactions(info: TransactionDetailsForUserOp, chainId: number): Promise<SignedTransaction> {
+    const userOp = await this.createUnsignedUserOp(info);
+    const requestId = await this.getRequestId(userOp, chainId);
+    const signature = this.signRequestId(requestId);
+    const txs = flattenAuxTransactions(info);
+    return {
+      ...userOp,
+      signature,
+      transactions: txs
     }
   }
 

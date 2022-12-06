@@ -73,9 +73,9 @@ export type BlockExplorerConfig = {
   txnHashUrl?: string
 }
 
-export const indexerURL = (network: string) => stringTemplate('https://${network}-indexer.sequence.app', { network: network })
-export const bundlerURL = (network: string) => stringTemplate('https://${network}-relayer.sequence.app', { network: network })
-export const nodesURL = (network: string) => stringTemplate('https://nodes.sequence.app/${network}', { network: network })
+export const indexerURL = (network: string) => stringTemplate('https://${network}-indexer.sodium.app', { network: network })
+export const bundlerURL = (network: string) => stringTemplate('https://${network}-bundler.sodium.app', { network: network })
+export const nodesURL = (network: string) => stringTemplate('https://nodes.sodium.app/${network}', { network: network })
 
 export const networks: Record<ChainId, NetworkConfig> = {
   [ChainId.MAINNET]: {

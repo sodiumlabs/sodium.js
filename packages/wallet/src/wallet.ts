@@ -108,8 +108,10 @@ export class Wallet extends Signer {
     // cache wallet config for future imageHash lookups
     this.imageHash;
 
+    const localSigner = this.getLocalSigner();
+
     this.wallet4337API = new WalletAPI({
-      signer: config.sessionSigner,
+      signer: localSigner,
       entryPointAddress: this.context.entryPointAddress,
       config: this.config,
       context: this.context
@@ -226,6 +228,14 @@ export class Wallet extends Signer {
     return Promise.all(this._signers.map(s => s.getAddress().then(s => ethers.utils.getAddress(s))))
   }
 
+  getLocalSigner(): AbstractSigner {
+    const localSigners = this._signers.filter(s => !RemoteSigner.isRemoteSigner(s));
+    if (localSigners.length == 0) {
+      throw new Error("not found local signer");
+    }
+    return localSigners[0];
+  }
+
   // chainId returns the network connected to this wallet instance
   async getChainId(): Promise<number> {
     if (this.chainId) return this.chainId
@@ -298,8 +308,7 @@ export class Wallet extends Signer {
     if (!this.provider) {
       throw new Error('missing provider');
     }
-    const userOP = await this.wallet4337API.createUnsignedUserOp(txs);
-    return this.wallet4337API.signUserOp(userOP, signChainId);
+    return this.wallet4337API.signTransactions(txs, signChainId);
   }
 
   async sendSignedTransactions(signedTxs: SignedTransaction, chainId?: ChainIdLike): Promise<TransactionResponse> {
@@ -308,7 +317,6 @@ export class Wallet extends Signer {
   }
 
   // signMessage will sign a message for a particular chainId with the wallet signers
-  //
   // NOTE: signMessage(message: Bytes | string): Promise<string> is defined on AbstractSigner
   async signMessage(message: BytesLike): Promise<string> {
     const data = typeof message === 'string' && !message.startsWith('0x') ? ethers.utils.toUtf8Bytes(message) : message;

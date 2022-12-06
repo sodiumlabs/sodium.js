@@ -24,9 +24,9 @@ import { Signer } from '@0xsodium/wallet'
 import { TransactionRequest, isSignedTransaction } from '@0xsodium/transactions'
 import { signAuthorization, AuthorizationOptions } from '@0xsodium/auth'
 import { logger, TypedData } from '@0xsodium/utils'
-import { prefixEIP191Message } from '../utils'
+import { prefixEIP191Message, isWalletUpToDate } from '../utils'
 
-const SIGNER_READY_TIMEOUT = 10000
+const SIGNER_READY_TIMEOUT = 10000 
 
 export interface WalletSignInOptions {
   connect?: boolean
@@ -100,10 +100,8 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
     // NOTE: signIn can optionally connect and notify dapp at this time for new signIn flows
     if (connect) {
       const connectOptions = this._connectOptions
-
       const connectDetails = await this.connect(connectOptions)
       this.notifyConnect(connectDetails)
-
       if (!connectOptions || connectOptions.keepWalletOpened !== true) {
         this.notifyClose()
       }
@@ -162,7 +160,6 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
       // if (typeof(options.authorize) === 'object') {
       //   authOptions = { ...authOptions, ...options.authorize }
       // }
-
       try {
         connectDetails.proof = await signAuthorization(this.signer, authOptions)
       } catch (err) {
@@ -174,10 +171,8 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
         }
       }
     }
-
     // Build session response for connect details
     connectDetails.session = await this.walletSession()
-
     return connectDetails
   }
 
@@ -186,21 +181,17 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
       // this is an unexpected state and should not happen
       throw new Error('prompter connect options are empty')
     }
-
     if (!this.prompter) {
       // if prompter is null, we'll auto connect
       return this.connect(options)
     }
-
     const promptConnectDetails = await this.prompter.promptConnect(options || this._connectOptions).catch(_ => {
       return { connected: false } as ConnectDetails
     })
-
     const connectDetails: ConnectDetails = promptConnectDetails
     if (connectDetails.connected && !connectDetails.session) {
       connectDetails.session = await this.walletSession()
     }
-
     return promptConnectDetails
   }
 
@@ -332,7 +323,7 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
           if (typeof typedDataObject === 'string') {
             try {
               typedData = JSON.parse(typedDataObject)
-            } catch (e) {}
+            } catch (e) { }
           } else {
             typedData = typedDataObject
           }
@@ -509,27 +500,27 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
         }
 
         // smart wallet method
-        case 'sequence_getWalletContext': {
+        case 'sodium_getWalletContext': {
           response.result = await signer.getWalletContext()
           break
         }
 
         // smart wallet method
-        case 'sequence_getWalletConfig': {
+        case 'sodium_getWalletConfig': {
           const [chainId] = request.params!
           response.result = await signer.getWalletConfig(chainId)
           break
         }
 
         // smart wallet method
-        case 'sequence_getWalletState': {
+        case 'sodium_getWalletState': {
           const [chainId] = request.params!
           response.result = await signer.getWalletState(chainId)
           break
         }
 
         // smart wallet method
-        case 'sequence_getNetworks': {
+        case 'sodium_getNetworks': {
           // NOTE: must ensure that the response result below returns clean serialized data, which is to omit
           // the provider and relayer objects and only return the urls so can be reinstantiated on dapp side.
           // This is handled by this.getNetworks() but noted here for future readers.
@@ -538,7 +529,7 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
         }
 
         // smart wallet method
-        case 'sequence_updateConfig': {
+        case 'sodium_updateConfig': {
           throw new Error('sequence_updateConfig method is not allowed from a dapp')
           // NOTE: method is disabled as we don't need a dapp to request to update a config.
           // However, if we ever want this, we can enable it but must also use the prompter
@@ -550,31 +541,31 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
         }
 
         // smart wallet method
-        case 'sequence_publishConfig': {
-          throw new Error('sequence_publishConfig method is not allowed from a dapp')
+        case 'sodium_publishConfig': {
+          throw new Error('sodium_publishConfig method is not allowed from a dapp')
           break
         }
 
         // relayer method
-        case 'sequence_gasRefundOptions': {
+        case 'sodium_gasRefundOptions': {
           // TODO
           break
         }
 
         // relayer method
-        case 'sequence_getNonce': {
+        case 'sodium_getNonce': {
           // TODO
           break
         }
 
         // relayer method
-        case 'sequence_relay': {
+        case 'sodium_relay': {
           // TODO
           break
         }
 
         // set default network of wallet
-        case 'sequence_setDefaultNetwork': {
+        case 'sodium_setDefaultNetwork': {
           const [defaultNetworkId] = request.params!
 
           if (!defaultNetworkId) {
@@ -659,7 +650,6 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
     if (!chainId) return undefined
     this._defaultNetworkId = chainId
     this._chainId = undefined
-
     if (this.signer && (<any>this.signer).setNetworks) {
       const defaultChainId: number = (<any>this.signer).setNetworks(this.mainnetNetworks, this.testnetNetworks, chainId)
       if (defaultChainId && notifyNetworks) {
@@ -695,10 +685,10 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
     return !this.signer
       ? undefined
       : {
-          walletContext: await this.signer.getWalletContext(),
-          accountAddress: await this.signer.getAddress(),
-          networks: await this.getNetworks(true)
-        }
+        walletContext: await this.signer.getWalletContext(),
+        accountAddress: await this.signer.getAddress(),
+        networks: await this.getNetworks(true)
+      }
   }
 
   notifyConnect(connectDetails: ConnectDetails, origin?: string) {
@@ -770,17 +760,17 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
   ): Promise<boolean> {
     // check if wallet is deployed and up to date, if not, prompt user to deploy
     // if no chainId is provided, we'll assume the wallet is auth chain wallet and is up to date
-    if (!chainId) {
+    if (chainId === undefined) {
       return true
     }
-    const isUpToDate = await isWalletUpToDate(signer, chainId)
+    const isUpToDate = await isWalletUpToDate(signer, chainId!)
     if (isUpToDate) {
       return true
     }
-    const promptResult = await prompter.promptConfirmWalletDeploy(chainId, this.connectOptions)
+    const promptResult = await prompter.promptConfirmWalletDeploy(chainId!, this.connectOptions)
     // if client returned true, check again to make sure wallet is deployed and up to date
     if (promptResult) {
-      const isPromptResultCorrect = await isWalletUpToDate(signer, chainId)
+      const isPromptResultCorrect = await isWalletUpToDate(signer, chainId!)
       if (!isPromptResultCorrect) {
         logger.error('WalletRequestHandler: result for promptConfirmWalletDeploy is not correct')
         return false
@@ -797,6 +787,8 @@ export interface WalletUserPrompter {
   promptSignMessage(message: MessageToSign, options?: ConnectOptions): Promise<string>
   promptSignTransaction(txn: TransactionRequest, chaindId?: number, options?: ConnectOptions): Promise<string>
   promptSendTransaction(txn: TransactionRequest, chaindId?: number, options?: ConnectOptions): Promise<string>
+
+  // 合约部署或者更新session时调用.
   promptConfirmWalletDeploy(chainId: number, options?: ConnectOptions): Promise<boolean>
 }
 
@@ -813,7 +805,7 @@ const permittedJsonRpcMethods = [
   'eth_estimateGas',
   'eth_gasPrice',
 
-  'sequence_getWalletContext',
-  'sequence_getNetworks',
-  'sequence_setDefaultNetwork'
+  'sodium_getWalletContext',
+  'sodium_getNetworks',
+  'sodium_setDefaultNetwork'
 ]

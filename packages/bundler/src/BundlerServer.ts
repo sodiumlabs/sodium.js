@@ -1,6 +1,6 @@
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import express, { Express, Response, Request } from 'express'
+import express, { Express, Response, Request } from 'express';
 import { Provider } from '@ethersproject/providers';
 import { Wallet, utils } from 'ethers';
 import { hexlify, parseEther } from 'ethers/lib/utils';
@@ -8,6 +8,7 @@ import { erc4337RuntimeVersion } from '@0xsodium/utils';
 import { BundlerConfig } from './BundlerConfig'
 import { UserOpMethodHandler } from './UserOpMethodHandler';
 import { Server } from 'http';
+import { RpcError } from './utils';
 
 export class BundlerServer {
   app: Express
@@ -23,9 +24,8 @@ export class BundlerServer {
     this.app.use(cors())
     this.app.use(bodyParser.json())
     this.app.get('/', this.intro.bind(this))
-    this.app.post('/', this.intro.bind(this))
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    this.app.post('/rpc', this.rpc.bind(this))
+    this.app.post('/', this.rpc.bind(this))
+    console.debug("listen: ", this.config.port)
     this.httpServer = this.app.listen(this.config.port)
     this.startingPromise = this._preflightCheck()
   }
@@ -93,7 +93,7 @@ export class BundlerServer {
     }
   }
 
-  async handleMethod(method: string, params: any[]): Promise<void> {
+  async handleMethod (method: string, params: any[]): Promise<void> {
     let result: any
     switch (method) {
       case 'eth_chainId':
@@ -107,8 +107,17 @@ export class BundlerServer {
       case 'eth_sendUserOperation':
         result = await this.methodHandler.sendUserOperation(params[0], params[1])
         break
+      case 'eth_simulateUserOperation':
+        result = await this.methodHandler.simulateUserOp(params[0], params[1])
+        break
+      case 'eth_getUserOperationReceipt':
+        result = await this.methodHandler.getUserOperationReceipt(params[0])
+        break
+      case 'eth_getUserOperationTransactionByHash':
+        result = await this.methodHandler.getUserOperationTransactionByHash(params[0])
+        break
       default:
-        throw new Error(`Method ${method} is not supported`)
+        throw new RpcError(`Method ${method} is not supported`, -32601)
     }
     return result
   }

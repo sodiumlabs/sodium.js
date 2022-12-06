@@ -11,8 +11,7 @@ export type Platform = 'web' | 'mobile' | 'pc';
 export interface WalletConfig {
   address?: string
   sodiumUserId: string
-  sessionSigner: Signer
-  platform: 'web' | 'mobile' | 'pc'
+  platform: Platform
   chainId?: number
 }
 
@@ -35,21 +34,19 @@ export interface WalletState {
 
 export const createWalletConfig = async (
   sodiumUserId: string,
-  sessionSigner: Signer,
   platform: Platform
 ): Promise<WalletConfig> => {
   const config: WalletConfig = {
     sodiumUserId,
-    sessionSigner,
     platform
   }
   return config;
 }
 
-export const getWalletInitCode = (config: WalletConfig, context: WalletContext) => {
+export const getWalletInitCode = (localSigner: Signer, config: WalletConfig, context: WalletContext) => {
   const singletonInterface = Sodium__factory.createInterface();
   const sodiumSetup = singletonInterface.encodeFunctionData("setup", [
-    config.sessionSigner.getAddress(),
+    localSigner.getAddress(),
     ethers.utils.hexDataSlice(ethers.utils.id(config.platform), 0, 4),
     context.defaultHandlerAddress,
     context.entryPointAddress,

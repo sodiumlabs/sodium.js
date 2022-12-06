@@ -5,6 +5,8 @@ import { ethers } from 'ethers';
 
 const entryPointAbi = EntryPoint__factory.abi;
 
+export const AddressZero = ethers.constants.AddressZero
+
 // UserOperation is the first parameter of simulateValidation
 const UserOpType = (entryPointAbi.find(entry => (entry.name || "") === 'simulateValidation')?.inputs || [])[0];
 
