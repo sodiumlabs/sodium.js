@@ -197,6 +197,7 @@ export function decodeErrorReason(error: string): DecodedError | undefined {
       paymaster
     }
   }
+  return undefined
 }
 
 /**

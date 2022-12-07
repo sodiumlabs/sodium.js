@@ -4,8 +4,8 @@ import { WalletContext, ChainIdLike } from '@0xsodium/network'
 import { encodeMessageDigest, TypedData, encodeTypedDataDigest } from '@0xsodium/utils'
 import { WalletConfig } from '@0xsodium/config'
 import { Wallet } from '../wallet'
-import { isValidSignature, prefixEIP191Message, recoverWalletConfig } from '../utils'
-import { isValidEIP712Signature, isValidEthSignSignature } from '@0xsequence/wallet'
+import { isValidSignature, prefixEIP191Message } from '../utils'
+import { isValidEIP712Signature, isValidEthSignSignature } from '@0xsodium/wallet'
 
 export class WalletUtils {
   private wallet: Wallet

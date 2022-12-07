@@ -31,4 +31,4 @@ export type {
   ProviderRpcError,
 
   ErrSignedInRequired
-} from '@0xsequence/provider'
+} from '@0xsodium/provider'

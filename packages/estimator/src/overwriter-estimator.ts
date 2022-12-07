@@ -81,8 +81,11 @@ export class OverwriterEstimator {
     const encodedEstimate = gasEstimatorInterface.encodeFunctionData("estimate", [args.to, data])
 
     const providedOverwrites = args.overwrites ? Object.keys(args.overwrites).reduce((p, a) => {
+      if (!args.overwrites) {
+        throw Error("TODO fix typescript lint")
+      }
       const address = ethers.utils.getAddress(a)
-      const o = args.overwrites![a]
+      const o = args.overwrites[a]
 
       if (address === from) {
         throw Error("Can't overwrite from address values")

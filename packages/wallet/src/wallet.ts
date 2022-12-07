@@ -122,26 +122,7 @@ export class Wallet extends Signer {
     await this.wallet4337API.init();
   }
 
-  // useConfig creates a new Wallet instance with the provided config, and uses the current provider
-  // and relayer. It's common to initialize a counter-factual / undeployed wallet by initializing
-  // it with the Wallet's init config, then calling useConfig() with the most-up-to-date config,
-  // ie. new Wallet({ config: initConfig }).useConfig(latestConfig).useSigners(signers)
-  // useConfig(config: WalletConfig, strict?: boolean): Wallet {
-  //   return new Wallet({ config, context: this.context, strict }, ...this._signers)
-  //     .setProvider(this.provider, this.wallet4337API.b)
-  // }
-
-  // useSigners(...signers: (BytesLike | AbstractSigner)[]): Wallet {
-  //   return new Wallet({ config: this.config, context: this.context }, ...signers)
-  //     .setProvider(this.provider)
-  //     .setRelayer(this.relayer)
-  // }
-
-  // connect is a short-hand to create an Account instance and set the provider and relayer.
-  //
-  // The connect method is defined on the AbstractSigner as connect(Provider): AbstractSigner
-  // @ts-ignore
-  connect(provider: ProviderEventTypes): Wallet {
+  connect(provider: Provider): Wallet {
     if (isJsonRpcProvider(provider)) {
       return new Wallet({ config: this.config, context: this.context }, ...this._signers)
         .setProvider(provider);

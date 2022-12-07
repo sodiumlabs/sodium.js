@@ -7,5 +7,5 @@ export type {
   TransactionResponse,
   NonceDependency,
   Transactionish,
-  SignedTransactions,
+  SignedTransaction,
 } from '@0xsodium/transactions'

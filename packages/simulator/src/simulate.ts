@@ -1,4 +1,4 @@
-import { sequenceTxAbiEncode, Transaction } from '@0xsodium/transactions'
+import { sodiumTxAbiEncode, Transaction } from '@0xsodium/transactions'
 import { Interface } from '@ethersproject/abi'
 import { BigNumber } from '@ethersproject/bignumber'
 import { BlockTag, JsonRpcProvider } from '@ethersproject/providers'
@@ -14,7 +14,7 @@ export async function simulate(
   transactions: Transaction[],
   block?: BlockTag
 ): Promise<Result[]> {
-  const encodedTransactions = sequenceTxAbiEncode(transactions)
+  const encodedTransactions = sodiumTxAbiEncode(transactions)
   const data = simulatorInterface.encodeFunctionData('simulateExecute', [encodedTransactions])
   const transaction = { to: wallet, data }
   const overrides = { [wallet]: { code: simulatorBytecode } }
