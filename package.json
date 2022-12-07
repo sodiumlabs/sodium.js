@@ -1,5 +1,5 @@
 {
-  "name": "0xsodium",
+  "name": "root",
   "private": true,
   "license": "Apache-2.0",
   "scripts": {
@@ -91,6 +91,6 @@
       "packages/wallet"
     ]
   },
-  "dependencies": {},
-  "version": "0.0.2-beta"
+  "version": "0.0.2-beta",
+  "packageManager": "yarn@3.3.0"
 }

@@ -24,3 +24,4 @@ yarn-error.log*
 lerna-debug.log*
 
 .nyc_output/
+.yarn/cache

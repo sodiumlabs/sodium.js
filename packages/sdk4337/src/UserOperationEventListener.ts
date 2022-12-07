@@ -54,7 +54,7 @@ export class UserOperationEventListener {
   }
 
   async listenerCallback(this: any, ...param: any): Promise<void> {
-    const event = arguments[arguments.length - 1] as Event
+    const event = param[param.length - 1] as Event
     if (event.args == null) {
       console.error('got event without args', event)
       return

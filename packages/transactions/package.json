@@ -1,6 +1,6 @@
 {
   "name": "@0xsodium/transactions",
-  "version": "0.42.9",
+  "version": "0.2.0",
   "description": "transactions sub-package for Sequence",
   "repository": "https://github.com/sodiumlabs/sodium.js/tree/main/packages/transactions",
   "source": "src/index.ts",
@@ -14,16 +14,14 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@0xsodium/abi": "^0.2.0",
+    "@0xsodium/network": "^0.2.0",
+    "@0xsodium/sdk4337": "^0.2.0",
+    "@0xsodium/utils": "^0.2.0",
     "@0xsodium/wallet-contracts": "0.0.3-beta",
-    "@0xsodium/abi": "^0.42.9",
-    "@0xsodium/network": "^0.42.9",
-    "@0xsodium/utils": "^0.42.9",
-    "@0xsodium/sdk4337": "^0.42.9",
-    "@ethersproject/abi": "^5.5.0",
-    "ethers": "^5.5.2"
+    "@ethersproject/abi": "^5.7.0",
+    "ethers": "^5.7.0"
   },
-  "peerDependencies": {},
-  "devDependencies": {},
   "files": [
     "src",
     "dist"

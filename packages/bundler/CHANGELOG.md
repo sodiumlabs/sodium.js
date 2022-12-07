@@ -1,4 +1,4 @@
-# @0xsodium/network
+# @0xsodium/bundler
 
 ## 0.2.0
 

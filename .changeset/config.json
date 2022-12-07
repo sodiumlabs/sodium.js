@@ -7,11 +7,11 @@
   "commit": false,
   "linked": [
     [
-      "@0xsequence/*"
+      "@0xsodium/*"
     ]
   ],
   "access": "public",
-  "baseBranch": "master",
+  "baseBranch": "main",
   "ignore": [],
   "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
     "updateInternalDependents": "always"

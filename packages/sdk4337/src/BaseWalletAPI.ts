@@ -247,7 +247,7 @@ export abstract class BaseWalletAPI {
         ...partialUserOp,
         preVerificationGas: this.getPreVerificationGas(partialUserOp)
       }
-      let temp = await this.paymasterAPI.getPaymasterAndData(userOpForPm);
+      const temp = await this.paymasterAPI.getPaymasterAndData(userOpForPm);
       partialUserOp.paymasterAndData = temp ?? '0x';
     }
     return {

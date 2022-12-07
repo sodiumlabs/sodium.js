@@ -183,6 +183,7 @@ export function decodeErrorReason(error: string): DecodedError | undefined {
     const [message] = defaultAbiCoder.decode(['string'], '0x' + error.substring(10))
     return { message }
   } else if (error.startsWith(FailedOpSig)) {
+    // eslint-disable-next-line prefer-const
     let [opIndex, paymaster, message] = defaultAbiCoder.decode(['uint256', 'address', 'string'], '0x' + error.substring(10))
     message = `FailedOp: ${message as string}`
     if (paymaster.toString() !== ethers.constants.AddressZero) {

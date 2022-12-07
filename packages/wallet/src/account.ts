@@ -145,7 +145,7 @@ export class Account extends Signer {
     message: BytesLike,
     target?: Wallet | ChainIdLike,
   ): Promise<string> {
-    let { wallet } = await (async () => {
+    const { wallet } = await (async () => {
       // eslint-disable-line
       if (!target) {
         return this.mainWallet()
