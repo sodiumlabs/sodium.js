@@ -22,9 +22,8 @@ import { NetworkConfig, JsonRpcHandler, JsonRpcRequest, JsonRpcResponseCallback,
 import { Signer } from '@0xsodium/wallet';
 import { TransactionRequest, isSignedTransaction } from '@0xsodium/transactions';
 import { signAuthorization, AuthorizationOptions } from '@0xsodium/auth';
-import { logger, TypedData } from '@0xsodium/utils';
+import { logger, TypedData, AddressZero } from '@0xsodium/utils';
 import { prefixEIP191Message, isWalletUpToDate } from '../utils';
-import { AddressZero } from '@0xsodium/utils';
 
 const SIGNER_READY_TIMEOUT = 10000
 
