@@ -20,7 +20,7 @@
     "dev": "preconstruct build",
     "postinstall": "preconstruct build",
     "coverage": "rimraf ./coverage && rimraf ./.nyc_output && nyc yarn test",
-    "link-sodium": "./scripts/yarn-link.sh publish",
+    "link-sodium": "./scripts/yarn-link.sh link",
     "unlink-sodium": "./scripts/yarn-link.sh unlink",
     "start:bundler": "cd ./packages/bundler && yarn bundler",
     "prepare": "husky-run install"

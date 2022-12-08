@@ -3,7 +3,7 @@ set -eu
 
 function usage() {
   echo "Usage:"
-  echo "  $0 publish"
+  echo "  $0 link"
   echo "  $0 unlink"
   exit 1
 }
@@ -13,7 +13,7 @@ option="$1"
 shift
 
 case "$option" in
-  "publish")
+  "link")
     ;;
   "unlink")
     ;;
@@ -26,7 +26,7 @@ esac
 packages=(./packages/*)
 for p in "${packages[@]}"
 do
-  (cd $p && yarn run yalc $option)
+  (cd $p && yarn $option)
 done
 
 exit $?
