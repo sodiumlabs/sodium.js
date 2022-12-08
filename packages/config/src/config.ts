@@ -43,10 +43,10 @@ export const createWalletConfig = async (
   return config;
 }
 
-export const getWalletInitCode = (localSigner: Signer, config: WalletConfig, context: WalletContext) => {
+export const getWalletInitCode = async (localSigner: Signer, config: WalletConfig, context: WalletContext) => {
   const singletonInterface = Sodium__factory.createInterface();
   const sodiumSetup = singletonInterface.encodeFunctionData("setup", [
-    localSigner.getAddress(),
+    await localSigner.getAddress(),
     ethers.utils.hexDataSlice(ethers.utils.id(config.platform), 0, 4),
     context.defaultHandlerAddress,
     context.entryPointAddress,

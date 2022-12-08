@@ -1,5 +1,6 @@
 import { ethers, Signer, BigNumberish } from 'ethers'
 import { Transaction, TransactionRequest, Transactionish, TransactionEncoded, NonceDependency, SignedTransaction } from './types'
+import { UserOperationStruct } from '@0xsodium/wallet-contracts/gen/adapter/IWallet';
 
 type FeeData = {
   maxFeePerGas?: ethers.BigNumberish
@@ -48,6 +49,23 @@ export function flattenAuxTransactions(txs: Transactionish | Transactionish[]): 
     }
   }
   return txs.flatMap(flattenAuxTransactions)
+}
+
+export function toUserOp(signedTx: SignedTransaction): UserOperationStruct {
+  const userOp: UserOperationStruct = {
+    sender: signedTx.sender,
+    nonce: signedTx.nonce,
+    initCode: signedTx.initCode,
+    callData: signedTx.callData,
+    callGasLimit: signedTx.callGasLimit,
+    verificationGasLimit: signedTx.verificationGasLimit,
+    preVerificationGas: signedTx.preVerificationGas,
+    maxFeePerGas: signedTx.maxFeePerGas,
+    maxPriorityFeePerGas: signedTx.maxPriorityFeePerGas,
+    paymasterAndData: signedTx.paymasterAndData,
+    signature: signedTx.signature
+  };
+  return userOp;
 }
 
 export function getFeeData(txs: Transactionish | Transactionish[]): FeeData {

@@ -2,6 +2,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import express, { Express, Response, Request } from 'express';
 import { Provider } from '@ethersproject/providers';
+import { Network } from '@ethersproject/networks';
 import { Wallet, utils } from 'ethers';
 import { hexlify, parseEther } from 'ethers/lib/utils';
 import { erc4337RuntimeVersion } from '@0xsodium/utils';
@@ -13,6 +14,8 @@ import { RpcError } from './utils';
 export class BundlerServer {
   app: Express
   private readonly httpServer: Server
+
+  private networkPromise: Promise<Network> | null
 
   constructor(
     readonly methodHandler: UserOpMethodHandler,
@@ -97,8 +100,11 @@ export class BundlerServer {
     let result: any
     switch (method) {
       case 'eth_chainId':
+        if (!this.networkPromise) {
+          this.networkPromise = this.provider.getNetwork();
+        }
         // eslint-disable-next-line no-case-declarations
-        const { chainId } = await this.provider.getNetwork()
+        const { chainId } = await this.networkPromise;
         result = hexlify(chainId)
         break
       case 'eth_supportedEntryPoints':

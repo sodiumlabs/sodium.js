@@ -1,13 +1,13 @@
-import { ethers, Signer as AbstractSigner } from 'ethers'
-import { TypedDataDomain, TypedDataField } from '@ethersproject/abstract-signer'
-import { NetworkConfig, ChainIdLike, WalletContext } from '@0xsodium/network'
+import { Signer as AbstractSigner } from 'ethers';
+import { TypedDataDomain, TypedDataField } from '@ethersproject/abstract-signer';
+import { NetworkConfig, ChainIdLike, WalletContext } from '@0xsodium/network';
 import {
   SignedTransaction,
   Transactionish,
   TransactionRequest,
   Transaction
 } from '@0xsodium/transactions';
-import { JsonRpcProvider, TransactionResponse } from '@ethersproject/providers';
+import { JsonRpcProvider, TransactionResponse, TransactionReceipt } from '@ethersproject/providers';
 import { BytesLike } from '@ethersproject/bytes';
 import { WalletConfig, WalletState } from '@0xsodium/config';
 import { Deferrable } from '@0xsodium/utils';
@@ -22,6 +22,7 @@ export abstract class Signer extends AbstractSigner {
 
   abstract getNetworks(): Promise<NetworkConfig[]>
 
+  abstract waitForTransaction(transactionHash: string, confirmations?: number, timeout?: number): Promise<TransactionReceipt>;
   // getSigners returns a list of available / attached signers to the interface. Note: you need
   // enough signers in order to meet the signing threshold that satisfies a wallet config.
   // abstract getSigners(): Promise<string[]>

@@ -76,12 +76,18 @@ export class WalletAPI extends BaseWalletAPI {
 
   async encodeGasLimit(transactions: TransactionRequest): Promise<BigNumber> {
     const txs = flattenAuxTransactions(transactions);
-    return txs.reduce((c, t) => {
+    let gasLimit = txs.reduce((c, t) => {
       if (t.gasLimit) {
         return c.add(t.gasLimit);
       }
       return c;
     }, BigNumber.from(0));
+    if (gasLimit.eq(0)) {
+      // TODO
+      // Update entrypoint contract, if gasLimit eq 0. no check
+      gasLimit = gasLimit.add(2e7);
+    }
+    return gasLimit.add(10000);
   }
 
   async signRequestId(requestId: string): Promise<string> {

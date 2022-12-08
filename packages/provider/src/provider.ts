@@ -21,10 +21,8 @@ import { resolveArrayProperties, Signer } from '@0xsodium/wallet'
 import { WalletConfig, WalletState } from '@0xsodium/config'
 import { Deferrable, shallowCopy, resolveProperties, Forbid } from '@0xsodium/utils'
 import {
-  Transaction,
   TransactionRequest,
   TransactionResponse,
-  Transactionish,
   SignedTransaction
 } from '@0xsodium/transactions'
 import { WalletRequestHandler } from './transports/wallet-request-handler'
@@ -130,6 +128,10 @@ export class Web3Signer extends Signer implements TypedDataSigner {
     throw new Error('unsupported: cannot alter JSON-RPC Signer connection')
   }
 
+  waitForTransaction(transactionHash: string, confirmations?: number | undefined, timeout?: number | undefined): Promise<ethers.providers.TransactionReceipt> {
+    throw new Error('Method not implemented.')
+  }
+
   //
   // Sequence Signer methods
   //
@@ -166,14 +168,14 @@ export class Web3Signer extends Signer implements TypedDataSigner {
 
   async getWalletContext(): Promise<WalletContext> {
     if (!this._context) {
-      this._context = await this.provider.send('sequence_getWalletContext', [])
+      this._context = await this.provider.send('sodium_getWalletContext', [])
     }
     return this._context
   }
 
   async getWalletConfig(chainId?: ChainIdLike): Promise<WalletConfig[]> {
     return await this.provider.send(
-      'sequence_getWalletConfig',
+      'sodium_getWalletConfig',
       [maybeChainId(chainId)],
       maybeChainId(chainId) || this.defaultChainId
     )
@@ -181,7 +183,7 @@ export class Web3Signer extends Signer implements TypedDataSigner {
 
   async getWalletState(chainId?: ChainIdLike): Promise<WalletState[]> {
     return await this.provider.send(
-      'sequence_getWalletState',
+      'sodium_getWalletState',
       [maybeChainId(chainId)],
       maybeChainId(chainId) || this.defaultChainId
     )
@@ -189,26 +191,10 @@ export class Web3Signer extends Signer implements TypedDataSigner {
 
   async getNetworks(): Promise<NetworkConfig[]> {
     if (!this._networks) {
-      this._networks = await this.provider.send('sequence_getNetworks', [])
+      this._networks = await this.provider.send('sodium_getNetworks', [])
     }
     return this._networks
   }
-
-  // async getSigners(): Promise<string[]> {
-  //   const networks = await this.getNetworks()
-
-  //   const authChainId = networks.find(n => n.isAuthChain)
-  //   if (!authChainId) {
-  //     throw new Error('authChainId could not be determined from network list')
-  //   }
-
-  //   const walletConfig = await this.getWalletConfig(authChainId)
-  //   if (!walletConfig || walletConfig.length === 0) {
-  //     throw new Error(`walletConfig returned zero results for authChainId {authChainId}`)
-  //   }
-
-  //   return walletConfig[0].signers.map(s => s.address)
-  // }
 
   // signMessage matches implementation from ethers JsonRpcSigner for compatibility, but with
   // multi-chain support.
@@ -230,8 +216,7 @@ export class Web3Signer extends Signer implements TypedDataSigner {
     domain: TypedDataDomain,
     types: Record<string, Array<TypedDataField>>,
     message: Record<string, any>,
-    chainId?: ChainIdLike,
-    allSigners?: boolean
+    chainId?: ChainIdLike
   ): Promise<string> {
     // Populate any ENS names (in-place)
     // const populated = await ethers.utils._TypedDataEncoder.resolveNames(domain, types, message, (name: string) => {
@@ -249,8 +234,7 @@ export class Web3Signer extends Signer implements TypedDataSigner {
   // multi-chain support.
   async sendTransaction(
     transaction: Deferrable<TransactionRequest>,
-    chainId?: ChainIdLike,
-    allSigners?: boolean
+    chainId?: ChainIdLike
   ): Promise<TransactionResponse> {
     const provider = await this.getSender(maybeChainId(chainId) || this.defaultChainId)
 
@@ -281,8 +265,7 @@ export class Web3Signer extends Signer implements TypedDataSigner {
   // send multiple transaction as a single payload and just one on-chain transaction.
   async sendTransactionBatch(
     transactions: Deferrable<Forbid<TransactionRequest, 'wait'>[]>,
-    chainId?: ChainIdLike,
-    allSigners?: boolean
+    chainId?: ChainIdLike
   ): Promise<TransactionResponse> {
     const batch = await resolveArrayProperties<Forbid<TransactionRequest, 'wait'>[]>(transactions)
     if (!batch || batch.length === 0) {
@@ -299,13 +282,12 @@ export class Web3Signer extends Signer implements TypedDataSigner {
       tx.auxiliary = batch.splice(1)
     }
 
-    return this.sendTransaction(tx, chainId, allSigners)
+    return this.sendTransaction(tx, chainId)
   }
 
   signTransactions(
     transaction: Deferrable<TransactionRequest>,
-    chainId?: ChainIdLike,
-    allSigners?: boolean
+    chainId?: ChainIdLike
   ): Promise<SignedTransaction> {
     transaction = shallowCopy(transaction)
     // TODO: transaction argument..? make sure to resolve any properties and serialize property before sending over
@@ -318,31 +300,6 @@ export class Web3Signer extends Signer implements TypedDataSigner {
     throw new Error('TODO')
   }
 
-  // updateConfig..
-  // NOTE: this is not supported by the remote wallet by default.
-  async updateConfig(newConfig?: WalletConfig): Promise<[WalletConfig, TransactionResponse | undefined]> {
-    // sequence_updateConfig
-    const [config, tx] = await this.provider.send('sequence_updateConfig', [newConfig], this.defaultChainId)
-    if (tx === null) {
-      return [config, undefined]
-    }
-
-    const provider = await this.getSender(this.defaultChainId)
-    return [config, provider!._wrapTransaction(tx, tx.hash)]
-  }
-
-  // publishConfig..
-  // NOTE: this is not supported by the remote wallet by default.
-  async publishConfig(): Promise<TransactionResponse | undefined> {
-    const provider = await this.getSender(this.defaultChainId)
-
-    const tx = await provider!.send('sequence_publishConfig', [])
-    if (tx === null) {
-      return undefined
-    }
-    return provider!._wrapTransaction(tx, tx.hash)
-  }
-
   async isDeployed(chainId?: ChainIdLike): Promise<boolean> {
     const provider = await this.getSender(maybeChainId(chainId))
     const walletCode = await provider!.getCode(await this.getAddress())
@@ -352,7 +309,6 @@ export class Web3Signer extends Signer implements TypedDataSigner {
   //
   // ethers JsonRpcSigner methods
   //
-
   async _legacySignMessage(message: Bytes | string, chainId?: ChainIdLike, allSigners?: boolean): Promise<string> {
     const provider = await this.getSender(maybeChainId(chainId) || this.defaultChainId)
 
@@ -368,15 +324,14 @@ export class Web3Signer extends Signer implements TypedDataSigner {
     domain: TypedDataDomain,
     types: Record<string, Array<TypedDataField>>,
     message: Record<string, any>,
-    chainId?: ChainIdLike,
-    allSigners?: boolean
+    chainId?: ChainIdLike
   ): Promise<string> {
-    return this.signTypedData(domain, types, message, chainId, allSigners)
+    return this.signTypedData(domain, types, message, chainId)
   }
 
   async sendUncheckedTransaction(transaction: Deferrable<TransactionRequest>, chainId?: ChainIdLike): Promise<string> {
     transaction = shallowCopy(transaction)
-
+    
     const fromAddress = this.getAddress()
 
     // NOTE: we do not use provider estimation, and instead rely on our relayer to determine the gasLimit and gasPrice

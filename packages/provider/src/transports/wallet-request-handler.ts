@@ -16,7 +16,7 @@ import {
   TypedEventEmitter
 } from '../types'
 
-import { BigNumber, ethers } from 'ethers'
+import { ethers, utils } from 'ethers'
 import { ExternalProvider } from '@ethersproject/providers'
 
 import { NetworkConfig, JsonRpcHandler, JsonRpcRequest, JsonRpcResponseCallback, JsonRpcResponse } from '@0xsodium/network'
@@ -252,8 +252,8 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
         }
 
         case 'eth_chainId': {
-          const result = await provider.send('eth_chainId', [])
-          response.result = result
+          const chainId = await this.getChainId();
+          response.result = utils.hexlify(chainId);
           break
         }
 
@@ -499,6 +499,16 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
           break
         }
 
+        case 'sodium_getTokens': {
+
+        }
+
+        case 'sodium_getTokenRates': {
+          return [
+            
+          ];
+        }
+
         // smart wallet method
         case 'sodium_getWalletContext': {
           response.result = await signer.getWalletContext()
@@ -580,20 +590,46 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
           break
         }
 
+        case 'sodium_waitForTransaction': {
+          const [txHash, confirmations, timeout] = request.params!
+          const result = await signer.waitForTransaction(txHash, confirmations, timeout);
+          response.result = result;
+          break
+        }
+
         default: {
           // NOTE: provider here will be chain-bound if chainId is provided
           const providerResponse = await provider.send(request.method, request.params!)
           response.result = providerResponse
         }
       }
-    } catch (err) {
+    } catch (err: any) {
       logger.error(err)
 
       // See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1193.md#rpc-errors
       response.result = null
-      response.error = {
-        ...new Error(err),
-        code: 4001
+
+      if (typeof err == "string") {
+        response.error = {
+          name: "rpc-error",
+          message: err,
+          code: 4001
+        }
+      } else if (typeof err == "object") {
+        response.error = {
+          name: "rpc-error",
+          message: err.toString(),
+          code: 4001
+        }
+
+        if ("stack" in err) {
+          response.error.stack = err.stack;
+        }
+      } else {
+        response.error = {
+          ...err,
+          code: 4001
+        }
       }
     }
 

@@ -33,12 +33,11 @@ export class WalletUtils {
     domain: TypedDataDomain,
     types: Record<string, Array<TypedDataField>>,
     message: Record<string, any>,
-    chainId?: ChainIdLike,
-    allSigners?: boolean
+    chainId?: ChainIdLike
   ): Promise<string> {
     const signer = this.wallet.getSigner()
     if (!signer) throw new Error('unable to get signer')
-    return signer.signTypedData(domain, types, message, chainId, allSigners)
+    return signer.signTypedData(domain, types, message, chainId)
   }
 
   // Sign EIP-712 TypedData on the AuthChain
@@ -50,7 +49,7 @@ export class WalletUtils {
   ): Promise<string> {
     const signer = await this.wallet.getAuthSigner()
     if (!signer) throw new Error('unable to get AuthChain signer')
-    return signer.signTypedData(domain, types, message, await signer.getChainId(), allSigners)
+    return signer.signTypedData(domain, types, message, await signer.getChainId())
   }
 
   // Verify signature of a digest, one of a message, typedData or other

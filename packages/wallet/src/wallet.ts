@@ -1,9 +1,9 @@
 import { Provider, BlockTag, JsonRpcProvider, TransactionResponse } from '@ethersproject/providers'
-import { BigNumber, BigNumberish, ethers, Signer as AbstractSigner } from 'ethers'
-import { TypedDataDomain, TypedDataField } from '@ethersproject/abstract-signer'
-import { BytesLike } from '@ethersproject/bytes'
-import { Deferrable } from '@ethersproject/properties'
-import { ConnectionInfo } from '@ethersproject/web'
+import { BigNumber, BigNumberish, ethers, Signer as AbstractSigner } from 'ethers';
+import { TypedDataDomain, TypedDataField } from '@ethersproject/abstract-signer';
+import { BytesLike } from '@ethersproject/bytes';
+import { Deferrable } from '@ethersproject/properties';
+import { ConnectionInfo } from '@ethersproject/web';
 import {
   decodeNonce,
   Transactionish,
@@ -22,7 +22,7 @@ import {
   sodiumContext,
   getChainId,
   networks
-} from '@0xsodium/network'
+} from '@0xsodium/network';
 
 import {
   WalletConfig,
@@ -31,11 +31,11 @@ import {
   sortConfig,
   compareAddr,
   imageHash,
-} from '@0xsodium/config'
-import { encodeTypedDataDigest, subDigestOf } from '@0xsodium/utils'
-import { RemoteSigner } from './remote-signers'
-import { resolveArrayProperties } from './utils'
-import { Signer } from './signer'
+} from '@0xsodium/config';
+import { encodeTypedDataDigest, subDigestOf } from '@0xsodium/utils';
+import { RemoteSigner } from './remote-signers';
+import { resolveArrayProperties } from './utils';
+import { Signer } from './signer';
 import { ProviderEventTypes } from '@0xsodium/provider'
 
 // Wallet is a signer interface to a Smart Contract based Ethereum account.
@@ -129,6 +129,10 @@ export class Wallet extends Signer {
     } else {
       throw new Error('Wallet provider argument is expected to be a JsonRpcProvider')
     }
+  }
+
+  waitForTransaction(transactionHash: string, confirmations?: number | undefined, timeout?: number | undefined): Promise<ethers.providers.TransactionReceipt> {
+    return this.wallet4337API.waitForTransaction(transactionHash, confirmations, timeout);
   }
 
   setBundler(bundlerUrl: string, chainId: number): Wallet {
@@ -259,12 +263,14 @@ export class Wallet extends Signer {
     chainId?: ChainIdLike,
     waitForReceipt?: boolean
   ): Promise<TransactionResponse> {
-    // this.wallet4337API.send
     const signedTxs = await this.signTransactions(transaction, chainId);
+    // TODO
+    // Now you need to force to wait for eip4337 transaction execution, and later support 4337 request id and tx hash query
     const tr = await this.wallet4337API.sendSignedTransaction(signedTxs);
-    if (waitForReceipt) {
-      await tr.wait();
-    }
+    const receipt = await tr.wait();
+
+    console.debug(receipt.transactionHash, "receipt.transactionHash")
+    tr.hash = receipt.transactionHash;
     return tr;
   }
 

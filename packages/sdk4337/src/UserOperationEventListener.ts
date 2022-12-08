@@ -1,12 +1,13 @@
-import { BigNumberish, Event } from 'ethers'
-import { TransactionReceipt } from '@ethersproject/providers'
-import { EntryPoint } from '@0xsodium/wallet-contracts'
-import { defaultAbiCoder } from 'ethers/lib/utils'
-import Debug from 'debug'
+import { BigNumberish, Event } from 'ethers';
+import { TransactionReceipt } from '@ethersproject/providers';
+import { EntryPoint } from '@0xsodium/wallet-contracts';
+import { UserOperationEventEventObject } from '@0xsodium/wallet-contracts/gen/IEntryPoint';
+import { defaultAbiCoder } from 'ethers/lib/utils';
+import Debug from 'debug';
 
 const debug = Debug('aa.listener')
 
-const DEFAULT_TRANSACTION_TIMEOUT: number = 10000
+const DEFAULT_TRANSACTION_TIMEOUT: number = 1000 * 120;
 
 /**
  * This class encapsulates Ethers.js listener function and necessary UserOperation details to
@@ -41,7 +42,8 @@ export class UserOperationEventListener {
     setTimeout(async () => {
       const res = await this.entryPoint.queryFilter(filter, 'latest')
       if (res.length > 0) {
-        void this.listenerCallback(res[0])
+        console.debug("filter: ");
+        void this.boundLisener(res[0])
       } else {
         this.entryPoint.once(filter, this.boundLisener)
       }
@@ -53,20 +55,38 @@ export class UserOperationEventListener {
     this.entryPoint.off('UserOperationEvent', this.boundLisener)
   }
 
-  async listenerCallback(this: any, ...param: any): Promise<void> {
-    const event = param[param.length - 1] as Event
+  async listenerCallback(...params: any): Promise<void> {
+    const [userOpHash, sender, paymaster, nonce, actualGasCost, actualGasPrice, success, block] = params;
+    const event = {
+      args: {
+        userOpHash,
+        sender,
+        paymaster,
+        nonce,
+        actualGasCost,
+        actualGasPrice,
+        success,
+        block
+      }
+    }
+
     if (event.args == null) {
       console.error('got event without args', event)
       return
     }
+
     // TODO: can this happen? we register to event by requestId..
-    if (event.args.requestId !== this.requestId) {
-      console.log(`== event with wrong requestId: sender/nonce: event.${event.args.sender as string}@${event.args.nonce.toString() as string}!= userOp.${this.sender as string}@${parseInt(this.nonce?.toString())}`)
+    if (event.args.userOpHash !== this.requestId) {
+      // console.debug(event.args.userOpHash !== this.requestId, event.args.userOpHash, this.requestId);
+      console.log(`== event with wrong requestId: sender/nonce: event.${event.args.sender as string}@${event.args.nonce.toString() as string}!= userOp.${this.sender as string}@${parseInt(this.nonce ? this.nonce.toString() : "")}`)
       return
     }
 
-    const transactionReceipt = await event.getTransactionReceipt()
-    transactionReceipt.transactionHash = this.requestId
+    const transactionReceipt = await block.getTransactionReceipt()
+
+    // TODO
+    // wait transaction by requestId
+    // transactionReceipt.transactionHash = this.requestId
     debug('got event with status=', event.args.success, 'gasUsed=', transactionReceipt.gasUsed)
 
     // before returning the receipt, update the status from the event.

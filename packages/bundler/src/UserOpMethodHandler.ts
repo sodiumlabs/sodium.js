@@ -133,20 +133,23 @@ export class UserOpMethodHandler {
     const beneficiary = await this.selectBeneficiary()
     const userOpHash = await this.entryPoint.getUserOpHash(userOp)
 
-    // TODO: this is only printing debug info, remove once not necessary
-    // await this.printGasEstimationDebugInfo(userOp, beneficiary)
-
     const expectedPreVerificationGas = calcPreVerificationGas(userOp)
     const preVerificationGas = BigNumber.from(await userOp.preVerificationGas).toNumber()
     if (expectedPreVerificationGas > preVerificationGas) {
       throw new Error(`userOp.preVerificationGas too low: expected ${expectedPreVerificationGas} but got ${preVerificationGas}`)
     }
 
-    const gasLimit = undefined
-    debug('using gasLimit=', gasLimit)
-    await this.entryPoint.handleOps([userOp], beneficiary, { gasLimit }).catch(rethrowError)
+    // const gasLimit = BigNumber.from(userOp.callGasLimit).add(2e7);
+    const gasLimit = undefined;
+    // debug('using gasLimit=', gasLimit)
+    const txr = await this.entryPoint.handleOps([userOp], beneficiary, { 
+      gasLimit,
+      maxFeePerGas: userOp.maxFeePerGas,
+      maxPriorityFeePerGas: userOp.maxPriorityFeePerGas
+    }).catch(rethrowError)
 
-    // await postExecutionDump(this.entryPoint, userOpHash)
+    console.debug(txr.hash, "txhash");
+    
     return userOpHash
   }
 

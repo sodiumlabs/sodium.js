@@ -2,6 +2,7 @@ import { ethers, BigNumber, BigNumberish } from 'ethers';
 import { Provider, TransactionReceipt, TransactionResponse } from '@ethersproject/providers';
 import {
   EntryPoint, EntryPoint__factory,
+  SenderCreator, SenderCreator__factory
 } from '@0xsodium/wallet-contracts';
 import type {
   UserOperationStruct
@@ -11,7 +12,7 @@ import { hexValue, resolveProperties } from 'ethers/lib/utils';
 import { PaymasterAPI } from './PaymasterAPI';
 import { getRequestId, NotPromise, packUserOp } from '@0xsodium/utils';
 import { calcPreVerificationGas, GasOverheads } from './calcPreVerificationGas';
-import { getFeeData, SignedTransaction, flattenAuxTransactions } from '@0xsodium/transactions';
+import { getFeeData, toUserOp, SignedTransaction, flattenAuxTransactions } from '@0xsodium/transactions';
 import { HttpRpcClient } from './HttpRpcClient';
 import { WalletConfig } from '@0xsodium/config';
 import { WalletContext } from '@0xsodium/network';
@@ -64,9 +65,11 @@ export abstract class BaseWalletAPI {
    * subclass SHOULD add parameters that define the owner (signer) of this wallet
    */
   protected constructor(params: BaseApiParams) {
-    this.overheads = params.overheads
-    this.entryPointAddress = params.entryPointAddress
-    this.paymasterAPI = params.paymasterAPI
+    this.overheads = params.overheads;
+    this.entryPointAddress = params.entryPointAddress;
+    this.walletConfig = params.config;
+    this.walletContext = params.context;
+    this.paymasterAPI = params.paymasterAPI;
   }
 
   async init(): Promise<this> {
@@ -131,7 +134,7 @@ export abstract class BaseWalletAPI {
    * calculate the wallet address even before it is deployed
    */
   async getCounterFactualAddress(): Promise<string> {
-    const initCode = this.getWalletInitCode()
+    const initCode = await this.getWalletInitCode()
     // use entryPoint to query wallet address (factory can provide a helper method to do the same, but
     // this method attempts to be generic
     return await this.entryPoint.callStatic.getSenderAddress(initCode)
@@ -187,7 +190,7 @@ export abstract class BaseWalletAPI {
    * @param userOp userOperation, (signature field ignored)
    */
   async getRequestId(userOp: UserOperationStruct, chainId: number): Promise<string> {
-    const op = await resolveProperties(userOp)
+    const op = await resolveProperties(userOp);
     return getRequestId(op, this.entryPointAddress, chainId)
   }
 
@@ -211,12 +214,22 @@ export abstract class BaseWalletAPI {
       callData,
       callGasLimit
     } = await this.encodeUserOpCallDataAndGasLimit(info)
-    const initCode = await this.getInitCode()
+    const initCode = await this.getInitCode();
     let verificationGasLimit = BigNumber.from(await this.getVerificationGasLimit())
     if (initCode.length > 2) {
       // add creation to required verification gas
-      const initGas = await this.entryPoint.estimateGas.getSenderAddress(initCode)
-      verificationGasLimit = verificationGasLimit.add(initGas)
+      const senderCreatorAddress = this.walletContext.walletCreatorAddress;
+      const senderCreator = SenderCreator__factory.connect(senderCreatorAddress, this.provider);
+      const data = senderCreator.interface.encodeFunctionData("createSender", [
+        initCode,
+      ]);
+      const initEstimate = await this.provider.estimateGas({
+        from: this.walletContext.entryPointAddress,
+        to: senderCreatorAddress,
+        data: data,
+        gasLimit: 10e6
+      })
+      verificationGasLimit = verificationGasLimit.add(initEstimate)
     }
     let {
       maxFeePerGas,
@@ -224,11 +237,13 @@ export abstract class BaseWalletAPI {
     } = getFeeData(info);
     if (maxFeePerGas == null || maxPriorityFeePerGas == null) {
       const feeData = await this.provider.getFeeData()
+
+      // TODO. how to fast send tx.
       if (maxFeePerGas == null) {
-        maxFeePerGas = feeData.maxFeePerGas ?? 0
+        maxFeePerGas = feeData.maxFeePerGas ? feeData.maxFeePerGas.mul(2) : 0
       }
       if (maxPriorityFeePerGas == null) {
-        maxPriorityFeePerGas = feeData.maxPriorityFeePerGas ?? 0
+        maxPriorityFeePerGas = feeData.maxPriorityFeePerGas ? feeData.maxPriorityFeePerGas.mul(2) : 0
       }
     }
     const partialUserOp: any = {
@@ -240,6 +255,7 @@ export abstract class BaseWalletAPI {
       verificationGasLimit,
       maxFeePerGas,
       maxPriorityFeePerGas,
+      paymasterAndData: '0x'
     }
     if (this.paymasterAPI != null) {
       // fill (partial) preVerificationGas (all except the cost of the generated paymasterAndData)
@@ -253,7 +269,7 @@ export abstract class BaseWalletAPI {
     return {
       ...partialUserOp,
       preVerificationGas: this.getPreVerificationGas(partialUserOp),
-      signature: ''
+      signature: '0x'
     };
   }
 
@@ -331,9 +347,10 @@ export abstract class BaseWalletAPI {
   }
 
   async sendSignedTransaction(tx: SignedTransaction) {
-    const transactionResponse = await this.constructUserOpTransactionResponse(tx)
+    const userOp = toUserOp(tx);
+    const transactionResponse = await this.constructUserOpTransactionResponse(userOp)
     try {
-      await this.httpRpcClient.sendUserOpToBundler(tx)
+      await this.httpRpcClient.sendUserOpToBundler(userOp)
     } catch (error: any) {
       throw this.unwrapError(error)
     }
@@ -346,7 +363,7 @@ export abstract class BaseWalletAPI {
     const sender = await this.getWalletAddress();
     return await new Promise<TransactionReceipt>((resolve, reject) => {
       new UserOperationEventListener(
-        resolve, reject, this.entryPoint, sender, requestId
+        resolve, reject, this.entryPoint, sender, requestId,
       ).start()
     })
   }
@@ -362,12 +379,8 @@ export abstract class BaseWalletAPI {
   // fabricate a response in a format usable by ethers users...
   async constructUserOpTransactionResponse(userOp1: UserOperationStruct): Promise<TransactionResponse> {
     const userOp = await resolveProperties(userOp1)
-    const requestId = getRequestId(userOp, this.entryPointAddress, this.chainId)
-    const waitPromise = new Promise<TransactionReceipt>((resolve, reject) => {
-      new UserOperationEventListener(
-        resolve, reject, this.entryPoint, userOp.sender, requestId, userOp.nonce
-      ).start()
-    })
+    const requestId = getRequestId(userOp, this.entryPointAddress, this.chainId);
+    let waitPromise: Promise<TransactionReceipt> | null
     return {
       hash: requestId,
       confirmations: 0,
@@ -375,9 +388,16 @@ export abstract class BaseWalletAPI {
       nonce: BigNumber.from(userOp.nonce).toNumber(),
       gasLimit: BigNumber.from(userOp.callGasLimit), // ??
       value: BigNumber.from(0),
-      data: hexValue(userOp.callData), // should extract the actual called method from this "execFromEntryPoint()" call
+      data: hexValue(userOp.callData.toString()), // should extract the actual called method from this "execFromEntryPoint()" call
       chainId: this.chainId,
       wait: async (confirmations?: number): Promise<TransactionReceipt> => {
+        if (!waitPromise) {
+          waitPromise = new Promise<TransactionReceipt>((resolve, reject) => {
+            new UserOperationEventListener(
+              resolve, reject, this.entryPoint, userOp.sender, requestId, userOp.nonce
+            ).start()
+          });
+        }
         const transactionReceipt = await waitPromise
         if (userOp.initCode.length !== 0) {
           // checking if the wallet has been deployed by the transaction; it must be if we are here

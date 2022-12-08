@@ -37,8 +37,10 @@ export class JsonRpcSender implements JsonRpcHandler {
             (error: any, response?: JsonRpcResponse) => {
               if (error) {
                 reject(error)
-              } else if (response) {
+              } else if (response && response.result) {
                 resolve(response.result)
+              } else if (response && response.error) {
+                reject(response.error)
               } else {
                 resolve(undefined)
               }

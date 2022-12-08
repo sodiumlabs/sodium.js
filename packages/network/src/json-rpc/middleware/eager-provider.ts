@@ -48,7 +48,7 @@ export class EagerProvider implements JsonRpcMiddlewareHandler {
           }
           break
 
-        case 'sequence_getWalletContext':
+        case 'sodium_getWalletContext':
           if (this.props.walletContext) {
             callback(undefined, { jsonrpc: '2.0', id: id!, result: this.props.walletContext })
             return
