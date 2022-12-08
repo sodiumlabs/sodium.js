@@ -26,6 +26,7 @@ import {
   SignedTransaction
 } from '@0xsodium/transactions'
 import { WalletRequestHandler } from './transports/wallet-request-handler'
+import { UserTokenInfo } from './types';
 
 export class Web3Provider extends EthersWeb3Provider implements JsonRpcHandler {
   static isSodiumProvider(cand: any): cand is Web3Provider {
@@ -177,6 +178,28 @@ export class Web3Signer extends Signer implements TypedDataSigner {
     return await this.provider.send(
       'sodium_getWalletConfig',
       [maybeChainId(chainId)],
+      maybeChainId(chainId) || this.defaultChainId
+    )
+  }
+
+  async getTokens(walletAddress?: string, chainId?: ChainIdLike): Promise<UserTokenInfo[]> {
+    return this.provider.send(
+      'sodium_getTokens',
+      [
+        walletAddress,
+        maybeChainId(chainId)
+      ],
+      maybeChainId(chainId) || this.defaultChainId
+    )
+  }
+
+  async getTokenRates(tokenAddress: string[], chainId?: ChainIdLike): Promise<number[]> {
+    return this.provider.send(
+      'sodium_getTokenRates',
+      [
+        tokenAddress,
+        maybeChainId(chainId)
+      ],
       maybeChainId(chainId) || this.defaultChainId
     )
   }

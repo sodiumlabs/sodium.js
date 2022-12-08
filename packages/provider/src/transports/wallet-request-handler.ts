@@ -1,4 +1,4 @@
-import { EventEmitter2 as EventEmitter } from 'eventemitter2'
+import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 
 import {
   ProviderMessageRequest,
@@ -13,20 +13,20 @@ import {
   OpenWalletIntent,
   ErrSignedInRequired,
   ProviderEventTypes,
-  TypedEventEmitter
-} from '../types'
+  TypedEventEmitter,
+  UserTokenInfo
+} from '../types';
+import { ethers, utils, FixedNumber } from 'ethers';
+import { ExternalProvider } from '@ethersproject/providers';
+import { NetworkConfig, JsonRpcHandler, JsonRpcRequest, JsonRpcResponseCallback, JsonRpcResponse } from '@0xsodium/network';
+import { Signer } from '@0xsodium/wallet';
+import { TransactionRequest, isSignedTransaction } from '@0xsodium/transactions';
+import { signAuthorization, AuthorizationOptions } from '@0xsodium/auth';
+import { logger, TypedData } from '@0xsodium/utils';
+import { prefixEIP191Message, isWalletUpToDate } from '../utils';
+import { AddressZero } from '@0xsodium/utils';
 
-import { ethers, utils } from 'ethers'
-import { ExternalProvider } from '@ethersproject/providers'
-
-import { NetworkConfig, JsonRpcHandler, JsonRpcRequest, JsonRpcResponseCallback, JsonRpcResponse } from '@0xsodium/network'
-import { Signer } from '@0xsodium/wallet'
-import { TransactionRequest, isSignedTransaction } from '@0xsodium/transactions'
-import { signAuthorization, AuthorizationOptions } from '@0xsodium/auth'
-import { logger, TypedData } from '@0xsodium/utils'
-import { prefixEIP191Message, isWalletUpToDate } from '../utils'
-
-const SIGNER_READY_TIMEOUT = 10000 
+const SIGNER_READY_TIMEOUT = 10000
 
 export interface WalletSignInOptions {
   connect?: boolean
@@ -500,13 +500,39 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
         }
 
         case 'sodium_getTokens': {
-
+          // testnet mock
+          // mainnet using https://tokenlists.org/
+          response.result = [
+            {
+              "address": AddressZero,
+              "chainId": 1337,
+              "isNativeToken": true,
+              "name": "Polygon",
+              "symbol": "MATIC",
+              "decimals": 18,
+              "logoURI": "https://tokens.1inch.io/0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0.png"
+            },
+            {
+              "address": "0x5A0585D409ca86d9Fa771690ea37d32405Da1f67",
+              "chainId": 1337,
+              "name": "PieDAOBTC++",
+              "symbol": "BTC",
+              "decimals": 18,
+              "logoURI": "https://tokens.1inch.io/0x0327112423f3a68efdf1fcf402f6c5cb9f7c33fd.png"
+            }
+          ] as UserTokenInfo[];
+          break;
         }
 
         case 'sodium_getTokenRates': {
-          return [
-            
-          ];
+          const [ tokenAddressList ] = request.params!
+
+          // testnet mock
+          // mainnet using https://www.coingecko.com/api/documentations/v3#/simple/get_simple_price
+          response.result = tokenAddressList.map(() => {
+            return 0.00018314;
+          });
+          break;
         }
 
         // smart wallet method

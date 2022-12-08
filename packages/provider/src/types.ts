@@ -105,6 +105,16 @@ export enum EventType {
   DEBUG = '_debug'
 }
 
+export type UserTokenInfo = {
+  address: string,
+  chainId: number,
+  isNativeToken?: true,
+  name: string,
+  symbol: string,
+  decimals: number,
+  logoURI: string,
+}
+
 export interface WalletEventTypes {
   open: (openInfo: { chainId?: string; sessionId?: string; session?: WalletSession; error?: string }) => void
   close: (error?: ProviderRpcError) => void
