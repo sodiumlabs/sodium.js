@@ -3,10 +3,11 @@
   "private": true,
   "license": "Apache-2.0",
   "scripts": {
+    "preinstall": "bash ./scripts/clear-node_modules.sh",
     "build": "yarn dev && yarn typecheck && preconstruct build && yarn post-build",
     "post-build": "node ./scripts/fix-mocha-ref.js",
     "watch": "preconstruct watch",
-    "clean": "rimraf ./node_modules",
+    "clean": "rimraf ./node_modules && bash ./scripts/clear-node_modules.sh",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "yarn build && changeset publish",

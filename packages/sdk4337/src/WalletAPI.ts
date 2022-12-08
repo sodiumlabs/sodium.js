@@ -8,7 +8,7 @@ import { Signer } from '@ethersproject/abstract-signer'
 import { BaseApiParams, BaseWalletAPI } from './BaseWalletAPI'
 import { TransactionDetailsForUserOp } from './TransactionDetailsForUserOp';
 import { TransactionRequest, flattenAuxTransactions, sodiumTxAbiEncode } from '@0xsodium/transactions';
-import { getWalletInitCode, WalletConfig } from '@0xsodium/config';
+import { getWalletInitCode } from '@0xsodium/config';
 
 /**
  * constructor params, added no top of base params:
