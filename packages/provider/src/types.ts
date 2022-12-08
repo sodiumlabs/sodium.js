@@ -1,5 +1,6 @@
-import { NetworkConfig, WalletContext, JsonRpcRequest, JsonRpcResponse, JsonRpcHandler } from '@0xsodium/network'
-import { TypedData } from '@0xsodium/utils'
+import { NetworkConfig, WalletContext, JsonRpcRequest, JsonRpcResponse, JsonRpcHandler } from '@0xsodium/network';
+import { TypedData } from '@0xsodium/utils';
+import { BigNumber } from 'ethers';
 
 export interface ProviderTransport extends JsonRpcHandler, ProviderMessageTransport, ProviderMessageRequestHandler {
   register(): void
@@ -108,6 +109,7 @@ export enum EventType {
 export type UserTokenInfo = {
   address: string,
   chainId: number,
+  balance: BigNumber,
   isNativeToken?: true,
   name: string,
   symbol: string,

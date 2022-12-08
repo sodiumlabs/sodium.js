@@ -16,7 +16,7 @@ import {
   TypedEventEmitter,
   UserTokenInfo
 } from '../types';
-import { ethers, utils, FixedNumber } from 'ethers';
+import { ethers, utils, FixedNumber, BigNumber } from 'ethers';
 import { ExternalProvider } from '@ethersproject/providers';
 import { NetworkConfig, JsonRpcHandler, JsonRpcRequest, JsonRpcResponseCallback, JsonRpcResponse } from '@0xsodium/network';
 import { Signer } from '@0xsodium/wallet';
@@ -226,7 +226,7 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
       result: null
     }
 
-    await this.getSigner()
+    await this.getSigner();
 
     try {
       // only allow public json rpc method to the provider when user is not logged in, aka signer is not set
@@ -501,23 +501,28 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
         case 'sodium_getTokens': {
           // testnet mock
           // mainnet using https://tokenlists.org/
+          const address = await this.getAddress();
+          const nativeTokenBalance = await provider.getBalance(address);
           response.result = [
             {
-              "address": AddressZero,
-              "chainId": 1337,
-              "isNativeToken": true,
-              "name": "Polygon",
-              "symbol": "MATIC",
-              "decimals": 18,
-              "logoURI": "https://tokens.1inch.io/0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0.png"
+              address: AddressZero,
+              chainId: 1337,
+              isNativeToken: true,
+              balance: nativeTokenBalance,
+              name: "Polygon",
+              symbol: "MATIC",
+              decimals: 18,
+              logoURI: "https://tokens.1inch.io/0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0.png"
             },
             {
-              "address": "0x5A0585D409ca86d9Fa771690ea37d32405Da1f67",
-              "chainId": 1337,
-              "name": "PieDAOBTC++",
-              "symbol": "BTC",
-              "decimals": 18,
-              "logoURI": "https://tokens.1inch.io/0x0327112423f3a68efdf1fcf402f6c5cb9f7c33fd.png"
+              address: "0x5A0585D409ca86d9Fa771690ea37d32405Da1f67",
+              chainId: 1337,
+              // TODO from thegraph query
+              balance: BigNumber.from(0),
+              name: "PieDAOBTC++",
+              symbol: "BTC",
+              decimals: 18,
+              logoURI: "https://tokens.1inch.io/0x0327112423f3a68efdf1fcf402f6c5cb9f7c33fd.png"
             }
           ] as UserTokenInfo[];
           break;
