@@ -11,7 +11,7 @@ import {
   SignedTransaction,
   Transaction
 } from '@0xsodium/transactions';
-import { ERC4337EthersSigner, ERC4337EthersProvider, WalletAPI } from '@0xsodium/sdk4337';
+import { WalletAPI } from '@0xsodium/sdk4337';
 
 import {
   ChainIdLike,
