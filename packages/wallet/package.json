@@ -27,11 +27,11 @@
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/properties": "^5.7.0",
     "@ethersproject/providers": "^5.7.0",
+    "@0xsodium/wallet-contracts": "0.0.3-beta",
     "ethers": "^5.7.0",
     "fetch-ponyfill": "^7.1.0"
   },
   "devDependencies": {
-    "@0xsodium/wallet-contracts": "0.0.3-beta",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "ganache-core": "^2.13.2",
     "web3": "^1.7.0"

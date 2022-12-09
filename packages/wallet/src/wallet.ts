@@ -21,7 +21,6 @@ import {
   isJsonRpcProvider,
   sodiumContext,
   getChainId,
-  networks
 } from '@0xsodium/network';
 
 import {
@@ -29,14 +28,13 @@ import {
   WalletState,
   addressOf,
   sortConfig,
-  compareAddr,
   imageHash,
 } from '@0xsodium/config';
 import { encodeTypedDataDigest, subDigestOf } from '@0xsodium/utils';
 import { RemoteSigner } from './remote-signers';
 import { resolveArrayProperties } from './utils';
 import { Signer } from './signer';
-import { ProviderEventTypes } from '@0xsodium/provider'
+import { Sodium__factory } from '@0xsodium/wallet-contracts';
 
 // Wallet is a signer interface to a Smart Contract based Ethereum account.
 //
@@ -343,9 +341,19 @@ export class Wallet extends Signer {
     return ethers.utils.arrayify(subDigestOf(this.address, solvedChainId, digest))
   }
 
-  async isDeployed(chainId?: ChainIdLike): Promise<boolean> {
+  async getBalance(chainId?: ChainIdLike, blockTag?: BlockTag | undefined): Promise<BigNumber> {
+    if (await this.isDeployed(chainId, blockTag)) {
+      const sodium = Sodium__factory.connect(this.address, this.provider);
+      return sodium.balanceOf({
+        blockTag: blockTag
+      });
+    }
+    return this.provider.getBalance(this.address, blockTag);
+  }
+
+  async isDeployed(chainId?: ChainIdLike, blockTag?: BlockTag | undefined): Promise<boolean> {
     await this.getChainIdNumber(chainId)
-    const walletCode = await this.provider.getCode(this.address)
+    const walletCode = await this.provider.getCode(this.address, blockTag)
     return !!walletCode && walletCode !== '0x'
   }
 

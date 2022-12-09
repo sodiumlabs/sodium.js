@@ -7,15 +7,11 @@ import {
   WalletContext,
   ChainIdLike,
   JsonRpcHandler,
-  JsonRpcHandlerFunc,
   JsonRpcFetchFunc,
   JsonRpcRequest,
   JsonRpcResponseCallback,
-  JsonRpcResponse,
   maybeChainId,
-  JsonRpcVersion,
   JsonRpcSender,
-  isJsonRpcProvider
 } from '@0xsodium/network'
 import { resolveArrayProperties, Signer } from '@0xsodium/wallet'
 import { WalletConfig, WalletState } from '@0xsodium/config'
@@ -129,6 +125,10 @@ export class Web3Signer extends Signer implements TypedDataSigner {
     throw new Error('unsupported: cannot alter JSON-RPC Signer connection')
   }
 
+  getBalance(chainId?: ChainIdLike | undefined, blockTag?: ethers.providers.BlockTag | undefined): Promise<ethers.BigNumber> {
+    throw new Error('Method not implemented.')
+  }
+
   waitForTransaction(transactionHash: string, confirmations?: number | undefined, timeout?: number | undefined): Promise<ethers.providers.TransactionReceipt> {
     throw new Error('Method not implemented.')
   }
@@ -199,6 +199,20 @@ export class Web3Signer extends Signer implements TypedDataSigner {
       [
         tokenAddress,
         maybeChainId(chainId)
+      ],
+      maybeChainId(chainId) || this.defaultChainId
+    )
+  }
+
+  async getTransactionHistories(skip: number, first: number, chainId?: ChainIdLike, tokenAddress?: string, tokenId?: string): Promise<number[]> {
+    return this.provider.send(
+      'sodium_getTransactionHistory',
+      [
+        skip,
+        first,
+        maybeChainId(chainId),
+        tokenAddress,
+        tokenId
       ],
       maybeChainId(chainId) || this.defaultChainId
     )

@@ -1,5 +1,5 @@
-import { TransactionRequest, JsonRpcProvider, Provider, TransactionResponse, TransactionReceipt } from '@ethersproject/providers';
-import { Signer as AbstractSigner, BytesLike } from 'ethers';
+import { TransactionRequest, JsonRpcProvider, Provider, TransactionResponse, TransactionReceipt, BlockTag } from '@ethersproject/providers';
+import { Signer as AbstractSigner, BytesLike, BigNumber } from 'ethers';
 import { TypedDataDomain, TypedDataField } from '@ethersproject/abstract-signer';
 import { Deferrable } from '@ethersproject/properties';
 import { Signer, NotEnoughSigners } from './signer';
@@ -194,6 +194,11 @@ export class Account extends Signer {
   waitForTransaction(transactionHash: string, confirmations?: number | undefined, timeout?: number | undefined, chainId?: ChainIdLike): Promise<TransactionReceipt> {
     const wallet = chainId ? this.getWalletByNetwork(chainId).wallet : this.mainWallet().wallet
     return wallet.waitForTransaction(transactionHash, confirmations, timeout);
+  }
+
+  getBalance(chainId?: ChainIdLike, blockTag?: BlockTag | undefined): Promise<BigNumber> {
+    const wallet = chainId ? this.getWalletByNetwork(chainId).wallet : this.mainWallet().wallet
+    return wallet.getBalance(chainId, blockTag);
   }
 
   async sendTransactionBatch(

@@ -1,4 +1,4 @@
-import { Signer as AbstractSigner } from 'ethers';
+import { BigNumber, Signer as AbstractSigner } from 'ethers';
 import { TypedDataDomain, TypedDataField } from '@ethersproject/abstract-signer';
 import { NetworkConfig, ChainIdLike, WalletContext } from '@0xsodium/network';
 import {
@@ -7,7 +7,7 @@ import {
   TransactionRequest,
   Transaction
 } from '@0xsodium/transactions';
-import { JsonRpcProvider, TransactionResponse, TransactionReceipt } from '@ethersproject/providers';
+import { JsonRpcProvider, TransactionResponse, TransactionReceipt, BlockTag } from '@ethersproject/providers';
 import { BytesLike } from '@ethersproject/bytes';
 import { WalletConfig, WalletState } from '@0xsodium/config';
 import { Deferrable } from '@0xsodium/utils';
@@ -19,7 +19,7 @@ export abstract class Signer extends AbstractSigner {
   abstract getWalletContext(): Promise<WalletContext>
   abstract getWalletConfig(chainId?: ChainIdLike): Promise<WalletConfig[]>
   abstract getWalletState(chainId?: ChainIdLike): Promise<WalletState[]>
-
+  abstract getBalance(chainId?: ChainIdLike, blockTag?: BlockTag): Promise<BigNumber>;
   abstract getNetworks(): Promise<NetworkConfig[]>
 
   abstract waitForTransaction(transactionHash: string, confirmations?: number, timeout?: number): Promise<TransactionReceipt>;

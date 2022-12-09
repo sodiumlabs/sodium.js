@@ -14,9 +14,10 @@ import {
   ErrSignedInRequired,
   ProviderEventTypes,
   TypedEventEmitter,
-  UserTokenInfo
+  UserTokenInfo,
+  TransactionHistory
 } from '../types';
-import { ethers, utils, FixedNumber, BigNumber } from 'ethers';
+import { ethers, utils, BigNumber } from 'ethers';
 import { ExternalProvider } from '@ethersproject/providers';
 import { NetworkConfig, JsonRpcHandler, JsonRpcRequest, JsonRpcResponseCallback, JsonRpcResponse } from '@0xsodium/network';
 import { Signer } from '@0xsodium/wallet';
@@ -264,6 +265,12 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
 
         case 'eth_getBalance': {
           const [accountAddress, blockTag] = request.params!
+          const walletAddress = await this.getAddress();
+          if (accountAddress == walletAddress) {
+            const walletBalance = await signer.getBalance(chainId, blockTag)
+            response.result = walletBalance.toHexString()
+            break
+          }
           const walletBalance = await provider.getBalance(accountAddress, blockTag)
           response.result = walletBalance.toHexString()
           break
@@ -499,32 +506,149 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
         }
 
         case 'sodium_getTokens': {
-          // testnet mock
-          // mainnet using https://tokenlists.org/
-          const address = await this.getAddress();
-          const nativeTokenBalance = await provider.getBalance(address);
+          // TODO mock
+          // using thegraph client https://thegraph.com/hosted-service/subgraph/alberthuang24/sodiumerc20subgraph
+          const nativeTokenBalance = await signer.getBalance(chainId);
           response.result = [
             {
-              address: AddressZero,
-              chainId: 1337,
-              isNativeToken: true,
+              token: {
+                address: AddressZero,
+                chainId: 1337,
+                isNativeToken: true,
+                name: "Polygon",
+                symbol: "MATIC",
+                decimals: 18,
+                centerData: {
+                  website: "https://polygon.technology/",
+                  description: "Matic Network provides scalable, secure and instant Ethereum transactions. It is built on an implementation of the PLASMA framework and functions as an off chain scaling solution. Matic Network offers scalability solutions along with other tools to the developer ecosystem, which enable Matic to seamlessly integrate with dApps while helping developers create an enhanced user experience.",
+                  logoURI: "https://tokens.1inch.io/0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0.png"
+                },
+              },
               balance: nativeTokenBalance,
-              name: "Polygon",
-              symbol: "MATIC",
-              decimals: 18,
-              logoURI: "https://tokens.1inch.io/0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0.png"
             },
             {
-              address: "0x5A0585D409ca86d9Fa771690ea37d32405Da1f67",
-              chainId: 1337,
+              token: {
+                address: "0x5A0585D409ca86d9Fa771690ea37d32405Da1f67",
+                chainId: 1337,
+                name: "PieDAOBTC++",
+                symbol: "BTC",
+                decimals: 18,
+                centerData: {
+                  logoURI: "https://tokens.1inch.io/0x0327112423f3a68efdf1fcf402f6c5cb9f7c33fd.png"
+                }
+              },
               // TODO from thegraph query
               balance: BigNumber.from(0),
-              name: "PieDAOBTC++",
-              symbol: "BTC",
-              decimals: 18,
-              logoURI: "https://tokens.1inch.io/0x0327112423f3a68efdf1fcf402f6c5cb9f7c33fd.png"
             }
           ] as UserTokenInfo[];
+          break;
+        }
+
+        case 'sodium_getTransactionHistory': {
+          // TODO tokenId coming soon when nft support
+          const [skip, first, chainId, tokenAddress, tokenId] = request.params!
+          // mock
+          const time = parseInt(`${new Date().getTime() / 1000}`);
+          const address = await this.getAddress();
+          let histories = [
+            {
+              type: "complete",
+              transactionHash: "0x0",
+              input: "0xa9059cbb2ab09eb219583f4a59a5d0623ade346d962bcd4e46b11da047c9049b",
+              block: {
+                blockTimestamp: time,
+                blockNumber: "1"
+              },
+              // eip4337
+              userOpHash: "0xmock",
+              erc20Transfers: [
+                {
+                  from: address,
+                  to: "0x17a243f7Dd13BadE0a7001Ad71a7ef4628A75fCB",
+                  amount: "1000000000000000000",
+                  token: {
+                    address: "0x5A0585D409ca86d9Fa771690ea37d32405Da1f67",
+                    chainId: 1337,
+                    name: "PieDAOBTC++",
+                    symbol: "BTC",
+                    decimals: 18,
+                    centerData: {
+                      logoURI: "https://tokens.1inch.io/0x0327112423f3a68efdf1fcf402f6c5cb9f7c33fd.png"
+                    }
+                  },
+                }
+              ],
+              // coming soon
+              erc1155Transfers: [],
+              // coming soon
+              erc721Transfers: [],
+              prefix: "sent",
+            },
+            {
+              type: "complete",
+              transactionHash: "0x0",
+              input: "0xa9059cbb2ab09eb219583f4a59a5d0623ade346d962bcd4e46b11da047c9049b",
+              block: {
+                blockTimestamp: time,
+                blockNumber: "1"
+              },
+              // eip4337
+              userOpHash: "0xmock",
+              erc20Transfers: [
+                {
+                  from: "0x17a243f7Dd13BadE0a7001Ad71a7ef4628A75fCB",
+                  to: address,
+                  amount: "1000000000000000000",
+                  token: {
+                    address: "0x5A0585D409ca86d9Fa771690ea37d32405Da1f67",
+                    chainId: 1337,
+                    name: "PieDAOBTC++",
+                    symbol: "BTC",
+                    decimals: 18,
+                    centerData: {
+                      logoURI: "https://tokens.1inch.io/0x0327112423f3a68efdf1fcf402f6c5cb9f7c33fd.png"
+                    }
+                  },
+                }
+              ],
+              // coming soon
+              erc1155Transfers: [],
+              // coming soon
+              erc721Transfers: [],
+              prefix: "received",
+            },
+            {
+              type: "failed",
+              transactionHash: "0xmock",
+              input: "0x000000",
+              block: {
+                blockTimestamp: time,
+                blockNumber: "1"
+              },
+              // eip4337
+              userOpHash: "0xmock",
+              erc20Transfers: [],
+              // coming soon
+              erc1155Transfers: [],
+              // coming soon
+              erc721Transfers: [],
+              prefix: "unknow"
+            }
+          ] as TransactionHistory[];
+          if (tokenAddress) {
+            histories = histories.filter((h) => {
+              if (h.erc20Transfers.length == 0) {
+                return false;
+              }
+              for (let i = 0; h.erc20Transfers.length; i ++) {
+                if (h.erc20Transfers[i].token.address.toLowerCase() == `${tokenAddress}`.toLowerCase()) {
+                  return true;
+                }
+              }
+              return false;
+            })
+          }
+          response.result = histories.slice(skip, skip+first); 
           break;
         }
 
