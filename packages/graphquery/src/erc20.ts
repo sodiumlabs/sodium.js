@@ -4,9 +4,12 @@ import { UserTokenInfo } from './types';
 export const getUserERC20Tokens = async (account: string, chainId: number, first: number = 10): Promise<UserTokenInfo[]> => {
     const sdk = getBuiltGraphSDK();
     const result = await sdk.QueryUserERC20({
-        accountId: account,
+        accountId: account.toLowerCase(),
         first: first
     });
+    if (result.accounts.length == 0) {
+        return [];
+    }
     return result.accounts[0].balances.map(b => {
         return {
             token: {
