@@ -1,6 +1,6 @@
 import { NetworkConfig, WalletContext, JsonRpcRequest, JsonRpcResponse, JsonRpcHandler } from '@0xsodium/network';
 import { TypedData } from '@0xsodium/utils';
-export * from '@0xsodium/graphquery/src/types';
+export * from '@0xsodium/graphquery';
 
 export interface ProviderTransport extends JsonRpcHandler, ProviderMessageTransport, ProviderMessageRequestHandler {
   register(): void
