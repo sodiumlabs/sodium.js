@@ -1,4 +1,4 @@
-import { ethers } from 'ethers'
+import { BigNumber, ethers } from 'ethers'
 import { BytesLike, Bytes } from '@ethersproject/bytes'
 import { Web3Provider as EthersWeb3Provider, ExternalProvider, JsonRpcProvider, Networkish } from '@ethersproject/providers'
 import { TypedDataDomain, TypedDataField, TypedDataSigner } from '@ethersproject/abstract-signer'
@@ -195,6 +195,19 @@ export class Web3Signer extends Signer implements TypedDataSigner {
     )
   }
 
+  async getToken(tokenAddress: string, chainId: ChainIdLike): Promise<UserTokenInfo[]> {
+    return this.provider.send(
+      'sodium_getToken',
+      [
+        tokenAddress,
+        maybeChainId(chainId)
+      ],
+      maybeChainId(chainId) || this.defaultChainId
+    )
+  }
+
+
+
   async getTokenRates(tokenAddress: string[], chainId?: ChainIdLike): Promise<number[]> {
     return this.provider.send(
       'sodium_getTokenRates',
@@ -250,19 +263,25 @@ export class Web3Signer extends Signer implements TypedDataSigner {
   }
 
   async getGasSuggest(): Promise<GasSuggest> {
-    // TODO get suggest by chain scan
+    const feeData = await this.provider.getFeeData();
+    const m = (v: BigNumber | null, mul: number, d: BigNumber): BigNumber => {
+      if (v == null) {
+        return d;
+      }
+      return v.mul(mul);
+    }
     return {
       standard: {
-        maxPriorityFeePerGas: 40,
-        maxFeePerGas: 50
+        maxPriorityFeePerGas: m(feeData.maxPriorityFeePerGas, 1, BigNumber.from("1500000000")),
+        maxFeePerGas: m(feeData.maxPriorityFeePerGas, 1, BigNumber.from("1500000000").mul(2))
       },
       fast: {
-        maxPriorityFeePerGas: 60,
-        maxFeePerGas: 70
+        maxPriorityFeePerGas: m(feeData.maxPriorityFeePerGas, 1.5, BigNumber.from("1500000000")),
+        maxFeePerGas: m(feeData.maxPriorityFeePerGas, 1.5, BigNumber.from("1500000000").mul(2))
       },
       rapid: {
-        maxPriorityFeePerGas: 100,
-        maxFeePerGas: 110
+        maxPriorityFeePerGas: m(feeData.maxPriorityFeePerGas, 2, BigNumber.from("1500000000")),
+        maxFeePerGas: m(feeData.maxPriorityFeePerGas, 2, BigNumber.from("1500000000").mul(2))
       }
     }
   }

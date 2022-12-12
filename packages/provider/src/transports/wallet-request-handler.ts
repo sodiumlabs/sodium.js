@@ -23,8 +23,9 @@ import { NetworkConfig, JsonRpcHandler, JsonRpcRequest, JsonRpcResponseCallback,
 import { Signer } from '@0xsodium/wallet';
 import { TransactionRequest, isSignedTransaction } from '@0xsodium/transactions';
 import { signAuthorization, AuthorizationOptions } from '@0xsodium/auth';
-import { logger, TypedData, AddressZero } from '@0xsodium/utils';
+import { logger, TypedData, AddressZero, ERC20OrNativeTokenMetadata } from '@0xsodium/utils';
 import { prefixEIP191Message, isWalletUpToDate } from '../utils';
+import { ERC20Token__factory } from '@0xsodium/wallet-contracts';
 
 const SIGNER_READY_TIMEOUT = 10000
 
@@ -660,6 +661,26 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
           response.result = tokenAddressList.map(() => {
             return 0.00018314;
           });
+          break;
+        }
+
+        case 'sodium_getToken': {
+          const [ tokenAddress, chainId ] = request.params!
+          const erc20 = ERC20Token__factory.connect(tokenAddress, signer);
+          const tokenSymbol = await erc20.symbol();
+          const tokenDecimals = await erc20.decimals();
+          const tokenName = await erc20.name();
+          const tokenInfo: ERC20OrNativeTokenMetadata = {
+            address: tokenAddress,
+            chainId: chainId,
+            decimals: tokenDecimals,
+            symbol: tokenSymbol,
+            name: tokenName,
+            centerData: {
+              
+            }
+          }
+          response.result = tokenInfo;
           break;
         }
 

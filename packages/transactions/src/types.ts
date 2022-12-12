@@ -1,4 +1,4 @@
-import { BigNumberish, BytesLike } from 'ethers';
+import { BigNumber, BigNumberish, BytesLike } from 'ethers';
 import { TransactionRequest as EthersTransactionRequest, TransactionResponse as EthersTransactionResponse } from '@ethersproject/providers';
 import { TransactionStruct, UserOperationStruct } from '@0xsodium/wallet-contracts/gen/adapter/IWallet';
 
@@ -41,8 +41,8 @@ export interface TransactionResponse<R = any> extends EthersTransactionResponse 
 }
 
 export type GasPrice = {
-  maxPriorityFeePerGas: number,
-  maxFeePerGas: number
+  maxPriorityFeePerGas: BigNumber,
+  maxFeePerGas: BigNumber
 }
 export type GasSuggest = {
   standard: GasPrice,
