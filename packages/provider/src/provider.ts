@@ -15,7 +15,7 @@ import {
 } from '@0xsodium/network'
 import { resolveArrayProperties, Signer } from '@0xsodium/wallet'
 import { WalletConfig, WalletState } from '@0xsodium/config'
-import { Deferrable, shallowCopy, resolveProperties, Forbid } from '@0xsodium/utils'
+import { Deferrable, shallowCopy, resolveProperties, Forbid, ERC20OrNativeTokenMetadata } from '@0xsodium/utils'
 import {
   TransactionRequest,
   TransactionResponse,
@@ -195,7 +195,7 @@ export class Web3Signer extends Signer implements TypedDataSigner {
     )
   }
 
-  async getToken(tokenAddress: string, chainId: ChainIdLike): Promise<UserTokenInfo[]> {
+  async getToken(tokenAddress: string, chainId: ChainIdLike): Promise<ERC20OrNativeTokenMetadata> {
     return this.provider.send(
       'sodium_getToken',
       [
