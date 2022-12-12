@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { sanitizeHost } from '@0xsequence/utils'
+import { sanitizeHost } from '@0xsodium/utils'
 
 describe('sanitize', function() {
   

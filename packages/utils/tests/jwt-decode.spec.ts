@@ -1,7 +1,7 @@
 
 
 import { expect } from 'chai'
-import { jwtDecodeClaims } from '@0xsequence/utils'
+import { jwtDecodeClaims } from '@0xsodium/utils'
 
 describe('jwt-decode', function() {
   

@@ -3,12 +3,16 @@ import {
   Sodium,
   Sodium__factory
 } from '@0xsodium/wallet-contracts';
-import { arrayify } from 'ethers/lib/utils'
+import { arrayify, resolveProperties } from 'ethers/lib/utils'
 import { Signer } from '@ethersproject/abstract-signer'
 import { BaseApiParams, BaseWalletAPI } from './BaseWalletAPI'
 import { TransactionDetailsForUserOp } from './TransactionDetailsForUserOp';
-import { TransactionRequest, flattenAuxTransactions, sodiumTxAbiEncode } from '@0xsodium/transactions';
+import { TransactionRequest, flattenAuxTransactions, sodiumTxAbiEncode, Transaction } from '@0xsodium/transactions';
 import { getWalletInitCode } from '@0xsodium/config';
+import { SodiumEstimator, OverwriterEstimator, OverwriterEstimatorDefaults } from '@0xsodium/estimator';
+import { JsonRpcProvider } from '@ethersproject/providers';
+import { PaymasterInfo } from './types';
+import { AddressZero } from '@0xsodium/utils';
 
 /**
  * constructor params, added no top of base params:
@@ -36,9 +40,23 @@ export class WalletAPI extends BaseWalletAPI {
    */
   walletContract?: Sodium
 
+  sodiumEstimator: SodiumEstimator
+
   constructor(params: WalletApiParams) {
     super(params)
     this.signer = params.signer
+    const overwriterEstimator = new OverwriterEstimator({
+      rpc: this.provider
+    });
+    this.sodiumEstimator = new SodiumEstimator(overwriterEstimator)
+  }
+
+  setProvider(provider: JsonRpcProvider): void {
+    super.setProvider(provider);
+    const overwriterEstimator = new OverwriterEstimator({
+      rpc: this.provider
+    });
+    this.sodiumEstimator = new SodiumEstimator(overwriterEstimator)
   }
 
   async _getWalletContract(): Promise<Sodium> {
@@ -74,20 +92,41 @@ export class WalletAPI extends BaseWalletAPI {
     );
   }
 
-  async encodeGasLimit(transactions: TransactionRequest): Promise<BigNumber> {
+  async encodeGasLimit(transactions: TransactionRequest): Promise<[Transaction[], BigNumber]> {
     const txs = flattenAuxTransactions(transactions);
-    let gasLimit = txs.reduce((c, t) => {
-      if (t.gasLimit) {
-        return c.add(t.gasLimit);
+    const estimateResult = await this.sodiumEstimator.estimateGasLimits(this.walletConfig, this.walletContext, ...txs);
+    return [
+      estimateResult.transactions,
+      estimateResult.total
+    ];
+  }
+
+  async getPaymasterInfos(transactions: TransactionRequest): Promise<PaymasterInfo[]> {
+    const tempOp = await this.createUnsignedUserOp(transactions);
+    const op = await resolveProperties(tempOp);
+    const totalLimit = BigNumber.from(op.verificationGasLimit).add(op.callGasLimit);
+    const gasPrice = BigNumber.from(op.maxFeePerGas).mul(totalLimit);
+
+    //TODO support more token with paymasterAPI
+    return [
+      {
+        token: {
+          address: AddressZero,
+          chainId: 1337,
+          isNativeToken: true,
+          name: "Polygon",
+          symbol: "MATIC",
+          decimals: 18,
+          centerData: {
+            website: "https://polygon.technology/",
+            description: "Matic Network provides scalable, secure and instant Ethereum transactions. It is built on an implementation of the PLASMA framework and functions as an off chain scaling solution. Matic Network offers scalability solutions along with other tools to the developer ecosystem, which enable Matic to seamlessly integrate with dApps while helping developers create an enhanced user experience.",
+            logoURI: "https://tokens.1inch.io/0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0.png"
+          },
+        },
+        amount: gasPrice,
+        expiry: parseInt(`${new Date().getTime()/1000}`) + 86400
       }
-      return c;
-    }, BigNumber.from(0));
-    if (gasLimit.eq(0)) {
-      // TODO
-      // Update entrypoint contract, if gasLimit eq 0. no check
-      gasLimit = gasLimit.add(2e7);
-    }
-    return gasLimit.add(10000);
+    ];
   }
 
   async signRequestId(requestId: string): Promise<string> {

@@ -19,10 +19,12 @@ import { Deferrable, shallowCopy, resolveProperties, Forbid } from '@0xsodium/ut
 import {
   TransactionRequest,
   TransactionResponse,
-  SignedTransaction
+  SignedTransaction,
+  GasSuggest
 } from '@0xsodium/transactions'
 import { WalletRequestHandler } from './transports/wallet-request-handler'
 import { UserTokenInfo } from './types';
+import { PaymasterInfo } from '@0xsodium/sdk4337'
 
 export class Web3Provider extends EthersWeb3Provider implements JsonRpcHandler {
   static isSodiumProvider(cand: any): cand is Web3Provider {
@@ -247,6 +249,36 @@ export class Web3Signer extends Signer implements TypedDataSigner {
     return await provider!.send('personal_sign', [ethers.utils.hexlify(data), address])
   }
 
+  async getGasSuggest(): Promise<GasSuggest> {
+    // TODO get suggest by chain scan
+    return {
+      standard: {
+        maxPriorityFeePerGas: 40,
+        maxFeePerGas: 50
+      },
+      fast: {
+        maxPriorityFeePerGas: 60,
+        maxFeePerGas: 70
+      },
+      rapid: {
+        maxPriorityFeePerGas: 100,
+        maxFeePerGas: 110
+      }
+    }
+  }
+
+  getPaymasterInfos(transactions: TransactionRequest, chainId?: ChainIdLike | undefined): Promise<PaymasterInfo[]> {
+    return this.provider.send(
+      'sodium_getPaymasterInfos',
+      [
+        transactions,
+        maybeChainId(chainId)
+      ],
+      maybeChainId(chainId) || this.defaultChainId
+    )
+  }
+
+  // async
   // signTypedData matches implementation from ethers JsonRpcSigner for compatibility, but with
   // multi-chain support.
   async signTypedData(
@@ -289,7 +321,7 @@ export class Web3Signer extends Signer implements TypedDataSigner {
           { onceBlock: this.provider! }
         )
         .catch((error: Error) => {
-          ;(<any>error).transactionHash = hash
+          ; (<any>error).transactionHash = hash
           throw error
         })
     })
@@ -368,7 +400,7 @@ export class Web3Signer extends Signer implements TypedDataSigner {
 
   async sendUncheckedTransaction(transaction: Deferrable<TransactionRequest>, chainId?: ChainIdLike): Promise<string> {
     transaction = shallowCopy(transaction)
-    
+
     const fromAddress = this.getAddress()
 
     // NOTE: we do not use provider estimation, and instead rely on our relayer to determine the gasLimit and gasPrice
@@ -457,30 +489,30 @@ const hexlifyTransaction = (
 
   const result: { [key: string]: any } = {}
 
-  // Some nodes (INFURA ropsten; INFURA mainnet is fine) do not like leading zeros.
-  ;['gasLimit', 'gasPrice', 'nonce', 'value'].forEach(key => {
-    const value = (transaction as any)[key]
-    if (value === null || value === undefined) {
-      return
-    }
-    const hexValue = ethers.utils.hexValue(value)
-    if (key === 'gasLimit') {
-      key = 'gas'
-    }
-    result[key] = hexValue
-  })
-  ;['from', 'to', 'data'].forEach(key => {
-    if (!(<any>transaction)[key]) {
-      return
-    }
-    result[key] = ethers.utils.hexlify((<any>transaction)[key])
-  })
-  ;['delegateCall', 'revertOnError'].forEach(key => {
-    const value = (transaction as any)[key]
-    if (value !== undefined && value !== null) {
-      result[key] = value
-    }
-  })
+    // Some nodes (INFURA ropsten; INFURA mainnet is fine) do not like leading zeros.
+    ;['gasLimit', 'gasPrice', 'nonce', 'value'].forEach(key => {
+      const value = (transaction as any)[key]
+      if (value === null || value === undefined) {
+        return
+      }
+      const hexValue = ethers.utils.hexValue(value)
+      if (key === 'gasLimit') {
+        key = 'gas'
+      }
+      result[key] = hexValue
+    })
+    ;['from', 'to', 'data'].forEach(key => {
+      if (!(<any>transaction)[key]) {
+        return
+      }
+      result[key] = ethers.utils.hexlify((<any>transaction)[key])
+    })
+    ;['delegateCall', 'revertOnError'].forEach(key => {
+      const value = (transaction as any)[key]
+      if (value !== undefined && value !== null) {
+        result[key] = value
+      }
+    })
 
   const auxiliary = <any>transaction['auxiliary']
   if (auxiliary && auxiliary.length > 0) {

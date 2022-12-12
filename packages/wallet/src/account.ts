@@ -1,12 +1,13 @@
-import { TransactionRequest, JsonRpcProvider, Provider, TransactionResponse, TransactionReceipt, BlockTag } from '@ethersproject/providers';
+import { JsonRpcProvider, Provider, TransactionResponse, TransactionReceipt, BlockTag } from '@ethersproject/providers';
 import { Signer as AbstractSigner, BytesLike, BigNumber } from 'ethers';
 import { TypedDataDomain, TypedDataField } from '@ethersproject/abstract-signer';
 import { Deferrable } from '@ethersproject/properties';
-import { Signer, NotEnoughSigners } from './signer';
+import { Signer } from './signer';
 import {
   Transactionish,
   SignedTransaction,
-  Transaction
+  Transaction,
+  TransactionRequest
 } from '@0xsodium/transactions';
 import {
   WalletConfig,
@@ -24,6 +25,7 @@ import {
 } from '@0xsodium/network';
 import { Wallet } from './wallet';
 import { encodeTypedDataDigest } from '@0xsodium/utils';
+import { PaymasterInfo } from '@0xsodium/sdk4337';
 
 export interface AccountOptions {
   initialConfig: WalletConfig
@@ -219,6 +221,11 @@ export class Account extends Signer {
   async sendSignedTransactions(signedTxs: SignedTransaction, chainId?: ChainIdLike): Promise<TransactionResponse> {
     const wallet = chainId ? this.getWalletByNetwork(chainId).wallet : this.mainWallet().wallet
     return wallet.sendSignedTransactions(signedTxs, chainId);
+  }
+
+  getPaymasterInfos(transactions: TransactionRequest, chainId?: ChainIdLike): Promise<PaymasterInfo[]> {
+    const wallet = chainId ? this.getWalletByNetwork(chainId).wallet : this.mainWallet().wallet
+    return wallet.getPaymasterInfos(transactions, chainId)
   }
 
   async isDeployed(target?: Wallet | ChainIdLike): Promise<boolean> {

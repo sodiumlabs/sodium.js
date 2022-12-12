@@ -663,6 +663,15 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
           break;
         }
 
+        case 'sodium_getPaymasterInfos': {
+          const [ transactions, chainId ] = request.params!
+
+          // testnet mock
+          // mainnet using https://www.coingecko.com/api/documentations/v3#/simple/get_simple_price
+          response.result = await signer.getPaymasterInfos(transactions, chainId);
+          break;
+        }
+
         // smart wallet method
         case 'sodium_getWalletContext': {
           response.result = await signer.getWalletContext()

@@ -1,5 +1,5 @@
 import { NetworkConfig, WalletContext, JsonRpcRequest, JsonRpcResponse, JsonRpcHandler } from '@0xsodium/network';
-import { TypedData } from '@0xsodium/utils';
+import { TypedData, ERC20OrNativeTokenMetadata } from '@0xsodium/utils';
 import { BigNumber } from 'ethers';
 
 export interface ProviderTransport extends JsonRpcHandler, ProviderMessageTransport, ProviderMessageRequestHandler {
@@ -106,19 +106,6 @@ export enum EventType {
   DEBUG = '_debug'
 }
 
-export type ERC20OrNativeTokenMetadata = {
-  address: string;
-  chainId: number;
-  isNativeToken?: true;
-  name: string;
-  symbol: string;
-  decimals: number;
-  centerData: {
-    logoURI?: string;
-    website?: string;
-    description?: string;
-  },
-};
 export type UserTokenInfo = {
   balance: BigNumber,
   token: ERC20OrNativeTokenMetadata,

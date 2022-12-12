@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { base64EncodeObject, base64DecodeObject } from '@0xsequence/utils'
+import { base64EncodeObject, base64DecodeObject } from '@0xsodium/utils'
 
 describe('base64', function() {
   

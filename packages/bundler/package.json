@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@0xsodium/utils": "^0.2.0",
-    "@0xsodium/wallet-contracts": "0.0.3-beta",
+    "@0xsodium/wallet-contracts": "^0.0.4-beta",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/providers": "^5.7.0",
     "@types/cors": "^2.8.12",

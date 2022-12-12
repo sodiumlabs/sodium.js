@@ -18,7 +18,7 @@
     "format": "prettier --write packages/**/src/**/*.ts packages/**/tests/**/*.ts",
     "audit:fix": "npx yarn-audit-fix",
     "typecheck": "tsc --noEmit",
-    "dev": "preconstruct build",
+    "dev": "preconstruct dev",
     "postinstall": "preconstruct build",
     "coverage": "rimraf ./coverage && rimraf ./.nyc_output && nyc yarn test",
     "link-sodium": "./scripts/yarn-link.sh link",

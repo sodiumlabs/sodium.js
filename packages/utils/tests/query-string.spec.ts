@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { queryStringFromObject, queryStringToObject } from '@0xsequence/utils'
+import { queryStringFromObject, queryStringToObject } from '@0xsodium/utils'
 
 describe('query-string', function() {
   

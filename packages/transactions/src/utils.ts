@@ -1,4 +1,4 @@
-import { ethers, Signer, BigNumberish } from 'ethers'
+import { ethers, BigNumberish } from 'ethers'
 import { Transaction, TransactionRequest, Transactionish, TransactionEncoded, NonceDependency, SignedTransaction } from './types'
 import { UserOperationStruct } from '@0xsodium/wallet-contracts/gen/adapter/IWallet';
 

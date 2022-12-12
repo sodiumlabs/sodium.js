@@ -11,7 +11,7 @@ import {
   SignedTransaction,
   Transaction
 } from '@0xsodium/transactions';
-import { WalletAPI } from '@0xsodium/sdk4337';
+import { PaymasterInfo, WalletAPI } from '@0xsodium/sdk4337';
 
 import {
   ChainIdLike,
@@ -127,6 +127,10 @@ export class Wallet extends Signer {
     } else {
       throw new Error('Wallet provider argument is expected to be a JsonRpcProvider')
     }
+  }
+
+  getPaymasterInfos(transactions: TransactionRequest, chainId?: ChainIdLike): Promise<PaymasterInfo[]> {
+    return this.wallet4337API.getPaymasterInfos(transactions);
   }
 
   waitForTransaction(transactionHash: string, confirmations?: number | undefined, timeout?: number | undefined): Promise<ethers.providers.TransactionReceipt> {

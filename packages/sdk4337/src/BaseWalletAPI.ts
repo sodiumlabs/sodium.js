@@ -1,5 +1,5 @@
 import { ethers, BigNumber, BigNumberish } from 'ethers';
-import { Provider, TransactionReceipt, TransactionResponse } from '@ethersproject/providers';
+import { JsonRpcProvider, Provider, TransactionReceipt, TransactionResponse } from '@ethersproject/providers';
 import {
   EntryPoint, EntryPoint__factory,
   SenderCreator, SenderCreator__factory
@@ -12,7 +12,7 @@ import { hexValue, resolveProperties } from 'ethers/lib/utils';
 import { PaymasterAPI } from './PaymasterAPI';
 import { getRequestId, NotPromise, packUserOp } from '@0xsodium/utils';
 import { calcPreVerificationGas, GasOverheads } from './calcPreVerificationGas';
-import { getFeeData, toUserOp, SignedTransaction, flattenAuxTransactions } from '@0xsodium/transactions';
+import { getFeeData, toUserOp, SignedTransaction, flattenAuxTransactions, Transaction } from '@0xsodium/transactions';
 import { HttpRpcClient } from './HttpRpcClient';
 import { WalletConfig } from '@0xsodium/config';
 import { WalletContext } from '@0xsodium/network';
@@ -53,7 +53,7 @@ export abstract class BaseWalletAPI {
   walletContext: WalletContext;
 
   chainId: number;
-  provider: Provider
+  provider: JsonRpcProvider
   overheads?: Partial<GasOverheads>
   entryPointAddress: string
   walletAddress?: string
@@ -80,7 +80,7 @@ export abstract class BaseWalletAPI {
     return this
   }
 
-  setProvider(provider: Provider): void {
+  setProvider(provider: JsonRpcProvider): void {
     this.provider = provider;
     this.entryPoint = EntryPoint__factory.connect(this.entryPointAddress, provider);
   }
@@ -104,7 +104,7 @@ export abstract class BaseWalletAPI {
   // encode the call from entryPoint through our wallet to the target contract.
   abstract encodeExecute(transactions: TransactionDetailsForUserOp): Promise<string>
 
-  abstract encodeGasLimit(transactions: TransactionDetailsForUserOp): Promise<BigNumber>
+  abstract encodeGasLimit(transactions: TransactionDetailsForUserOp): Promise<[Transaction[], BigNumber]>
 
   /**
    * sign a userOp's hash (requestId).
@@ -176,8 +176,8 @@ export abstract class BaseWalletAPI {
   }
 
   async encodeUserOpCallDataAndGasLimit(detailsForUserOp: TransactionDetailsForUserOp): Promise<{ callData: string, callGasLimit: BigNumber }> {
-    const callData = await this.encodeExecute(detailsForUserOp)
-    const callGasLimit = await this.encodeGasLimit(detailsForUserOp);
+    const [newTxs, callGasLimit] = await this.encodeGasLimit(detailsForUserOp);
+    const callData = await this.encodeExecute(newTxs)
     return {
       callData,
       callGasLimit

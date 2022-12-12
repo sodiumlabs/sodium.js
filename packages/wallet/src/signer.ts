@@ -11,6 +11,7 @@ import { JsonRpcProvider, TransactionResponse, TransactionReceipt, BlockTag } fr
 import { BytesLike } from '@ethersproject/bytes';
 import { WalletConfig, WalletState } from '@0xsodium/config';
 import { Deferrable } from '@0xsodium/utils';
+import { PaymasterInfo } from '@0xsodium/sdk4337';
 
 export abstract class Signer extends AbstractSigner {
   abstract getProvider(chainId?: number): Promise<JsonRpcProvider | undefined>
@@ -21,7 +22,7 @@ export abstract class Signer extends AbstractSigner {
   abstract getWalletState(chainId?: ChainIdLike): Promise<WalletState[]>
   abstract getBalance(chainId?: ChainIdLike, blockTag?: BlockTag): Promise<BigNumber>;
   abstract getNetworks(): Promise<NetworkConfig[]>
-
+  abstract getPaymasterInfos(transactions: TransactionRequest, chainId?: ChainIdLike): Promise<PaymasterInfo[]>;
   abstract waitForTransaction(transactionHash: string, confirmations?: number, timeout?: number): Promise<TransactionReceipt>;
   // getSigners returns a list of available / attached signers to the interface. Note: you need
   // enough signers in order to meet the signing threshold that satisfies a wallet config.

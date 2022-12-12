@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@0xsodium/transactions": "^0.2.0",
-    "@0xsodium/wallet-contracts": "0.0.3-beta",
+    "@0xsodium/wallet-contracts": "^0.0.4-beta",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/bignumber": "^5.7.0",
     "@ethersproject/bytes": "^5.7.0",

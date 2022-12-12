@@ -22,7 +22,7 @@
     "@0xsodium/multicall": "^0.2.0",
     "@0xsodium/network": "^0.2.0",
     "@0xsodium/utils": "^0.2.0",
-    "@0xsodium/wallet-contracts": "0.0.3-beta",
+    "@0xsodium/wallet-contracts": "^0.0.4-beta",
     "ethers": "^5.7.0"
   },
   "files": [

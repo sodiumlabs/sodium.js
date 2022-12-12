@@ -10,10 +10,14 @@ export interface WalletContext {
     multicall: string
   };
 
+  utils: {
+    gasEstimator: string
+  };
+
   nonStrict?: boolean;
 }
 
-export const sodiumContext = {
+export const sodiumContext: WalletContext = {
   entryPointAddress: "0xC8Ddd44bB33BBC2c8DCcB0BB958DdE47363D5C28",
   singletonAddress: "0xA5512e27D4F5178DA33750647944F7496b608F55",
   defaultHandlerAddress: "0xd8CBB2C610f4877547077752c99B7D5ce2E5F115",
@@ -21,6 +25,10 @@ export const sodiumContext = {
 
   modules: {
     multicall: ""
+  },
+
+  utils: {
+    gasEstimator: "0xdF0e977EC85e0fD97daA4cB39869DCb7FCc26389"
   },
 
   nonStrict: false

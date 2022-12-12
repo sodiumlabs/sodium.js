@@ -20,7 +20,7 @@
     "ethers": "^5.7.0"
   },
   "devDependencies": {
-    "@0xsodium/wallet-contracts": "0.0.3-beta",
+    "@0xsodium/wallet-contracts": "^0.0.4-beta",
     "@types/web3-provider-engine": "^14.0.1",
     "eth-json-rpc-middleware": "^8.0.0",
     "json-rpc-engine": "^6.1.0",

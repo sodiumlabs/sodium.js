@@ -39,3 +39,13 @@ export type Transactionish = TransactionRequest | TransactionRequest[] | Transac
 export interface TransactionResponse<R = any> extends EthersTransactionResponse {
   receipt?: R
 }
+
+export type GasPrice = {
+  maxPriorityFeePerGas: number,
+  maxFeePerGas: number
+}
+export type GasSuggest = {
+  standard: GasPrice,
+  fast: GasPrice,
+  rapid: GasPrice
+}
