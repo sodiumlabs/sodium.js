@@ -1,12 +1,11 @@
 {
   "name": "0xsodium",
   "version": "0.2.0",
-  "description": "Sequence: simple & powerful Ethereum development library and Web-based smart wallet",
+  "description": "Sodium: simple & powerful Ethereum development library and Web-based smart wallet",
   "repository": "https://github.com/sodiumlabs/sodium.js",
   "source": "src/index.ts",
   "main": "dist/0xsodium.cjs.js",
   "module": "dist/0xsodium.esm.js",
-  "umd:main": "dist/0xsodium.umd.min.js",
   "license": "Apache-2.0",
   "scripts": {
     "test": "yarn test:concurrently 'yarn test:run'",
@@ -49,32 +48,8 @@
     "webpack-dev-server": "^3.11.2"
   },
   "keywords": [],
-  "preconstruct": {
-    "umdName": "sodium"
-  },
   "files": [
     "src",
     "dist"
-  ],
-  "ava": {
-    "require": [
-      "ts-node/register"
-    ],
-    "files": [
-      "tests/**/*.spec.ts"
-    ],
-    "extensions": [
-      "ts"
-    ],
-    "verbose": true
-  },
-  "config": {
-    "mnemonic": "ripple axis someone ridge uniform wrist prosper there frog rate olympic knee",
-    "ganacheChainID": 31337,
-    "ganachePort": 8545,
-    "ganacheGasLimit": "0xfffffffffff",
-    "ganacheGasPrice": "0x200",
-    "etherBalance": "100000",
-    "extra": ""
-  }
+  ]
 }

@@ -230,6 +230,7 @@ export class Wallet extends Signer {
       throw new Error('provider is not set, first connect a provider')
     }
     this.chainId = (await this.provider.getNetwork()).chainId
+    console.debug("request chainId");
     return this.chainId
   }
 

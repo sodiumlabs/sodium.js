@@ -10,7 +10,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "postinstall": "graphclient build",
-    "build": "graphclient build"
+    "build": "graphclient build && mv ./.graphclient ./src/.graphclient && rm -rf ./src/.graphclient/package.json"
   },
   "dependencies": {
     "@0xsodium/abi": "^0.2.0",
@@ -20,13 +20,21 @@
     "@0xsodium/transactions": "^0.2.0",
     "@0xsodium/utils": "^0.2.0",
     "@0xsodium/wallet": "^0.2.0",
+    "@graphprotocol/client-cli": "^2.2.16",
+    "@graphql-mesh/cache-localforage": "^0.7.3",
+    "@graphql-mesh/cross-helpers": "^0.3.0",
+    "@graphql-mesh/graphql": "^0.33.4",
+    "@graphql-mesh/http": "^0.3.3",
+    "@graphql-mesh/merger-bare": "^0.16.4",
+    "@graphql-mesh/runtime": "^0.46.2",
+    "@graphql-mesh/store": "^0.9.3",
+    "@graphql-mesh/utils": "^0.43.3",
+    "@whatwg-node/fetch": "^0.5.3",
     "ethers": "^5.7.0",
-    "graphql": "16.6.0",
-    "@graphprotocol/client-cli": "^2.2.16"
+    "graphql": "16.6.0"
   },
   "files": [
     "src",
-    "dist",
-    ".graphclient"
+    "dist"
   ]
 }

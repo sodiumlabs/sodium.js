@@ -13,10 +13,9 @@ import {
   OpenWalletIntent,
   ErrSignedInRequired,
   ProviderEventTypes,
-  TypedEventEmitter,
-  TransactionHistory
+  TypedEventEmitter
 } from '../types';
-import { UserTokenInfo, getUserERC20Tokens } from '@0xsodium/graphquery';
+import { UserTokenInfo, getUserERC20Tokens, TransactionHistory } from '@0xsodium/graphquery';
 import { ethers, utils, BigNumber } from 'ethers';
 import { ExternalProvider } from '@ethersproject/providers';
 import { NetworkConfig, JsonRpcHandler, JsonRpcRequest, JsonRpcResponseCallback, JsonRpcResponse } from '@0xsodium/network';

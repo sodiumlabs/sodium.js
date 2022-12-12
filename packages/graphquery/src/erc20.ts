@@ -1,4 +1,4 @@
-import { getBuiltGraphSDK } from '../.graphclient';
+import { getBuiltGraphSDK } from './.graphclient';
 import { UserTokenInfo } from './types';
 
 export const getUserERC20Tokens = async (account: string, chainId: number, first: number = 10): Promise<UserTokenInfo[]> => {
