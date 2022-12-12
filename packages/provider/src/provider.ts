@@ -1,4 +1,4 @@
-import { BigNumber, ethers } from 'ethers'
+import { BigNumber, ethers, FixedNumber } from 'ethers'
 import { BytesLike, Bytes } from '@ethersproject/bytes'
 import { Web3Provider as EthersWeb3Provider, ExternalProvider, JsonRpcProvider, Networkish } from '@ethersproject/providers'
 import { TypedDataDomain, TypedDataField, TypedDataSigner } from '@ethersproject/abstract-signer'
@@ -206,8 +206,6 @@ export class Web3Signer extends Signer implements TypedDataSigner {
     )
   }
 
-
-
   async getTokenRates(tokenAddress: string[], chainId?: ChainIdLike): Promise<number[]> {
     return this.provider.send(
       'sodium_getTokenRates',
@@ -268,7 +266,9 @@ export class Web3Signer extends Signer implements TypedDataSigner {
       if (v == null) {
         return d;
       }
-      return v.mul(mul);
+      const r = FixedNumber.from(v.toString()).mulUnsafe(FixedNumber.from(mul)).round().toString();
+      const rv = r.split(".")[0];
+      return BigNumber.from(rv);
     }
     return {
       standard: {

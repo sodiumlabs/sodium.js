@@ -20,10 +20,10 @@
   },
   "dependencies": {
     "@0xsodium/config": "^0.2.0",
+    "@0xsodium/estimator": "^0.2.0",
     "@0xsodium/network": "^0.2.0",
     "@0xsodium/transactions": "^0.2.0",
     "@0xsodium/utils": "^0.2.0",
-    "@0xsodium/estimator": "^0.2.0",
     "@0xsodium/wallet-contracts": "^0.0.4-beta",
     "@ethersproject/abstract-provider": "^5.7.0",
     "@ethersproject/abstract-signer": "^5.7.0",

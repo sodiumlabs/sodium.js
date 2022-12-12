@@ -190,7 +190,7 @@ export class Wallet extends Signer {
 
   // address returns the address of the wallet account address
   get address(): string {
-    return addressOf(this.config, this.context)
+    return addressOf(this.config, this.context, true)
   }
 
   // imageHash is the unique hash of the WalletConfig

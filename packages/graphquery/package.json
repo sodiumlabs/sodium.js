@@ -1,0 +1,18 @@
+{
+  "name": "@0xsodium/graphquery",
+  "version": "0.2.0",
+  "description": "graphquery sub-package for sodium",
+  "repository": "https://github.com/sodiumlabs/sodium.js/tree/main/packages/graphquery",
+  "source": "src/index.ts",
+  "main": "dist/0xsodium-graphquery.cjs.js",
+  "module": "dist/0xsodium-graphquery.esm.js",
+  "author": "Horizon Blockchain Games",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@graphprotocol/client-cli": "^2.2.16"
+  },
+  "files": [
+    "src",
+    "dist"
+  ]
+}

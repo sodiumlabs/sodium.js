@@ -1,0 +1,8 @@
+query QueryUserSupportERC20 {
+  rebases(first: 2) {
+    chainName
+    id
+    base
+    elastic
+  }
+}

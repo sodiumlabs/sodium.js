@@ -1,0 +1,11 @@
+sources:
+  - name: ERC20
+    handler:
+      graphql:
+        endpoint: https://api.thegraph.com/subgraphs/name/alberthuang24/sodiumerc20subgraph/graphql
+
+documents:
+  - ./userERC20.graphql
+
+codegen:
+  contextType: 'MeshContext & { chainId: string }'
