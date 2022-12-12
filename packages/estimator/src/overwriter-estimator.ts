@@ -1,7 +1,6 @@
 import { ethers } from "ethers"
 import { isBigNumberish, Optionals } from '@0xsodium/utils'
-
-const GasEstimator = require("@0xsodium/wallet-contracts/artifacts/contracts/modules/utils/GasEstimator.sol/GasEstimator.json")
+import { GasEstimator__factory } from '@0xsodium/wallet-contracts';
 
 function toQuantity(number: ethers.BigNumberish | string): string {
   if (isBigNumberish(number)) {
@@ -77,7 +76,7 @@ export class OverwriterEstimator {
     const data = args.data ? args.data : []
     const from = args.from ? ethers.utils.getAddress(args.from) : ethers.Wallet.createRandom().address
 
-    const gasEstimatorInterface = new ethers.utils.Interface(GasEstimator.abi)
+    const gasEstimatorInterface = new ethers.utils.Interface(GasEstimator__factory.abi)
     const encodedEstimate = gasEstimatorInterface.encodeFunctionData("estimate", [args.to, data])
 
     const providedOverwrites = args.overwrites ? Object.keys(args.overwrites).reduce((p, a) => {
@@ -106,7 +105,7 @@ export class OverwriterEstimator {
     const overwrites = {
       ...providedOverwrites,
       [from]: {
-        code: GasEstimator.deployedBytecode
+        code: GasEstimator__factory.bytecode
       }
     }
 
