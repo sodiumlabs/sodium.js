@@ -14,9 +14,9 @@ import {
   ErrSignedInRequired,
   ProviderEventTypes,
   TypedEventEmitter,
-  UserTokenInfo,
   TransactionHistory
 } from '../types';
+import { UserTokenInfo, getUserERC20Tokens } from '@0xsodium/graphquery';
 import { ethers, utils, BigNumber } from 'ethers';
 import { ExternalProvider } from '@ethersproject/providers';
 import { NetworkConfig, JsonRpcHandler, JsonRpcRequest, JsonRpcResponseCallback, JsonRpcResponse } from '@0xsodium/network';
@@ -507,8 +507,19 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
         }
 
         case 'sodium_getTokens': {
-          // TODO mock
-          // using thegraph client https://thegraph.com/hosted-service/subgraph/alberthuang24/sodiumerc20subgraph
+          let [walletAddress, chainId, first] = request.params!;
+
+          if (!walletAddress) {
+            walletAddress = await signer.getAddress();
+          }
+
+          if (!chainId) {
+            chainId = await signer.getChainId();
+          }
+
+          if (!first) {
+            first = 10;
+          }
           const nativeTokenBalance = await signer.getBalance(chainId);
           response.result = [
             {
@@ -526,22 +537,13 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
                 },
               },
               balance: nativeTokenBalance,
-            },
-            {
-              token: {
-                address: "0x5A0585D409ca86d9Fa771690ea37d32405Da1f67",
-                chainId: 1337,
-                name: "PieDAOBTC++",
-                symbol: "BTC",
-                decimals: 18,
-                centerData: {
-                  logoURI: "https://tokens.1inch.io/0x0327112423f3a68efdf1fcf402f6c5cb9f7c33fd.png"
-                }
-              },
-              // TODO from thegraph query
-              balance: BigNumber.from(0),
             }
           ] as UserTokenInfo[];
+          const addressOfWallet = await signer.getAddress();
+          const erc20TokenInfos = await getUserERC20Tokens(addressOfWallet, chainId, first);
+          erc20TokenInfos.forEach(v => {
+            response.result.push(v);
+          })
           break;
         }
 
@@ -677,7 +679,7 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
             symbol: tokenSymbol,
             name: tokenName,
             centerData: {
-              
+
             }
           }
           response.result = tokenInfo;

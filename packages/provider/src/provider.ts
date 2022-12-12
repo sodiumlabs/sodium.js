@@ -23,8 +23,8 @@ import {
   GasSuggest
 } from '@0xsodium/transactions'
 import { WalletRequestHandler } from './transports/wallet-request-handler'
-import { UserTokenInfo } from './types';
-import { PaymasterInfo } from '@0xsodium/sdk4337'
+import { UserTokenInfo } from '@0xsodium/graphquery';
+import { PaymasterInfo } from '@0xsodium/sdk4337';
 
 export class Web3Provider extends EthersWeb3Provider implements JsonRpcHandler {
   static isSodiumProvider(cand: any): cand is Web3Provider {
@@ -266,7 +266,7 @@ export class Web3Signer extends Signer implements TypedDataSigner {
       if (v == null) {
         return d;
       }
-      const r = FixedNumber.from(v.toString()).mulUnsafe(FixedNumber.from(mul)).round().toString();
+      const r = FixedNumber.from(v.toString()).mulUnsafe(FixedNumber.fromString(`${mul}`)).round().toString();
       const rv = r.split(".")[0];
       return BigNumber.from(rv);
     }

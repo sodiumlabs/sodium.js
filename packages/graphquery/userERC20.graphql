@@ -1,8 +1,31 @@
-query QueryUserSupportERC20 {
-  rebases(first: 2) {
-    chainName
+query QueryUserERC20($accountId: ID, $first: Int) {
+  accounts(first: 1, skip: 0, where: {id: $accountId}) {
     id
-    base
-    elastic
+    balances(first: $first, skip: 0, where: { value_gt: 0 }) {
+      id
+      value
+      token {
+        id
+        name
+        decimals
+        symbol
+      }
+    }
+  }
+}
+
+query QueryUserHistories($accountId: ID, $first: Int, $skip: Int) {
+  accounts(first: 1, skip: 0, where: {id: $accountId}) {
+    id
+    balances(first: $first, skip: 0, where: { value_gt: 0 }) {
+      id
+      value
+      token {
+        id
+        name
+        decimals
+        symbol
+      }
+    }
   }
 }

@@ -8,11 +8,24 @@
   "module": "dist/0xsodium-graphquery.esm.js",
   "author": "Horizon Blockchain Games",
   "license": "Apache-2.0",
+  "scripts": {
+    "postinstall": "graphclient build",
+    "build": "graphclient build"
+  },
   "dependencies": {
+    "@0xsodium/abi": "^0.2.0",
+    "@0xsodium/auth": "^0.2.0",
+    "@0xsodium/config": "^0.2.0",
+    "@0xsodium/network": "^0.2.0",
+    "@0xsodium/transactions": "^0.2.0",
+    "@0xsodium/utils": "^0.2.0",
+    "@0xsodium/wallet": "^0.2.0",
+    "ethers": "^5.7.0",
     "@graphprotocol/client-cli": "^2.2.16"
   },
   "files": [
     "src",
-    "dist"
+    "dist",
+    ".graphclient"
   ]
 }

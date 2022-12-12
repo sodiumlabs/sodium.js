@@ -90,7 +90,8 @@
       "packages/simulator",
       "packages/transactions",
       "packages/utils",
-      "packages/wallet"
+      "packages/wallet",
+      "packages/graphquery"
     ]
   },
   "version": "0.0.2-beta",
