@@ -21,6 +21,7 @@
     "@0xsodium/transactions": "^0.2.0",
     "@0xsodium/utils": "^0.2.0",
     "@0xsodium/wallet": "^0.2.0",
+    "@0xsodium/wallet-contracts": "^0.0.4-beta",
     "@ethersproject/abstract-signer": "^5.7.0",
     "@ethersproject/hash": "^5.7.0",
     "@ethersproject/providers": "^5.7.0",
