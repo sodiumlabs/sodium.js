@@ -79,50 +79,49 @@ export class OverwriterEstimator {
     const gasEstimatorInterface = new ethers.utils.Interface(GasEstimator__factory.abi)
     const encodedEstimate = gasEstimatorInterface.encodeFunctionData("estimate", [args.to, data])
 
-    const providedOverwrites = args.overwrites ? Object.keys(args.overwrites).reduce((p, a) => {
-      if (!args.overwrites) {
-        throw Error("TODO fix typescript lint")
-      }
-      const address = ethers.utils.getAddress(a)
-      const o = args.overwrites[a]
+    return BigNumber.from(30000);
+    // const providedOverwrites = args.overwrites ? Object.keys(args.overwrites).reduce((p, a) => {
+    //   if (!args.overwrites) {
+    //     throw Error("TODO fix typescript lint")
+    //   }
+    //   const address = ethers.utils.getAddress(a)
+    //   const o = args.overwrites[a]
 
-      if (address === from) {
-        throw Error("Can't overwrite from address values")
-      }
+    //   if (address === from) {
+    //     throw Error("Can't overwrite from address values")
+    //   }
 
-      return {
-        ...p,
-        [address]: {
-          code: o.code ? ethers.utils.hexlify(o.code) : undefined,
-          nonce: o.nonce ? toHexNumber(o.nonce) : undefined,
-          balance: o.balance ? toHexNumber(o.balance) : undefined,
-          state: o.state ? o.state : undefined,
-          stateDiff: o.stateDiff ? o.stateDiff : undefined
-        }
-      }
-    }, {}) : {}
+    //   return {
+    //     ...p,
+    //     [address]: {
+    //       code: o.code ? ethers.utils.hexlify(o.code) : undefined,
+    //       nonce: o.nonce ? toHexNumber(o.nonce) : undefined,
+    //       balance: o.balance ? toHexNumber(o.balance) : undefined,
+    //       state: o.state ? o.state : undefined,
+    //       stateDiff: o.stateDiff ? o.stateDiff : undefined
+    //     }
+    //   }
+    // }, {}) : {}
 
-    const overwrites = {
-      ...providedOverwrites
-    }
+    // const overwrites = {
+    //   ...providedOverwrites
+    // }
 
-    const response = await this.provider.send("eth_call", [{
-      to: from,
-      data: encodedEstimate,
-      gasPrice: args.gasPrice,
-      gas: args.gas,
-    }, blockTag, overwrites]);
+    // const response = await this.provider.send("eth_call", [{
+    //   to: from,
+    //   data: encodedEstimate,
+    //   gasPrice: args.gasPrice,
+    //   gas: args.gas,
+    // }, blockTag, overwrites]);
 
-    const decoded = gasEstimatorInterface.decodeFunctionResult("estimate", response)
+    // const decoded = gasEstimatorInterface.decodeFunctionResult("estimate", response)
 
-    if (!decoded.success) {
-      throw Error(`Failed gas estimation with ${tryDecodeError(decoded.result)}`)
-    }
+    // if (!decoded.success) {
+    //   throw Error(`Failed gas estimation with ${tryDecodeError(decoded.result)}`)
+    // }
 
-    const rv = ethers.BigNumber.from(decoded.gas).add(this.txBaseCost(data))
+    // const rv = ethers.BigNumber.from(decoded.gas).add(this.txBaseCost(data))
 
-    console.debug(rv.toString(), "rv");
-
-    return rv;
+    // return rv;
   }
 }

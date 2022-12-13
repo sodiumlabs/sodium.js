@@ -3,7 +3,7 @@ import { WalletConfig, addressOf } from '@0xsodium/config';
 import { sodiumTxAbiEncode, Transaction } from '@0xsodium/transactions';
 import { OverwriterEstimator } from './overwriter-estimator';
 import { BigNumber, ethers } from 'ethers';
-import { Sodium__factory } from '@0xsodium/wallet-contracts';
+import { GasEstimator__factory, Sodium__factory } from '@0xsodium/wallet-contracts';
 import { Estimator } from './estimator';
 
 export class SodiumEstimator implements Estimator {
@@ -18,7 +18,12 @@ export class SodiumEstimator implements Estimator {
     const encoded = sodiumTxAbiEncode(transactions)
 
     const sodiumOverwrites = {
-
+      // [wallet]: {
+      //   code: Sodium__factory.bytecode
+      // },
+      [context.entryPointAddress]: {
+        code: GasEstimator__factory.bytecode
+      }
     }
 
     const estimates = await Promise.all([
@@ -29,7 +34,7 @@ export class SodiumEstimator implements Estimator {
         }
         return this.estimator.estimate({
           to: wallet,
-          from: context.utils.gasEstimator,
+          from: context.entryPointAddress,
           data: walletInterface.encodeFunctionData('execute', [
             encoded.slice(0, i)
           ]),
@@ -38,7 +43,7 @@ export class SodiumEstimator implements Estimator {
       }),
       this.estimator.estimate({
         to: wallet,
-        from: context.utils.gasEstimator,
+        from: context.entryPointAddress,
         data: walletInterface.encodeFunctionData('execute', [
           encoded
         ]),
