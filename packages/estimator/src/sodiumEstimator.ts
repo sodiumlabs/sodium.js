@@ -14,18 +14,12 @@ export class SodiumEstimator implements Estimator {
   async estimateGasLimits(config: WalletConfig, context: WalletContext, ...transactions: Transaction[]): Promise<{ transactions: Transaction[], total: ethers.BigNumber }> {
     const wallet = addressOf(config, context)
     const walletInterface = Sodium__factory.createInterface();
-
     const encoded = sodiumTxAbiEncode(transactions)
-
     const sodiumOverwrites = {
-      // [wallet]: {
-      //   code: Sodium__factory.bytecode
-      // },
       [context.entryPointAddress]: {
         code: GasEstimator__factory.bytecode
       }
     }
-
     const estimates = await Promise.all([
       ...encoded.map(async (tx, i) => {
         // If the user specifies a gas limit, an additional amount is added as the cost of execution for the "execute" function.
