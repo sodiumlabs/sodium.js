@@ -10,7 +10,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "postinstall": "yarn build",
-    "build": "graphclient build && mv ./.graphclient ./src/.graphclient && rm -rf ./src/.graphclient/package.json"
+    "build": "graphclient build && rm -rf  ./src/.graphclient && mv ./.graphclient ./src/.graphclient && rm -rf ./src/.graphclient/package.json"
   },
   "dependencies": {
     "@0xsodium/abi": "^0.2.0",

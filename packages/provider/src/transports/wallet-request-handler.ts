@@ -15,7 +15,7 @@ import {
   ProviderEventTypes,
   TypedEventEmitter
 } from '../types';
-import { UserTokenInfo, getUserERC20Tokens, TransactionHistory } from '@0xsodium/graphquery';
+import { UserTokenInfo, getUserERC20Tokens, TransactionHistory, getHistories } from '@0xsodium/graphquery';
 import { ethers, utils, BigNumber } from 'ethers';
 import { ExternalProvider } from '@ethersproject/providers';
 import { NetworkConfig, JsonRpcHandler, JsonRpcRequest, JsonRpcResponseCallback, JsonRpcResponse } from '@0xsodium/network';
@@ -551,108 +551,9 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
         case 'sodium_getTransactionHistory': {
           // TODO tokenId coming soon when nft support
           const [skip, first, chainId, tokenAddress, tokenId] = request.params!
-          // mock
-          const time = parseInt(`${new Date().getTime() / 1000}`);
-          const address = await this.getAddress();
-          let histories = [
-            {
-              type: "complete",
-              transactionHash: "0x0",
-              input: "0xa9059cbb2ab09eb219583f4a59a5d0623ade346d962bcd4e46b11da047c9049b",
-              block: {
-                blockTimestamp: time,
-                blockNumber: "1"
-              },
-              // eip4337
-              userOpHash: "0xmock",
-              erc20Transfers: [
-                {
-                  from: address,
-                  to: "0x17a243f7Dd13BadE0a7001Ad71a7ef4628A75fCB",
-                  amount: "1000000000000000000",
-                  token: {
-                    address: "0x5A0585D409ca86d9Fa771690ea37d32405Da1f67",
-                    chainId: 1337,
-                    name: "PieDAOBTC++",
-                    symbol: "BTC",
-                    decimals: 18,
-                    centerData: {
-                      logoURI: "https://tokens.1inch.io/0x0327112423f3a68efdf1fcf402f6c5cb9f7c33fd.png"
-                    }
-                  },
-                }
-              ],
-              // coming soon
-              erc1155Transfers: [],
-              // coming soon
-              erc721Transfers: [],
-              prefix: "sent",
-            },
-            {
-              type: "complete",
-              transactionHash: "0x0",
-              input: "0xa9059cbb2ab09eb219583f4a59a5d0623ade346d962bcd4e46b11da047c9049b",
-              block: {
-                blockTimestamp: time,
-                blockNumber: "1"
-              },
-              // eip4337
-              userOpHash: "0xmock",
-              erc20Transfers: [
-                {
-                  from: "0x17a243f7Dd13BadE0a7001Ad71a7ef4628A75fCB",
-                  to: address,
-                  amount: "1000000000000000000",
-                  token: {
-                    address: "0x5A0585D409ca86d9Fa771690ea37d32405Da1f67",
-                    chainId: 1337,
-                    name: "PieDAOBTC++",
-                    symbol: "BTC",
-                    decimals: 18,
-                    centerData: {
-                      logoURI: "https://tokens.1inch.io/0x0327112423f3a68efdf1fcf402f6c5cb9f7c33fd.png"
-                    }
-                  },
-                }
-              ],
-              // coming soon
-              erc1155Transfers: [],
-              // coming soon
-              erc721Transfers: [],
-              prefix: "received",
-            },
-            {
-              type: "failed",
-              transactionHash: "0xmock",
-              input: "0x000000",
-              block: {
-                blockTimestamp: time,
-                blockNumber: "1"
-              },
-              // eip4337
-              userOpHash: "0xmock",
-              erc20Transfers: [],
-              // coming soon
-              erc1155Transfers: [],
-              // coming soon
-              erc721Transfers: [],
-              prefix: "unknow"
-            }
-          ] as TransactionHistory[];
-          if (tokenAddress) {
-            histories = histories.filter((h) => {
-              if (h.erc20Transfers.length == 0) {
-                return false;
-              }
-              for (let i = 0; h.erc20Transfers.length; i ++) {
-                if (h.erc20Transfers[i].token.address.toLowerCase() == `${tokenAddress}`.toLowerCase()) {
-                  return true;
-                }
-              }
-              return false;
-            })
-          }
-          response.result = histories.slice(skip, skip+first); 
+          const address = await signer.getAddress();
+          const result = await getHistories(address, chainId, first, skip, tokenAddress);
+          response.result = result;
           break;
         }
 

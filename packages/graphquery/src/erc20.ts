@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers';
 import { getBuiltGraphSDK } from './.graphclient';
 import { UserTokenInfo } from './types';
 
@@ -24,7 +25,7 @@ export const getUserERC20Tokens = async (account: string, chainId: number, first
 
                 }
             },
-            balance: b.value
+            balance: BigNumber.from(b.value)
         }
     });
 }

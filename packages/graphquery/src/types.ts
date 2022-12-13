@@ -29,7 +29,6 @@ export type TransactionHistory = {
     transactionHash: string,
     input: string,
     block: TransactionBlock,
-    // eip4337
     userOpHash: string,
     erc20Transfers: TransactionERC20Transfer[]
     // coming soon

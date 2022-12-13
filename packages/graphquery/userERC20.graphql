@@ -14,18 +14,84 @@ query QueryUserERC20($accountId: ID, $first: Int) {
   }
 }
 
-query QueryUserHistories($accountId: ID, $first: Int, $skip: Int) {
-  accounts(first: 1, skip: 0, where: {id: $accountId}) {
-    id
-    balances(first: $first, skip: 0, where: { value_gt: 0 }) {
+query QueryUserHistories($accountId: String, $first: Int, $skip: Int) {
+  transfers: tokenTransfers(first: $first, skip: $skip, where: { from: $accountId }, orderBy: blockNumber, orderDirection: desc) {
+    logIndex
+    txnHash
+    blockNumber
+    blockHash
+    amount
+    from {
       id
-      value
-      token {
-        id
-        name
-        decimals
-        symbol
-      }
+    }
+    to {
+      id
+    }
+    token {
+      id
+      name
+      decimals
+      symbol
+    }
+  }
+  receives: tokenTransfers(first: $first, skip: $skip, where: { to: $accountId }, orderBy: blockNumber, orderDirection: desc) {
+    blockNumber
+    blockHash
+    txnHash
+    logIndex
+    amount
+    from {
+      id
+    }
+    to {
+      id
+    }
+    token {
+      id
+      name
+      decimals
+      symbol
+    }
+  }
+}
+
+query QueryUserTokenHistories($accountId: String, $tokenAddress: String, $first: Int, $skip: Int) {
+  transfers: tokenTransfers(first: $first, skip: $skip, where: { from: $accountId, token: $tokenAddress }, orderBy: blockNumber, orderDirection: desc) {
+    logIndex
+    txnHash
+    blockNumber
+    blockHash
+    amount
+    from {
+      id
+    }
+    to {
+      id
+    }
+    token {
+      id
+      name
+      decimals
+      symbol
+    }
+  }
+  receives: tokenTransfers(first: $first, skip: $skip, where: { to: $accountId, token: $tokenAddress }, orderBy: blockNumber, orderDirection: desc) {
+    blockNumber
+    blockHash
+    txnHash
+    logIndex
+    amount
+    from {
+      id
+    }
+    to {
+      id
+    }
+    token {
+      id
+      name
+      decimals
+      symbol
     }
   }
 }

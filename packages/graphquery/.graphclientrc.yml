@@ -2,10 +2,14 @@ sources:
   - name: ERC20
     handler:
       graphql:
-        endpoint: https://api.thegraph.com/subgraphs/name/alberthuang24/sodiumerc20subgraph
+        endpoint: https://api.thegraph.com/subgraphs/name/alberthuang24/sodium80001erc20subgraph
 
 documents:
   - ./userERC20.graphql
 
 codegen:
   contextType: 'MeshContext & { chainId: string }'
+  scalars:
+    BigInt: string
+    Bytes: string
+    BigDecimal: string

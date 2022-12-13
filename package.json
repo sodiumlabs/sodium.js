@@ -19,7 +19,7 @@
     "audit:fix": "npx yarn-audit-fix",
     "typecheck": "tsc --noEmit",
     "dev": "preconstruct dev",
-    "postinstall": "preconstruct build",
+    "postinstall": "wsrun --package @0xsodium/graphquery -c build && preconstruct build",
     "coverage": "rimraf ./coverage && rimraf ./.nyc_output && nyc yarn test",
     "link-sodium": "./scripts/yarn-link.sh link",
     "unlink-sodium": "./scripts/yarn-link.sh unlink",
