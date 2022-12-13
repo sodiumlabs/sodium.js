@@ -18,10 +18,10 @@ export interface WalletContext {
 }
 
 export const sodiumContext: WalletContext = {
-  entryPointAddress: "0xC8Ddd44bB33BBC2c8DCcB0BB958DdE47363D5C28",
+  entryPointAddress: "0xd32cFD0A47069905444a6F49f66da2e9557E361a",
   singletonAddress: "0xA5512e27D4F5178DA33750647944F7496b608F55",
   defaultHandlerAddress: "0xd8CBB2C610f4877547077752c99B7D5ce2E5F115",
-  walletCreatorAddress: "0x34D0F455e9fC681ab9896CeeA5f1A5acbFb4497a",
+  walletCreatorAddress: "0xFc9A2c3eCb53fB7aA1149bB3A0CC82232DC2A8ef",
 
   modules: {
     multicall: ""

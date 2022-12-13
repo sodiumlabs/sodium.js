@@ -1,4 +1,4 @@
-import { ethers } from "ethers"
+import { BigNumber, ethers } from "ethers"
 import { isBigNumberish, Optionals } from '@0xsodium/utils'
 import { GasEstimator__factory } from '@0xsodium/wallet-contracts';
 
@@ -103,10 +103,7 @@ export class OverwriterEstimator {
     }, {}) : {}
 
     const overwrites = {
-      ...providedOverwrites,
-      [from]: {
-        code: GasEstimator__factory.bytecode
-      }
+      ...providedOverwrites
     }
 
     const response = await this.provider.send("eth_call", [{
@@ -114,7 +111,7 @@ export class OverwriterEstimator {
       data: encodedEstimate,
       gasPrice: args.gasPrice,
       gas: args.gas,
-    }, blockTag, overwrites])
+    }, blockTag, overwrites]);
 
     const decoded = gasEstimatorInterface.decodeFunctionResult("estimate", response)
 
@@ -122,6 +119,10 @@ export class OverwriterEstimator {
       throw Error(`Failed gas estimation with ${tryDecodeError(decoded.result)}`)
     }
 
-    return ethers.BigNumber.from(decoded.gas).add(this.txBaseCost(data))
+    const rv = ethers.BigNumber.from(decoded.gas).add(this.txBaseCost(data))
+
+    console.debug(rv.toString(), "rv");
+
+    return rv;
   }
 }

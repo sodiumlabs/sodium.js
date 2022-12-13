@@ -213,7 +213,7 @@ export abstract class BaseWalletAPI {
     const {
       callData,
       callGasLimit
-    } = await this.encodeUserOpCallDataAndGasLimit(info)
+    } = await this.encodeUserOpCallDataAndGasLimit(info);
     const initCode = await this.getInitCode();
     let verificationGasLimit = BigNumber.from(await this.getVerificationGasLimit())
     if (initCode.length > 2) {
