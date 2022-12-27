@@ -9,7 +9,6 @@
   "author": "Horizon Blockchain Games",
   "license": "Apache-2.0",
   "scripts": {
-    "postinstall": "yarn build",
     "build": "graphclient build && rm -rf  ./src/.graphclient && mv ./.graphclient ./src/.graphclient && rm -rf ./src/.graphclient/package.json"
   },
   "dependencies": {
