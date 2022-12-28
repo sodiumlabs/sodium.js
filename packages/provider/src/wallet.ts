@@ -249,7 +249,7 @@ export class Wallet implements WalletProvider {
   }
 
   loadSession = async (): Promise<WalletSession | undefined> => {
-    const data = await LocalStorage.getInstance().getItem('@sequence.session')
+    const data = await LocalStorage.getInstance().getItem('@sodium.session')
     if (!data || data === '') {
       return undefined
     }
@@ -454,14 +454,16 @@ export class Wallet implements WalletProvider {
     this.transport.messageProvider!.closeWallet()
   }
 
-  getProvider(chainId?: ChainIdLike): Web3Provider | undefined {
+  getProvider(chainId?: ChainIdLike): Web3Provider {
     // return the top-level provider message transport when chainId is unspecified
     // and user has not logged in
     if (!this.isConnected()) {
       if (chainId) {
         throw new Error(`session is empty. connect and try again.`)
-      } else {
+      } else if (this.transport.provider) {
         return this.transport.provider
+      } else {
+        throw new Error(`session is empty. connect and try again.`)
       }
     }
 
@@ -652,7 +654,7 @@ export class Wallet implements WalletProvider {
 
   private clearSession(): void {
     logger.debug('wallet provider: clearing session')
-    LocalStorage.getInstance().removeItem('@sequence.session')
+    LocalStorage.getInstance().removeItem('@sodium.session')
     this.session = undefined
     this.networks = []
     this.providers = {}
@@ -718,9 +720,6 @@ export interface ProviderConfig {
 
 export const DefaultProviderConfig: ProviderConfig = {
   walletAppURL: 'https://sequence.app',
-
-  // walletSessionURL: 'https://session.sequence.app',
-
   transports: {
     windowTransport: { enabled: true },
     proxyTransport: { enabled: false }

@@ -464,6 +464,12 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
           break
         }
 
+        case 'eth_coinbase': {
+          const walletAddress = ethers.utils.getAddress(await signer.getAddress())
+          response.result = walletAddress;
+          break
+        }
+
         case 'eth_call': {
           const [transactionObject, blockTag] = request.params!
           response.result = await provider.call(transactionObject, blockTag)

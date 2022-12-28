@@ -400,7 +400,6 @@ export abstract class BaseWalletTransport implements WalletTransport {
       // prompt user with a connect request. the options will be used as previously set above.
       // upon success, the walletRequestHandler will notify the dapp with the ConnectDetails.
       // upon cancellation by user, the walletRequestHandler will throw an error
-
       if (intent && intent.type === 'connect') {
         // notify wallet is opened, without session details
         this.notifyOpen({

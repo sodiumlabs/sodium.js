@@ -6,7 +6,7 @@ import { logger } from '@0xsodium/utils'
 export class PublicProvider implements JsonRpcMiddlewareHandler {
 
   private privateJsonRpcMethods = [
-    'net_version', 'eth_chainId', 'eth_accounts', ...SignerJsonRpcMethods
+    'net_version', 'eth_chainId', 'eth_coinbase', 'eth_accounts', ...SignerJsonRpcMethods
   ]
 
   private provider?: JsonRpcProvider

@@ -4,9 +4,12 @@ export const SignerJsonRpcMethods = [
   'personal_sign', 'eth_sign', 'eth_signTypedData', 'eth_signTypedData_v4',
   'eth_sendTransaction', 'eth_sendRawTransaction',
   
-  'sequence_getWalletContext', 'sequence_getWalletConfig', 'sequence_getWalletState', 'sequence_getNetworks',
-  'sequence_updateConfig', 'sequence_publishConfig', 'sequence_gasRefundOptions',
-  'sequence_getNonce', 'sequence_relay',
+  'sodium_getWalletContext', 'sodium_getWalletConfig', 'sodium_getWalletState', 'sodium_getNetworks',
+  'sodium_updateConfig', 'sodium_publishConfig', 'sodium_gasRefundOptions',
+  'sodium_getNonce', 'sodium_relay',
+
+  'eth_chainId',
+  'eth_coinbase',
 
   'eth_decrypt', 'eth_getEncryptionPublicKey',
   'wallet_addEthereumChain', 'wallet_switchEthereumChain',
@@ -31,7 +34,7 @@ export class SigningProvider implements JsonRpcMiddlewareHandler {
       }
 
       // Continue to next handler
-      next(request, callback, chainId)
+      // next(request, callback, chainId)
     }
   }
 

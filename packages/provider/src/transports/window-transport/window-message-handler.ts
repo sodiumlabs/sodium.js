@@ -25,7 +25,7 @@ export class WindowMessageHandler extends BaseWalletTransport {
   async register(windowHref?: any) {
     const isPopup = parent.window.opener !== null
     this._isPopup = isPopup
-    if (isPopup !== true) {
+    if (!isPopup) {
       return
     }
 
