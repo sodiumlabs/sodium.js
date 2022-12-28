@@ -1,5 +1,16 @@
 # @0xsodium/bundler
 
+## 0.3.0
+
+### Minor Changes
+
+- fix postinstall
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/utils@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes

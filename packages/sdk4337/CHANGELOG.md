@@ -1,5 +1,20 @@
 # @0xsodium/sdk4337
 
+## 0.3.0
+
+### Minor Changes
+
+- fix postinstall
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/config@0.3.0
+  - @0xsodium/estimator@0.3.0
+  - @0xsodium/network@0.3.0
+  - @0xsodium/transactions@0.3.0
+  - @0xsodium/utils@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes
