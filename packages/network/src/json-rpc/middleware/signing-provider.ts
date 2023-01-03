@@ -8,9 +8,6 @@ export const SignerJsonRpcMethods = [
   'sodium_updateConfig', 'sodium_publishConfig', 'sodium_gasRefundOptions',
   'sodium_getNonce', 'sodium_relay',
 
-  'eth_chainId',
-  'eth_coinbase',
-
   'eth_decrypt', 'eth_getEncryptionPublicKey',
   'wallet_addEthereumChain', 'wallet_switchEthereumChain',
   'wallet_registerOnboarding', 'wallet_watchAsset',
@@ -34,7 +31,7 @@ export class SigningProvider implements JsonRpcMiddlewareHandler {
       }
 
       // Continue to next handler
-      // next(request, callback, chainId)
+      next(request, callback, chainId)
     }
   }
 

@@ -48,6 +48,13 @@ export class EagerProvider implements JsonRpcMiddlewareHandler {
           }
           break
 
+        case 'eth_coinbase':
+          if (this.props.accountAddress) {
+            callback(undefined, { jsonrpc: '2.0', id: id!, result: ethers.utils.getAddress(this.props.accountAddress) })
+            return
+          }
+          break
+
         case 'sodium_getWalletContext':
           if (this.props.walletContext) {
             callback(undefined, { jsonrpc: '2.0', id: id!, result: this.props.walletContext })

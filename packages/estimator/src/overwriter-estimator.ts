@@ -97,7 +97,7 @@ export class OverwriterEstimator {
     }, {}) : {}
 
     const overwrites = {
-      ...providedOverwrites
+      ...providedOverwrites,
     }
 
     const response = await this.provider.send("eth_call", [{

@@ -15,8 +15,6 @@ import { PaymasterInfo } from '@0xsodium/sdk4337';
 
 export abstract class Signer extends AbstractSigner {
   abstract getProvider(chainId?: number): Promise<JsonRpcProvider | undefined>
-  // abstract getRelayer(chainId?: number): Promise<Relayer | undefined>
-
   abstract getWalletContext(): Promise<WalletContext>
   abstract getWalletConfig(chainId?: ChainIdLike): Promise<WalletConfig[]>
   abstract getWalletState(chainId?: ChainIdLike): Promise<WalletState[]>
@@ -45,6 +43,7 @@ export abstract class Signer extends AbstractSigner {
   abstract sendTransaction(
     transaction: Deferrable<Transactionish>,
     chainId?: ChainIdLike,
+    paymasterId?: string
   ): Promise<TransactionResponse>
 
   // sendTransactionBatch provides the ability to send an array/batch of transactions as a single native on-chain transaction.
@@ -52,6 +51,7 @@ export abstract class Signer extends AbstractSigner {
   abstract sendTransactionBatch(
     transactions: Deferrable<TransactionRequest[] | Transaction[]>,
     chainId?: ChainIdLike,
+    paymasterId?: string
   ): Promise<TransactionResponse>
 
   // Low-level methods to sign and send/relayer signed transactions separately. The combination of these methods
@@ -63,7 +63,11 @@ export abstract class Signer extends AbstractSigner {
     allSigners?: boolean
   ): Promise<SignedTransaction>
 
-  abstract sendSignedTransactions(signedTxs: SignedTransaction, chainId?: ChainIdLike): Promise<TransactionResponse>
+  abstract sendSignedTransactions(
+    signedTxs: SignedTransaction, 
+    chainId?: ChainIdLike,
+    paymasterId?: string
+  ): Promise<TransactionResponse>
 
   // isDeployed ..
   abstract isDeployed(chainId?: ChainIdLike): Promise<boolean>

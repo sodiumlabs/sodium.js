@@ -1,5 +1,107 @@
 # @0xsodium/wallet
 
+## 0.9.0
+
+### Minor Changes
+
+- fix iframe provider bug
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@0.9.0
+  - @0xsodium/config@0.9.0
+  - @0xsodium/guard@0.9.0
+  - @0xsodium/network@0.9.0
+  - @0xsodium/sdk4337@0.9.0
+  - @0xsodium/transactions@0.9.0
+  - @0xsodium/utils@0.9.0
+
+## 0.8.0
+
+### Minor Changes
+
+- Support iframe provider
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@0.8.0
+  - @0xsodium/config@0.8.0
+  - @0xsodium/guard@0.8.0
+  - @0xsodium/network@0.8.0
+  - @0xsodium/sdk4337@0.8.0
+  - @0xsodium/transactions@0.8.0
+  - @0xsodium/utils@0.8.0
+
+## 0.7.0
+
+### Minor Changes
+
+- Support paymaster
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@0.7.0
+  - @0xsodium/config@0.7.0
+  - @0xsodium/guard@0.7.0
+  - @0xsodium/network@0.7.0
+  - @0xsodium/sdk4337@0.7.0
+  - @0xsodium/transactions@0.7.0
+  - @0xsodium/utils@0.7.0
+
+## 0.6.0
+
+### Minor Changes
+
+- fix bugs
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@0.6.0
+  - @0xsodium/config@0.6.0
+  - @0xsodium/guard@0.6.0
+  - @0xsodium/network@0.6.0
+  - @0xsodium/sdk4337@0.6.0
+  - @0xsodium/transactions@0.6.0
+  - @0xsodium/utils@0.6.0
+
+## 0.5.0
+
+### Minor Changes
+
+- fix bugs
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@0.5.0
+  - @0xsodium/config@0.5.0
+  - @0xsodium/guard@0.5.0
+  - @0xsodium/network@0.5.0
+  - @0xsodium/sdk4337@0.5.0
+  - @0xsodium/transactions@0.5.0
+  - @0xsodium/utils@0.5.0
+
+## 0.4.0
+
+### Minor Changes
+
+- fix bugs
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@0.4.0
+  - @0xsodium/config@0.4.0
+  - @0xsodium/guard@0.4.0
+  - @0xsodium/network@0.4.0
+  - @0xsodium/sdk4337@0.4.0
+  - @0xsodium/transactions@0.4.0
+  - @0xsodium/utils@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes

@@ -70,7 +70,7 @@ export interface ProviderMessageTransport {
   sendMessage(message: ProviderMessage<any>): void
 }
 
-export type WindowSessionParam = 'sid' | 'net' | 'intent'
+export type WindowSessionParam = 'sid' | 'net' | 'intent' | 'iframe'
 
 export interface WindowSessionParams extends URLSearchParams {
   get(name: WindowSessionParam): string | null

@@ -23,6 +23,7 @@ import { JsonRpcProvider } from '@ethersproject/providers'
 import { Web3Provider, Web3Signer } from './provider'
 import {
   MuxMessageProvider,
+  IframeMessageProvider,
   WindowMessageProvider,
   ProxyMessageProvider,
   ProxyMessageChannelPort,
@@ -35,6 +36,8 @@ import { LocalStore, ItemStore, LocalStorage } from './utils'
 import { WalletUtils } from './utils/index'
 
 import { Runtime } from 'webextension-polyfill-ts'
+
+const SESSION_LS_KEY = '@sodium.session'
 
 export interface WalletProvider {
   connect(options?: ConnectOptions): Promise<ConnectDetails>
@@ -89,6 +92,7 @@ export class Wallet implements WalletProvider {
     // message communication
     messageProvider?: MuxMessageProvider
     windowMessageProvider?: WindowMessageProvider
+    iframeMessageProvider?: IframeMessageProvider
     proxyMessageProvider?: ProxyMessageProvider
     extensionMessageProvider?: ExtensionMessageProvider
     unrealMessageProvider?: UnrealMessageProvider
@@ -137,26 +141,13 @@ export class Wallet implements WalletProvider {
       this.transport.windowMessageProvider = new WindowMessageProvider(this.config.walletAppURL)
       this.transport.messageProvider.add(this.transport.windowMessageProvider)
     }
+    if (this.config.transports?.iframeTransport?.enabled) {
+      this.transport.iframeMessageProvider = new IframeMessageProvider(this.config.walletAppURL)
+      this.transport.messageProvider.add(this.transport.iframeMessageProvider)
+    }
     if (this.config.transports?.proxyTransport?.enabled) {
       this.transport.proxyMessageProvider = new ProxyMessageProvider(this.config.transports.proxyTransport.appPort!)
       this.transport.messageProvider.add(this.transport.proxyMessageProvider)
-    }
-    if (this.config.transports?.extensionTransport?.enabled) {
-      this.transport.extensionMessageProvider = new ExtensionMessageProvider(this.config.transports.extensionTransport.runtime)
-      // this.transport.extensionMessageProvider.register()
-      this.transport.messageProvider.add(this.transport.extensionMessageProvider)
-
-      // NOTE/REVIEW: see note in mux-message-provider
-      //
-      // We don't add the extensionMessageProvider here because we don't send requests to it anyways, we seem to
-      // send all requests to the WindowMessageProvider anyways. By allowing it, if browser restarts, it will break
-      // the entire extension because messageProvider.provider will be undefined. So this is a hack to fix it.
-      //
-      // this.transport.messageProvider.add(this.transport.extensionMessageProvider)
-    }
-    if (this.config.transports?.unrealTransport?.enabled) {
-      this.transport.unrealMessageProvider = new UnrealMessageProvider(this.config.walletAppURL)
-      this.transport.messageProvider.add(this.transport.unrealMessageProvider)
     }
     this.transport.messageProvider.register()
 
@@ -249,7 +240,8 @@ export class Wallet implements WalletProvider {
   }
 
   loadSession = async (): Promise<WalletSession | undefined> => {
-    const data = await LocalStorage.getInstance().getItem('@sodium.session')
+    const data = await LocalStorage.getInstance().getItem(SESSION_LS_KEY)
+
     if (!data || data === '') {
       return undefined
     }
@@ -570,9 +562,8 @@ export class Wallet implements WalletProvider {
   }
 
   private saveSession = async (session: WalletSession) => {
-    logger.debug('wallet provider: saving session')
     const data = JSON.stringify(session)
-    await LocalStorage.getInstance().setItem('@sequence.session', data)
+    await LocalStorage.getInstance().setItem(SESSION_LS_KEY, data)
   }
 
   private useSession = async (session: WalletSession, autoSave: boolean = true) => {
@@ -693,22 +684,20 @@ export interface ProviderConfig {
       enabled: boolean
     }
 
+    iframeTransport?: {
+      enabled: boolean
+    }
+
     // ProxyMessage transport (optional)
     proxyTransport?: {
       enabled: boolean
       appPort?: ProxyMessageChannelPort
     }
 
-    // Extension transport (optional)
-    extensionTransport?: {
-      enabled: boolean
-      runtime: Runtime.Static
-    }
-
-    // Unreal Engine transport (optional)
-    unrealTransport?: {
-      enabled: boolean
-    }
+    // // Unreal Engine transport (optional)
+    // unrealTransport?: {
+    //   enabled: boolean
+    // }
   }
 
   // Sequence Wallet Modules Context override. By default (and recommended), the
@@ -719,9 +708,10 @@ export interface ProviderConfig {
 }
 
 export const DefaultProviderConfig: ProviderConfig = {
-  walletAppURL: 'https://sequence.app',
+  walletAppURL: 'https://sodium-two.vercel.app',
   transports: {
     windowTransport: { enabled: true },
+    iframeTransport: { enabled: false },
     proxyTransport: { enabled: false }
   }
 }

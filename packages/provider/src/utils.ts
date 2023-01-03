@@ -133,7 +133,7 @@ export class LocalStorage {
 
   const walletStateForRequiredChain = walletState.find(state => state.chainId === chainId)
   if (!walletStateForRequiredChain) {
-    throw new Error(`WalletRequestHandler: could not find wallet state for chainId ${chainId}`)
+    throw new Error(`WalletRequestHandler: could not find wallet state for chainId ${chainId} ${JSON.stringify(walletState)}`)
   }
 
   const isDeployed = walletStateForRequiredChain.deployed

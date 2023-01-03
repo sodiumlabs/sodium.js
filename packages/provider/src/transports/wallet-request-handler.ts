@@ -549,8 +549,6 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
           erc20TokenInfos.forEach(v => {
             response.result.push(v);
           })
-
-          console.debug(response.result, "debug");
           break;
         }
 

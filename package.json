@@ -10,7 +10,7 @@
     "clean": "rimraf ./node_modules && bash ./scripts/clear-node_modules.sh",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "yarn build && changeset publish",
+    "release": "changeset publish",
     "test": "wsrun --serial -c test",
     "test:parallel": "wsrun -c test",
     "lint": "eslint -c .eslintrc.js 'packages/**/src/**/*.{ts,tsx}'",

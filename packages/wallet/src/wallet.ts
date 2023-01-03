@@ -180,7 +180,15 @@ export class Wallet extends Signer {
 
   async getWalletState(_?: ChainIdLike): Promise<WalletState[]> {
     const [address, chainId, isDeployed] = await Promise.all([this.getAddress(), this.getChainId(), this.isDeployed()])
-    return [];
+    const state: WalletState = {
+      context: this.context,
+      config: this.config,
+      address: address,
+      chainId: chainId,
+      deployed: isDeployed,
+      imageHash: this.imageHash,
+    }
+    return [state]
   }
 
   // connected reports if json-rpc provider has been connected
@@ -264,7 +272,7 @@ export class Wallet extends Signer {
   async sendTransaction(
     transaction: Deferrable<Transactionish>,
     chainId?: ChainIdLike,
-    waitForReceipt?: boolean
+    paymasterId?: string,
   ): Promise<TransactionResponse> {
     const signedTxs = await this.signTransactions(transaction, chainId);
     // TODO
@@ -281,9 +289,9 @@ export class Wallet extends Signer {
   async sendTransactionBatch(
     transactions: Deferrable<TransactionRequest[] | Transaction[]>,
     chainId?: ChainIdLike,
-    waitForReceipt?: boolean
+    paymasterId?: string,
   ): Promise<TransactionResponse> {
-    return this.sendTransaction(transactions, chainId, waitForReceipt)
+    return this.sendTransaction(transactions, chainId, paymasterId)
   }
 
   // signTransactions will sign a Sequence transaction with the wallet signers
@@ -301,7 +309,11 @@ export class Wallet extends Signer {
     return this.wallet4337API.signTransactions(txs, signChainId);
   }
 
-  async sendSignedTransactions(signedTxs: SignedTransaction, chainId?: ChainIdLike): Promise<TransactionResponse> {
+  async sendSignedTransactions(
+    signedTxs: SignedTransaction, 
+    chainId?: ChainIdLike,
+    paymasterId?: string
+  ): Promise<TransactionResponse> {
     await this.getChainIdNumber(chainId)
     return this.wallet4337API.sendSignedTransaction(signedTxs);
   }

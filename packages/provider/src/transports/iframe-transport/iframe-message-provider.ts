@@ -4,11 +4,12 @@ import { logger, base64EncodeObject } from '@0xsodium/utils'
 import { isBrowserExtension, isUnityPlugin } from '../../utils'
 
 // ..
-let registeredWindowMessageProvider: WindowMessageProvider | undefined
+let registeredWindowMessageProvider: IframeMessageProvider | undefined
 
-export class WindowMessageProvider extends BaseProviderTransport {
+export class IframeMessageProvider extends BaseProviderTransport {
   private walletURL: URL
-  private walletWindow: Window | null
+
+  private iframe: HTMLIFrameElement | null;
 
   constructor(walletAppURL: string) {
     super()
@@ -28,21 +29,17 @@ export class WindowMessageProvider extends BaseProviderTransport {
 
     // open heartbeat
     this.on('open', () => {
-      // Heartbeat to track if window closed
-      const popup = this.walletWindow
-      const interval = setInterval(() => {
-        if (popup && popup.closed) {
-          clearInterval(interval)
-          this.close()
-        }
-      }, 500)
+      if (this.iframe) {
+        this.iframe.addEventListener('close', () => {
+          this.close();
+        });
+      }
     })
 
     // close clean up
     this.on('close', () => {
-      if (this.walletWindow) {
-        this.walletWindow.close()
-        this.walletWindow = null
+      if (this.iframe) {
+        this.iframe.style.display = 'none';
       }
     })
 
@@ -58,15 +55,14 @@ export class WindowMessageProvider extends BaseProviderTransport {
       registeredWindowMessageProvider = undefined
     }
     window.removeEventListener('message', this.onWindowEvent)
-
     // clear event listeners
     this.events.removeAllListeners()
   }
 
   openWallet = (path?: string, intent?: OpenWalletIntent, networkId?: string | number): void => {
-    if (this.walletWindow && this.isOpened()) {
-      // TODO: update the location of window to path
-      this.walletWindow.focus()
+    if (this.iframe && this.isOpened()) {
+      this.iframe.style.display = 'block';
+      this.iframe.focus()
       return
     }
 
@@ -105,39 +101,42 @@ export class WindowMessageProvider extends BaseProviderTransport {
       windowSessionParams.set('net', `${networkId}`)
     }
 
-    // Open popup window on center of the app window
-    let windowSize: number[]
-    let windowPos: number[]
+    windowSessionParams.set('iframe', 'true');
 
-    if (isBrowserExtension()) {
-      windowSize = [450, 750]
-      windowPos = [Math.abs(window.screen.width / 2 - windowSize[0] / 2), Math.abs(window.screen.height / 2 - windowSize[1] / 2)]
-    } else {
-      windowSize = [450, 750]
-      windowPos = [
-        Math.abs(window.screenX + window.innerWidth / 2 - windowSize[0] / 2),
-        Math.abs(window.screenY + window.innerHeight / 2 - windowSize[1] / 2)
-      ]
-    }
-
-    const windowFeatures =
-      `toolbar=0,location=0,menubar=0,scrollbars=yes,status=yes` +
-      `,width=${windowSize[0]},height=${windowSize[1]}` +
-      `,left=${windowPos[0]},top=${windowPos[1]}`
+    const windowSize = [450, 750]
+    const windowPos = [
+      Math.abs(window.screenX + window.innerWidth / 2 - windowSize[0] / 2),
+      Math.abs(35)
+    ]
 
     // serialize params
     walletURL.search = windowSessionParams.toString()
 
-    this.walletWindow = window.open(walletURL.href, 'sodium.app', windowFeatures)
+    const iframe = document.createElement('iframe');
+    iframe.src = walletURL.href;
+    iframe.style.position = 'fixed';
+    iframe.style.border = 'none';
+    iframe.style.display = 'block';
+    iframe.style.zIndex = '10000';
+    iframe.style.width = `${windowSize[0]}px`;
+    iframe.style.height = `${windowSize[1]}px`;
+    iframe.style.top = `${windowPos[1]}px`;
+    iframe.style.left = `${windowPos[0]}px`;
+    iframe.title = 'sodium.app';
+    document.body.appendChild(iframe);
+    this.iframe = iframe;
   }
 
   closeWallet() {
     this.close()
-    this.walletWindow?.close()
+    if (this.iframe) {
+      this.iframe.style.display = 'none';
+    }
   }
 
   // onmessage, receives ProviderMessageResponse from the wallet post-message transport
   private onWindowEvent = (event: MessageEvent) => {
+    console.debug(event);
     // Security check, ensure message is coming from wallet origin url
     if (event.origin !== this.walletURL.origin) {
       // Safetly can skip events not from the wallet
@@ -161,11 +160,15 @@ export class WindowMessageProvider extends BaseProviderTransport {
   }
 
   sendMessage(message: ProviderMessage<any>) {
-    if (!this.walletWindow) {
-      logger.warn('WindowMessageProvider: sendMessage failed as walletWindow is unavailable')
+    if (this.iframe === null) {
+      logger.warn('IframeMessageProvider: sendMessage failed as iframe is unavailable')
+      return
+    }
+    if (this.iframe.contentWindow === null) {
+      logger.warn('IframeMessageProvider: sendMessage failed as iframe window is unavailable')
       return
     }
     const postedMessage = typeof message !== 'string' ? JSON.stringify(message) : message
-    this.walletWindow.postMessage(postedMessage, this.walletURL.origin)
+    this.iframe.contentWindow.postMessage(postedMessage, this.walletURL.origin)
   }
 }

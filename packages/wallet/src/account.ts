@@ -187,10 +187,11 @@ export class Account extends Signer {
 
   async sendTransaction(
     dtransactionish: Deferrable<Transactionish>,
-    chainId?: ChainIdLike
+    chainId?: ChainIdLike,
+    paymasterId?: string,
   ): Promise<TransactionResponse> {
     const wallet = chainId ? this.getWalletByNetwork(chainId).wallet : this.mainWallet().wallet
-    return wallet.sendTransaction(dtransactionish, chainId);
+    return wallet.sendTransaction(dtransactionish, chainId, paymasterId);
   }
 
   waitForTransaction(transactionHash: string, confirmations?: number | undefined, timeout?: number | undefined, chainId?: ChainIdLike): Promise<TransactionReceipt> {
@@ -206,8 +207,9 @@ export class Account extends Signer {
   async sendTransactionBatch(
     transactions: Deferrable<TransactionRequest[] | Transaction[]>,
     chainId?: ChainIdLike,
+    paymasterId?: string,
   ): Promise<TransactionResponse> {
-    return this.sendTransaction(transactions, chainId);
+    return this.sendTransaction(transactions, chainId, paymasterId);
   }
 
   async signTransactions(
@@ -218,9 +220,13 @@ export class Account extends Signer {
     return wallet.signTransactions(dtransactionish, chainId)
   }
 
-  async sendSignedTransactions(signedTxs: SignedTransaction, chainId?: ChainIdLike): Promise<TransactionResponse> {
+  async sendSignedTransactions(
+    signedTxs: SignedTransaction, 
+    chainId?: ChainIdLike,
+    paymasterId?: string,
+  ): Promise<TransactionResponse> {
     const wallet = chainId ? this.getWalletByNetwork(chainId).wallet : this.mainWallet().wallet
-    return wallet.sendSignedTransactions(signedTxs, chainId);
+    return wallet.sendSignedTransactions(signedTxs, chainId, paymasterId);
   }
 
   getPaymasterInfos(transactions: TransactionRequest, chainId?: ChainIdLike): Promise<PaymasterInfo[]> {
