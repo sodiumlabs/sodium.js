@@ -19,6 +19,7 @@ query QueryUserHistories($accountId: String, $first: Int, $skip: Int) {
     logIndex
     txnHash
     blockNumber
+    blockTimestamp
     blockHash
     amount
     from {
@@ -37,6 +38,7 @@ query QueryUserHistories($accountId: String, $first: Int, $skip: Int) {
   receives: tokenTransfers(first: $first, skip: $skip, where: { to: $accountId }, orderBy: blockNumber, orderDirection: desc) {
     blockNumber
     blockHash
+    blockTimestamp
     txnHash
     logIndex
     amount
@@ -55,11 +57,32 @@ query QueryUserHistories($accountId: String, $first: Int, $skip: Int) {
   }
 }
 
+query QueryUserAllowances($accountId: String, $first: Int, $skip: Int) {
+  tokenApprovals(first: $first, skip: $skip, where: { ownerAccount: $accountId, value_gt: 0 }) {
+    logIndex
+    txnHash
+    blockNumber
+    blockHash
+    blockTimestamp
+    value
+    spenderAccount {
+      id
+    }
+    token {
+      id
+      name
+      decimals
+      symbol
+    }
+  }
+}
+
 query QueryUserTokenHistories($accountId: String, $tokenAddress: String, $first: Int, $skip: Int) {
   transfers: tokenTransfers(first: $first, skip: $skip, where: { from: $accountId, token: $tokenAddress }, orderBy: blockNumber, orderDirection: desc) {
     logIndex
     txnHash
     blockNumber
+    blockTimestamp
     blockHash
     amount
     from {
@@ -77,6 +100,7 @@ query QueryUserTokenHistories($accountId: String, $tokenAddress: String, $first:
   }
   receives: tokenTransfers(first: $first, skip: $skip, where: { to: $accountId, token: $tokenAddress }, orderBy: blockNumber, orderDirection: desc) {
     blockNumber
+    blockTimestamp
     blockHash
     txnHash
     logIndex

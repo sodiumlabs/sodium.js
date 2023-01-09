@@ -100,7 +100,6 @@ export class UserOperationEventListener {
   }
 
   async extractFailureReason(receipt: TransactionReceipt): Promise<void> {
-    console.log('mark tx as failed')
     receipt.status = 0
     const revertReasonEvents = await this.entryPoint.queryFilter(this.entryPoint.filters.UserOperationRevertReason(this.requestId, this.sender), receipt.blockHash)
     if (revertReasonEvents[0] != null) {
@@ -113,5 +112,6 @@ export class UserOperationEventListener {
       this.reject(new Error(`UserOp failed with reason: ${message}`)
       )
     }
+    this.reject("UserOp failed with unknown")
   }
 }

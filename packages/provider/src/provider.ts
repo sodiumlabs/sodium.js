@@ -231,6 +231,18 @@ export class Web3Signer extends Signer implements TypedDataSigner {
     )
   }
 
+  async getAccountAllowances(skip: number, first: number, chainId?: ChainIdLike): Promise<number[]> {
+    return this.provider.send(
+      'sodium_getAccountAllowances',
+      [
+        skip,
+        first,
+        maybeChainId(chainId),
+      ],
+      maybeChainId(chainId) || this.defaultChainId
+    )
+  }
+
   async getWalletState(chainId?: ChainIdLike): Promise<WalletState[]> {
     return await this.provider.send(
       'sodium_getWalletState',

@@ -350,11 +350,16 @@ export abstract class BaseWalletAPI {
     const userOp = toUserOp(tx);
     const transactionResponse = await this.constructUserOpTransactionResponse(userOp)
     try {
-      await this.httpRpcClient.sendUserOpToBundler(userOp)
+      const userOpHash = await this.httpRpcClient.sendUserOpToBundler(userOp);
+      
+      // TODO
+      // temp impl
+      const txHash = await this.httpRpcClient.getTransactionHashByUserOpHash(userOpHash);
+      transactionResponse.hash = txHash;
     } catch (error: any) {
       throw this.unwrapError(error)
     }
-    // TODO: handle errors - transaction that is "rejected" by bundler is _not likely_ to ever resolve its "wait()"
+
     return transactionResponse
   }
 

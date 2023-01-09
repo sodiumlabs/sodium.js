@@ -1,5 +1,35 @@
 # @0xsodium/sdk4337
 
+## 0.11.0
+
+### Minor Changes
+
+- fix transaction await
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/config@0.11.0
+  - @0xsodium/estimator@0.11.0
+  - @0xsodium/network@0.11.0
+  - @0xsodium/transactions@0.11.0
+  - @0xsodium/utils@0.11.0
+
+## 0.10.0
+
+### Minor Changes
+
+- fix estimator
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/estimator@0.10.0
+  - @0xsodium/transactions@0.10.0
+  - @0xsodium/config@0.10.0
+  - @0xsodium/network@0.10.0
+  - @0xsodium/utils@0.10.0
+
 ## 0.9.0
 
 ### Minor Changes

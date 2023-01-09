@@ -32,26 +32,25 @@ export class SodiumEstimator implements Estimator {
           to: wallet,
           from: from,
           data: walletInterface.encodeFunctionData('execute', [
-            encoded.slice(0, i)
+            encoded.slice(0, i+1)
           ]),
           overwrites: sodiumOverwrites
         })
       }),
-      this.estimator.estimate({
-        to: wallet,
-        from: from,
-        data: walletInterface.encodeFunctionData('execute', [
-          encoded
-        ]),
-        overwrites: sodiumOverwrites
-      })
     ])
 
+    const txs = transactions.map((t, i) => {
+      if (i == 0) {
+        return { ...t, gasLimit: estimates[i] };
+      }
+      return { ...t, gasLimit: estimates[i].sub(estimates[i-1]) };
+    });
     return {
-      transactions: transactions.map((t, i) => {
-        return { ...t, gasLimit: t.gasLimit };
-      }),
-      total: BigNumber.from(estimates[estimates.length - 1])
+      transactions: txs,
+      // total: BigNumber.from(estimates[estimates.length - 1]).add(1000000),
+      total: txs.map(t => t.gasLimit).reduce((p, c) => {
+        return c.add(p);
+      }, BigNumber.from(100000))
     }
   }
 }

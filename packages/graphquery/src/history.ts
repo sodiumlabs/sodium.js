@@ -37,7 +37,7 @@ export const getHistories = async (
                 input: "",
                 block: {
                     blockNumber: a.blockNumber,
-                    blockTimestamp: parseInt(`${new Date().getTime()/ 1000}`),
+                    blockTimestamp: a.blockTimestamp,
                 },
                 userOpHash: "",
                 erc20Transfers: [
@@ -85,10 +85,7 @@ export const getHistories = async (
                 input: "",
                 block: {
                     blockNumber: a.blockNumber,
-                    blockTimestamp: parseInt(`${new Date().getTime()/ 1000}`),
-                    // TODO wait thegraph sync
-                    // https://thegraph.com/hosted-service/subgraph/alberthuang24/sodiumerc20subgraph
-                    // blockTimestamp: a.
+                    blockTimestamp: a.blockTimestamp,
                 },
                 userOpHash: "",
                 erc20Transfers: [

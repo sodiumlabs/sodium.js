@@ -15,7 +15,7 @@ import {
   ProviderEventTypes,
   TypedEventEmitter
 } from '../types';
-import { UserTokenInfo, getUserERC20Tokens, TransactionHistory, getHistories } from '@0xsodium/graphquery';
+import { UserTokenInfo, getUserERC20Tokens, getHistories, getTokenAllowances } from '@0xsodium/graphquery';
 import { ethers, utils, BigNumber } from 'ethers';
 import { ExternalProvider } from '@ethersproject/providers';
 import { NetworkConfig, JsonRpcHandler, JsonRpcRequest, JsonRpcResponseCallback, JsonRpcResponse } from '@0xsodium/network';
@@ -557,6 +557,15 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
           const [skip, first, chainId, tokenAddress, tokenId] = request.params!
           const address = await signer.getAddress();
           const result = await getHistories(address, chainId, first, skip, tokenAddress);
+          response.result = result;
+          break;
+        }
+
+        case 'sodium_getAccountAllowances': {
+          // TODO tokenId coming soon when nft support
+          const [skip, first, chainId] = request.params!
+          const address = await signer.getAddress();
+          const result = await getTokenAllowances(address, chainId, first, skip);
           response.result = result;
           break;
         }

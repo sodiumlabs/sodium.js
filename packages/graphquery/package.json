@@ -1,6 +1,6 @@
 {
   "name": "@0xsodium/graphquery",
-  "version": "0.9.0",
+  "version": "0.11.0",
   "description": "graphquery sub-package for sodium",
   "repository": "https://github.com/sodiumlabs/sodium.js/tree/main/packages/graphquery",
   "source": "src/index.ts",
@@ -12,13 +12,13 @@
     "build": "graphclient build && rm -rf  ./src/.graphclient && mv ./.graphclient ./src/.graphclient && rm -rf ./src/.graphclient/package.json"
   },
   "dependencies": {
-    "@0xsodium/abi": "^0.9.0",
-    "@0xsodium/auth": "^0.9.0",
-    "@0xsodium/config": "^0.9.0",
-    "@0xsodium/network": "^0.9.0",
-    "@0xsodium/transactions": "^0.9.0",
-    "@0xsodium/utils": "^0.9.0",
-    "@0xsodium/wallet": "^0.9.0",
+    "@0xsodium/abi": "^0.11.0",
+    "@0xsodium/auth": "^0.11.0",
+    "@0xsodium/config": "^0.11.0",
+    "@0xsodium/network": "^0.11.0",
+    "@0xsodium/transactions": "^0.11.0",
+    "@0xsodium/utils": "^0.11.0",
+    "@0xsodium/wallet": "^0.11.0",
     "@graphprotocol/client-cli": "^2.2.16",
     "@graphql-mesh/cache-localforage": "^0.7.3",
     "@graphql-mesh/cross-helpers": "^0.3.0",

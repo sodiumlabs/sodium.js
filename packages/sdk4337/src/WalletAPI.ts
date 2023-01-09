@@ -7,7 +7,7 @@ import { arrayify, resolveProperties } from 'ethers/lib/utils'
 import { Signer } from '@ethersproject/abstract-signer'
 import { BaseApiParams, BaseWalletAPI } from './BaseWalletAPI'
 import { TransactionDetailsForUserOp } from './TransactionDetailsForUserOp';
-import { TransactionRequest, flattenAuxTransactions, sodiumTxAbiEncode, Transaction } from '@0xsodium/transactions';
+import { TransactionRequest, flattenAuxTransactions, toSodiumTransactions, sodiumTxAbiEncode, Transaction } from '@0xsodium/transactions';
 import { getWalletInitCode } from '@0xsodium/config';
 import { SodiumEstimator, OverwriterEstimator, OverwriterEstimatorDefaults } from '@0xsodium/estimator';
 import { JsonRpcProvider } from '@ethersproject/providers';
@@ -83,7 +83,10 @@ export class WalletAPI extends BaseWalletAPI {
    */
   async encodeExecute(transactions: TransactionDetailsForUserOp): Promise<string> {
     const walletContract = await this._getWalletContract();
-    const txs = flattenAuxTransactions(transactions);
+    const txs = await toSodiumTransactions(flattenAuxTransactions(transactions));
+
+    console.debug(txs, "txs");
+
     return walletContract.interface.encodeFunctionData(
       'execute',
       [
@@ -93,7 +96,7 @@ export class WalletAPI extends BaseWalletAPI {
   }
 
   async encodeGasLimit(transactions: TransactionRequest): Promise<[Transaction[], BigNumber]> {
-    const txs = flattenAuxTransactions(transactions);
+    const txs = await toSodiumTransactions(flattenAuxTransactions(transactions));
     const estimateResult = await this.sodiumEstimator.estimateGasLimits(this.walletConfig, this.walletContext, ...txs);
     return [
       estimateResult.transactions,

@@ -37,3 +37,16 @@ export type TransactionHistory = {
     erc721Transfers: any[]
     prefix: TransactionPrefixName
 }
+
+// txnHash
+// blockNumber
+// blockHash
+// blockTimestamp
+export type Allowance = {
+    transactionHash: string,
+    blockNumber: string,
+    blockTimestamp: number,
+    value: string,
+    to: string,
+    token: ERC20OrNativeTokenMetadata
+}

@@ -1,5 +1,27 @@
 # @0xsodium/simulator
 
+## 0.11.0
+
+### Minor Changes
+
+- fix transaction await
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/transactions@0.11.0
+
+## 0.10.0
+
+### Minor Changes
+
+- fix estimator
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/transactions@0.10.0
+
 ## 0.9.0
 
 ### Minor Changes

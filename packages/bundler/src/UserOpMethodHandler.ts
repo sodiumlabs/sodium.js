@@ -13,6 +13,9 @@ import Debug from 'debug'
 
 const debug = Debug('aa.handler.userop');
 const HEX_REGEX = /^0x[a-fA-F\d]*$/i
+const userOpCache: {
+  [key: string]: string
+} = {};
 
 export class UserOpMethodHandler {
   constructor (
@@ -139,8 +142,8 @@ export class UserOpMethodHandler {
       throw new Error(`userOp.preVerificationGas too low: expected ${expectedPreVerificationGas} but got ${preVerificationGas}`)
     }
 
-    // const gasLimit = BigNumber.from(userOp.callGasLimit).add(2e7);
-    const gasLimit = undefined;
+    const gasLimit = BigNumber.from(2e7);
+    // const gasLimit = undefined;
     // debug('using gasLimit=', gasLimit)
     const txr = await this.entryPoint.handleOps([userOp], beneficiary, { 
       gasLimit,
@@ -149,8 +152,13 @@ export class UserOpMethodHandler {
     }).catch(rethrowError)
 
     console.debug(txr.hash, "txhash");
+    userOpCache[userOpHash] = txr.hash;
     
     return userOpHash
+  }
+
+  async getTransactionHashByUserOpHash(userOpHash: string): Promise<string> {
+    return userOpCache[userOpHash];
   }
 
   async _getUserOperationEvent (userOpHash: string): Promise<UserOperationEventEvent> {

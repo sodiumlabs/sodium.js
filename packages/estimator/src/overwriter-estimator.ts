@@ -99,22 +99,17 @@ export class OverwriterEstimator {
     const overwrites = {
       ...providedOverwrites,
     }
-
     const response = await this.provider.send("eth_call", [{
       to: from,
       data: encodedEstimate,
       gasPrice: args.gasPrice,
       gas: args.gas,
     }, blockTag, overwrites]);
-
     const decoded = gasEstimatorInterface.decodeFunctionResult("estimate", response)
-
     if (!decoded.success) {
       throw Error(`Failed gas estimation with ${tryDecodeError(decoded.result)}`)
     }
-
     const rv = ethers.BigNumber.from(decoded.gas).add(this.txBaseCost(data))
-
     return rv;
   }
 }

@@ -22,7 +22,7 @@ export function packMetaTransactionsNonceData(nonce: BigNumberish, ...txs: Trans
 
 export async function toSodiumTransactions(
   txs: (Transaction | TransactionRequest)[],
-  revertOnError: boolean = false,
+  revertOnError: boolean = true,
   gasLimit?: BigNumberish
 ): Promise<Transaction[]> {
   // Bundles all transactions, including the auxiliary ones

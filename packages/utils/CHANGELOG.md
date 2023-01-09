@@ -1,5 +1,17 @@
 # @0xsodium/utils
 
+## 0.11.0
+
+### Minor Changes
+
+- fix transaction await
+
+## 0.10.0
+
+### Minor Changes
+
+- fix estimator
+
 ## 0.9.0
 
 ### Minor Changes

@@ -113,6 +113,9 @@ export class BundlerServer {
       case 'eth_sendUserOperation':
         result = await this.methodHandler.sendUserOperation(params[0], params[1])
         break
+      case 'eth_getTransactionHashByUserOpHash':
+        result = await this.methodHandler.getTransactionHashByUserOpHash(params[0])
+        break
       case 'eth_simulateUserOperation':
         result = await this.methodHandler.simulateUserOp(params[0], params[1])
         break

@@ -59,6 +59,11 @@ export class HttpRpcClient {
     return await this.userOpJsonRpcProvider.send('eth_sendUserOperation', [hexifiedUserOp, this.entryPointAddress])
   }
 
+  async getTransactionHashByUserOpHash(userOpHash: string): Promise<string> {
+    await this.initializing
+    return await this.userOpJsonRpcProvider.send('eth_getTransactionHashByUserOpHash', [userOpHash])
+  }
+
   private async printUserOperation([userOp1, entryPointAddress]: [UserOperationStruct, string]): Promise<void> {
     const userOp = await resolveProperties(userOp1)
     debug('sending eth_sendUserOperation', {

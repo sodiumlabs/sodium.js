@@ -275,13 +275,10 @@ export class Wallet extends Signer {
     paymasterId?: string,
   ): Promise<TransactionResponse> {
     const signedTxs = await this.signTransactions(transaction, chainId);
-    // TODO
-    // Now you need to force to wait for eip4337 transaction execution, and later support 4337 request id and tx hash query
     const tr = await this.wallet4337API.sendSignedTransaction(signedTxs);
-    const receipt = await tr.wait();
-
-    console.debug(receipt.transactionHash, "receipt.transactionHash")
-    tr.hash = receipt.transactionHash;
+    // const receipt = await tr.wait();
+    // console.debug(receipt.transactionHash, "receipt.transactionHash")
+    // tr.hash = receipt.transactionHash;
     return tr;
   }
 
