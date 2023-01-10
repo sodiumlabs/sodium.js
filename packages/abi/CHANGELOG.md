@@ -1,5 +1,11 @@
 # @0xsodium/abi
 
+## 0.12.0
+
+### Minor Changes
+
+- eth call cache
+
 ## 0.11.0
 
 ### Minor Changes

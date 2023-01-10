@@ -1,5 +1,16 @@
 # @0xsodium/simulator
 
+## 0.12.0
+
+### Minor Changes
+
+- eth call cache
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/transactions@0.12.0
+
 ## 0.11.0
 
 ### Minor Changes

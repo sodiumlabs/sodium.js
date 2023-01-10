@@ -137,14 +137,14 @@ export class UncheckedJsonRpcSigner extends Signer {
         return this.sendUncheckedTransaction(transaction).then((hash) => {
             return <TransactionResponse>{
                 hash: hash,
-                nonce: null,
-                gasLimit: null,
-                gasPrice: null,
-                data: null,
-                value: null,
-                chainId: null,
+                nonce: transaction.nonce,
+                gasLimit: transaction.gasLimit,
+                gasPrice: transaction.gasPrice,
+                data: transaction.data,
+                value: transaction.value,
+                chainId: transaction.chainId,
                 confirmations: 0,
-                from: null,
+                from: transaction.from,
                 wait: (confirmations?: number) => { return this.provider.waitForTransaction(hash, confirmations); }
             };
         });
@@ -169,10 +169,10 @@ export class UncheckedJsonRpcSigner extends Signer {
 
         if (transaction.to != null) {
             transaction.to = Promise.resolve(transaction.to).then(async (to) => {
-                if (to == null) { return null; }
+                if (to == null) { return undefined; }
                 const address = await this.provider.resolveName(to);
                 if (address == null) {
-                    logger.throwArgumentError("provided ENS name resolves to null", "tx.to", to);
+                    return logger.throwArgumentError("provided ENS name resolves to null", "tx.to", to);
                 }
                 return address;
             });
