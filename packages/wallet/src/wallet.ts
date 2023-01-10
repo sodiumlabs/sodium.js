@@ -155,7 +155,7 @@ export class Wallet extends Signer {
       this.provider = provider
       this.sender = new JsonRpcSender(provider)
     } else {
-      const jsonProvider = new EthJsonRpcProvider(<ConnectionInfo | string>provider, network?.chainId)
+      const jsonProvider = new JsonRpcProvider(<ConnectionInfo | string>provider)
       this.provider = jsonProvider
       this.sender = new JsonRpcSender(jsonProvider)
     }
@@ -370,12 +370,12 @@ export class Wallet extends Signer {
   }
 
   async isDeployed(chainId?: ChainIdLike, blockTag?: BlockTag | undefined): Promise<boolean> {
+    if (this._isDeployed === true) {
+      return true;
+    }
     await this.getChainIdNumber(chainId)
     const walletCode = await this.provider.getCode(this.address, blockTag)
     const rv = !!walletCode && walletCode !== '0x';
-    if (this._isDeployed == true) {
-      return true;
-    }
     if (rv) {
       this._isDeployed = true;
       return true;
