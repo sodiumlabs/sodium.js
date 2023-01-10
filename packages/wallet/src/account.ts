@@ -326,9 +326,9 @@ export class Account extends Signer {
       )
 
       if (network.provider) {
-        wallet.setProvider(network.provider)
+        wallet.setProvider(network.provider, network)
       } else if (network.rpcUrl && network.rpcUrl !== '') {
-        wallet.setProvider(network.rpcUrl)
+        wallet.setProvider(network.rpcUrl, network)
       } else {
         throw new Error(`network config is missing provider settings for chainId ${network.chainId}`)
       }

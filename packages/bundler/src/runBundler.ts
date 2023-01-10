@@ -9,6 +9,7 @@ import { BundlerConfig, bundlerConfigDefault, BundlerConfigShape } from './Bundl
 import { BundlerServer } from './BundlerServer';
 import { UserOpMethodHandler } from './UserOpMethodHandler';
 import { EntryPoint, EntryPoint__factory } from '@0xsodium/wallet-contracts';
+import { UncheckedJsonRpcSigner } from './UncheckSigner';
 
 // this is done so that console.log outputs BigNumber as hex string instead of unreadable object
 export const inspectCustomSymbol = Symbol.for('nodejs.util.inspect.custom')
@@ -45,7 +46,7 @@ function getCommandLineParams (programOpts: any): Partial<BundlerConfig> {
 }
 
 export async function connectContracts (
-  wallet: Wallet,
+  wallet: ethers.Signer,
   entryPointAddress: string,
 ): Promise<{ entryPoint: EntryPoint }> {
   const entryPoint = EntryPoint__factory.connect(entryPointAddress, wallet)
@@ -105,23 +106,30 @@ export async function runBundler (argv: string[], overrideExit = true): Promise<
     console.log('creaed mnemonic file', mnemonicFile)
     process.exit(1)
   }
-  const provider: BaseProvider =
+  const provider: ethers.providers.JsonRpcProvider =
     // eslint-disable-next-line
     config.network === 'hardhat' ? require('hardhat').ethers.provider :
-      ethers.getDefaultProvider(config.network)
+      new ethers.providers.JsonRpcProvider(config.network)
+
+      ethers.getDefaultProvider()
+      // ethers.providers.AlchemyProvider()
   let mnemonic: string
   let wallet: Wallet
   try {
     mnemonic = fs.readFileSync(config.mnemonic, 'ascii').trim();
-    // @ts-ignore
     wallet = Wallet.fromMnemonic(mnemonic).connect(provider)
+
+    // (method: string, params?: Array<any>)
+    
   } catch (e: any) {
     throw new Error(`Unable to read --mnemonic ${config.mnemonic}: ${e.message as string}`)
   }
 
+  const uncheckSigner = new UncheckedJsonRpcSigner(wallet, provider);
+
   const {
     entryPoint
-  } = await connectContracts(wallet, config.entryPoint)
+  } = await connectContracts(uncheckSigner, config.entryPoint)
 
   const methodHandler = new UserOpMethodHandler(
     provider,

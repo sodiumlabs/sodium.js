@@ -40,6 +40,7 @@ export class UserOpMethodHandler {
   }
 
   async selectBeneficiary (): Promise<string> {
+    return this.config.beneficiary;
     const currentBalance = await this.provider.getBalance(this.signer.getAddress())
     let beneficiary = this.config.beneficiary
     // below min-balance redeem to the signer, to keep it active.
@@ -129,27 +130,26 @@ export class UserOpMethodHandler {
     if (entryPointInput.toLowerCase() !== this.config.entryPoint.toLowerCase()) {
       throw new Error(`The EntryPoint at "${entryPointInput}" is not supported. This bundler uses ${this.config.entryPoint}`)
     }
-
     console.log(`UserOperation: Sender=${userOp.sender} EntryPoint=${entryPointInput} Paymaster=${hexValue(userOp.paymasterAndData)}`)
-
-    await this.simulateUserOp(userOp1, entryPointInput)
+    // await this.simulateUserOp(userOp1, entryPointInput)
     const beneficiary = await this.selectBeneficiary()
-    const userOpHash = await this.entryPoint.getUserOpHash(userOp)
-
     const expectedPreVerificationGas = calcPreVerificationGas(userOp)
     const preVerificationGas = BigNumber.from(await userOp.preVerificationGas).toNumber()
     if (expectedPreVerificationGas > preVerificationGas) {
       throw new Error(`userOp.preVerificationGas too low: expected ${expectedPreVerificationGas} but got ${preVerificationGas}`)
     }
-
+    console.debug("start ops");
     const gasLimit = BigNumber.from(2e7);
     // const gasLimit = undefined;
     // debug('using gasLimit=', gasLimit)
-    const txr = await this.entryPoint.handleOps([userOp], beneficiary, { 
-      gasLimit,
-      maxFeePerGas: userOp.maxFeePerGas,
-      maxPriorityFeePerGas: userOp.maxPriorityFeePerGas
-    }).catch(rethrowError)
+    const [ txr, userOpHash ] = await Promise.all([
+      this.entryPoint.handleOps([userOp], beneficiary, { 
+        gasLimit,
+        maxFeePerGas: userOp.maxFeePerGas,
+        maxPriorityFeePerGas: userOp.maxPriorityFeePerGas
+      }).catch(rethrowError),
+      this.entryPoint.getUserOpHash(userOp),
+    ]);
 
     console.debug(txr.hash, "txhash");
     userOpCache[userOpHash] = txr.hash;

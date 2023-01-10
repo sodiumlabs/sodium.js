@@ -1,4 +1,4 @@
-import { Provider, BlockTag, JsonRpcProvider, TransactionResponse } from '@ethersproject/providers'
+import { Provider, BlockTag, JsonRpcProvider as EthJsonRpcProvider, TransactionResponse } from '@ethersproject/providers'
 import { BigNumber, BigNumberish, ethers, Signer as AbstractSigner } from 'ethers';
 import { TypedDataDomain, TypedDataField } from '@ethersproject/abstract-signer';
 import { BytesLike } from '@ethersproject/bytes';
@@ -19,6 +19,7 @@ import {
   JsonRpcSender,
   NetworkConfig,
   isJsonRpcProvider,
+  JsonRpcProvider,
   sodiumContext,
   getChainId,
 } from '@0xsodium/network';
@@ -65,7 +66,7 @@ export class Wallet extends Signer {
 
   // provider is an Ethereum Json RPC provider that is connected to a particular network (aka chain)
   // and access to the signer for signing transactions.
-  provider: JsonRpcProvider
+  provider: EthJsonRpcProvider
 
   // sender is a minimal Json RPC sender interface. It's here for convenience for other web3
   // interfaces to use.
@@ -79,6 +80,8 @@ export class Wallet extends Signer {
 
   // chainId is the node network id, used for memoization
   chainId?: number
+
+  _isDeployed?: boolean
 
   constructor(options: WalletOptions, ...signers: (BytesLike | AbstractSigner)[]) {
     super()
@@ -144,23 +147,24 @@ export class Wallet extends Signer {
 
   // setProvider assigns a json-rpc provider to this wallet instance
   setProvider(
-    provider: JsonRpcProvider | ConnectionInfo | string,
+    provider: EthJsonRpcProvider | ConnectionInfo | string,
+    network?: NetworkConfig
   ): Wallet {
     if (provider === undefined) return this
     if (Provider.isProvider(provider)) {
       this.provider = provider
       this.sender = new JsonRpcSender(provider)
     } else {
-      const jsonProvider = new JsonRpcProvider(<ConnectionInfo | string>provider)
+      const jsonProvider = new EthJsonRpcProvider(<ConnectionInfo | string>provider, network?.chainId)
       this.provider = jsonProvider
       this.sender = new JsonRpcSender(jsonProvider)
     }
-    this.chainId = undefined;
+    this.chainId = network?.chainId;
     this.wallet4337API.setProvider(this.provider);
     return this
   }
 
-  async getProvider(chainId?: number): Promise<JsonRpcProvider> {
+  async getProvider(chainId?: number): Promise<EthJsonRpcProvider> {
     if (chainId) await this.getChainIdNumber(chainId)
     return this.provider
   }
@@ -368,7 +372,15 @@ export class Wallet extends Signer {
   async isDeployed(chainId?: ChainIdLike, blockTag?: BlockTag | undefined): Promise<boolean> {
     await this.getChainIdNumber(chainId)
     const walletCode = await this.provider.getCode(this.address, blockTag)
-    return !!walletCode && walletCode !== '0x'
+    const rv = !!walletCode && walletCode !== '0x';
+    if (this._isDeployed == true) {
+      return true;
+    }
+    if (rv) {
+      this._isDeployed = true;
+      return true;
+    }
+    return false;
   }
 
   // getChainIdFromArgument will return the chainId of the argument, as well as ensure
