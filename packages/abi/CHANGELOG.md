@@ -1,5 +1,29 @@
 # @0xsodium/abi
 
+## 0.16.0
+
+### Minor Changes
+
+- fix provider export
+
+## 0.15.0
+
+### Minor Changes
+
+- fix graphql-mesh unsupported react-native
+
+## 0.14.0
+
+### Minor Changes
+
+- x
+
+## 0.13.0
+
+### Minor Changes
+
+- fix browser buffer api
+
 ## 0.12.0
 
 ### Minor Changes

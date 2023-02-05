@@ -1,6 +1,6 @@
 {
   "name": "@0xsodium/graphquery",
-  "version": "0.12.0",
+  "version": "0.16.0",
   "description": "graphquery sub-package for sodium",
   "repository": "https://github.com/sodiumlabs/sodium.js/tree/main/packages/graphquery",
   "source": "src/index.ts",
@@ -9,28 +9,18 @@
   "author": "Horizon Blockchain Games",
   "license": "Apache-2.0",
   "scripts": {
-    "build": "graphclient build && rm -rf  ./src/.graphclient && mv ./.graphclient ./src/.graphclient && rm -rf ./src/.graphclient/package.json"
+    "build": "echo ok"
   },
   "dependencies": {
-    "@0xsodium/abi": "^0.12.0",
-    "@0xsodium/auth": "^0.12.0",
-    "@0xsodium/config": "^0.12.0",
-    "@0xsodium/network": "^0.12.0",
-    "@0xsodium/transactions": "^0.12.0",
-    "@0xsodium/utils": "^0.12.0",
-    "@0xsodium/wallet": "^0.12.0",
-    "@graphprotocol/client-cli": "^2.2.16",
-    "@graphql-mesh/cache-localforage": "^0.7.3",
-    "@graphql-mesh/cross-helpers": "^0.3.0",
-    "@graphql-mesh/graphql": "^0.33.4",
-    "@graphql-mesh/http": "^0.3.3",
-    "@graphql-mesh/merger-bare": "^0.16.4",
-    "@graphql-mesh/runtime": "^0.46.2",
-    "@graphql-mesh/store": "^0.9.3",
-    "@graphql-mesh/utils": "^0.43.3",
-    "@whatwg-node/fetch": "^0.5.3",
     "ethers": "^5.7.0",
-    "graphql": "16.6.0"
+    "graphql": "16.6.0",
+    "graphql-request": "^5.1.0"
+  },
+  "devDependencies": {
+    "@graphprotocol/client-cli": "^2.2.16",
+    "@graphql-codegen/cli": "^3.0.0",
+    "@graphql-codegen/client-preset": "^2.0.0",
+    "@graphql-codegen/typescript-graphql-request": "^4.5.8"
   },
   "files": [
     "src",

@@ -1,5 +1,27 @@
 import { Allowance } from './types';
-import { getBuiltGraphSDK } from './.graphclient';
+import { GraphQLClient, gql } from 'graphql-request';
+
+const document = gql`
+query QueryUserAllowances($accountId: String, $first: Int, $skip: Int) {
+  tokenApprovals(first: $first, skip: $skip, where: { ownerAccount: $accountId, value_gt: 0 }) {
+    logIndex
+    txnHash
+    blockNumber
+    blockHash
+    blockTimestamp
+    value
+    spenderAccount {
+      id
+    }
+    token {
+      id
+      name
+      decimals
+      symbol
+    }
+  }
+}
+`
 
 export const getTokenAllowances = async (
     account: string,
@@ -7,12 +29,13 @@ export const getTokenAllowances = async (
     first: number = 100,
     skip: number = 0
 ): Promise<Allowance[]> => {
-    const sdk = getBuiltGraphSDK();
-    const result = await sdk.QueryUserAllowances({
+    const client = new GraphQLClient("https://api.thegraph.com/subgraphs/name/alberthuang24/sodium80001erc20subgraph")
+    const result = await client.request(document, {
         accountId: account.toLowerCase(),
         first,
         skip
     });
+    // @ts-ignore
     const allowances: Allowance[] = result.tokenApprovals.map(approval => {
         return {
             transactionHash: approval.txnHash,

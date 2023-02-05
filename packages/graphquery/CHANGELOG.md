@@ -1,5 +1,17 @@
 # @0xsodium/graphquery
 
+## 0.16.0
+
+### Minor Changes
+
+- fix provider export
+
+## 0.15.0
+
+### Minor Changes
+
+- fix graphql-mesh unsupported react-native
+
 ## 0.12.0
 
 ### Minor Changes

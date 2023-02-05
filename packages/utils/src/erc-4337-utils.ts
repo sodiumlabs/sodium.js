@@ -2,6 +2,7 @@ import { defaultAbiCoder, hexConcat, keccak256 } from 'ethers/lib/utils';
 import type { UserOperationStruct } from '@0xsodium/wallet-contracts/gen/adapter/EntryPoint';
 import { EntryPoint__factory } from '@0xsodium/wallet-contracts';
 import { ethers } from 'ethers';
+const Buffer = require('buffer').Buffer;
 
 const entryPointAbi = EntryPoint__factory.abi;
 

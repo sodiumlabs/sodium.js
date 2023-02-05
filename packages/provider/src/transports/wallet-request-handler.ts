@@ -16,7 +16,7 @@ import {
   TypedEventEmitter
 } from '../types';
 import { UserTokenInfo, getUserERC20Tokens, getHistories, getTokenAllowances } from '@0xsodium/graphquery';
-import { ethers, utils, BigNumber } from 'ethers';
+import { ethers, utils } from 'ethers';
 import { ExternalProvider } from '@ethersproject/providers';
 import { NetworkConfig, JsonRpcHandler, JsonRpcRequest, JsonRpcResponseCallback, JsonRpcResponse } from '@0xsodium/network';
 import { Signer } from '@0xsodium/wallet';

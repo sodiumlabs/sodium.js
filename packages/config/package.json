@@ -1,6 +1,6 @@
 {
   "name": "@0xsodium/config",
-  "version": "0.12.0",
+  "version": "0.16.0",
   "description": "config sub-package for Sequence",
   "repository": "https://github.com/sodiumlabs/sodium.js/tree/main/packages/config",
   "source": "src/index.ts",
@@ -18,10 +18,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@0xsodium/abi": "^0.12.0",
-    "@0xsodium/multicall": "^0.12.0",
-    "@0xsodium/network": "^0.12.0",
-    "@0xsodium/utils": "^0.12.0",
+    "@0xsodium/abi": "^0.16.0",
+    "@0xsodium/multicall": "^0.16.0",
+    "@0xsodium/network": "^0.16.0",
+    "@0xsodium/utils": "^0.16.0",
     "@0xsodium/wallet-contracts": "^0.0.4-beta",
     "ethers": "^5.7.0"
   },

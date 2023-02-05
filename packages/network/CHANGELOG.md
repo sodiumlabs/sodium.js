@@ -1,5 +1,49 @@
 # @0xsodium/network
 
+## 0.16.0
+
+### Minor Changes
+
+- fix provider export
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/utils@0.16.0
+
+## 0.15.0
+
+### Minor Changes
+
+- fix graphql-mesh unsupported react-native
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/utils@0.15.0
+
+## 0.14.0
+
+### Minor Changes
+
+- x
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/utils@0.14.0
+
+## 0.13.0
+
+### Minor Changes
+
+- fix browser buffer api
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/utils@0.13.0
+
 ## 0.12.0
 
 ### Minor Changes

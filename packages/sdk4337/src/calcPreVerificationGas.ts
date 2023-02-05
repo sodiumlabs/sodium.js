@@ -1,6 +1,7 @@
 import type { UserOperationStruct } from '@0xsodium/wallet-contracts/gen/EntryPoint';
 import { NotPromise, packUserOp } from '@0xsodium/utils';
 import { arrayify, hexlify } from 'ethers/lib/utils';
+const Buffer = require('buffer').Buffer
 
 export interface GasOverheads {
   /**

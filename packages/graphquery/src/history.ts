@@ -1,5 +1,96 @@
-import { getBuiltGraphSDK } from './.graphclient';
+// import { getBuiltGraphSDK } from './.graphclient';
 import { TransactionHistory } from './types';
+import { GraphQLClient, gql } from 'graphql-request';
+
+const allDocument = gql`
+query QueryUserHistories($accountId: String, $first: Int, $skip: Int) {
+  transfers: tokenTransfers(first: $first, skip: $skip, where: { from: $accountId }, orderBy: blockNumber, orderDirection: desc) {
+    logIndex
+    txnHash
+    blockNumber
+    blockTimestamp
+    blockHash
+    amount
+    from {
+      id
+    }
+    to {
+      id
+    }
+    token {
+      id
+      name
+      decimals
+      symbol
+    }
+  }
+  receives: tokenTransfers(first: $first, skip: $skip, where: { to: $accountId }, orderBy: blockNumber, orderDirection: desc) {
+    blockNumber
+    blockHash
+    blockTimestamp
+    txnHash
+    logIndex
+    amount
+    from {
+      id
+    }
+    to {
+      id
+    }
+    token {
+      id
+      name
+      decimals
+      symbol
+    }
+  }
+}
+`
+
+const tokenDocument = gql`
+query QueryUserTokenHistories($accountId: String, $tokenAddress: String, $first: Int, $skip: Int) {
+  transfers: tokenTransfers(first: $first, skip: $skip, where: { from: $accountId, token: $tokenAddress }, orderBy: blockNumber, orderDirection: desc) {
+    logIndex
+    txnHash
+    blockNumber
+    blockTimestamp
+    blockHash
+    amount
+    from {
+      id
+    }
+    to {
+      id
+    }
+    token {
+      id
+      name
+      decimals
+      symbol
+    }
+  }
+  receives: tokenTransfers(first: $first, skip: $skip, where: { to: $accountId, token: $tokenAddress }, orderBy: blockNumber, orderDirection: desc) {
+    blockNumber
+    blockTimestamp
+    blockHash
+    txnHash
+    logIndex
+    amount
+    from {
+      id
+    }
+    to {
+      id
+    }
+    token {
+      id
+      name
+      decimals
+      symbol
+    }
+  }
+}
+`
 
 export const getHistories = async (
     account: string,
@@ -8,27 +99,28 @@ export const getHistories = async (
     skip: number = 0,
     tokenAddress?: string
 ): Promise<TransactionHistory[]> => {
-    const sdk = getBuiltGraphSDK();
+    const client = new GraphQLClient("https://api.thegraph.com/subgraphs/name/alberthuang24/sodium80001erc20subgraph")
     let result;
     if (tokenAddress) {
-        result = await sdk.QueryUserTokenHistories({
+        result = await client.request(tokenDocument, {
             accountId: account.toLowerCase(),
             first: first,
             skip,
-            tokenAddress
-        });
+            tokenAddress,
+        })
     } else {
-        result = await sdk.QueryUserHistories({
+        result = await client.request(allDocument, {
             accountId: account.toLowerCase(),
             first: first,
-            skip
-        });
+            skip,
+        })
     }
 
     const mapx: {
         [key: string]: TransactionHistory
     } = {};
 
+    // @ts-ignore
     result.transfers.forEach(a => {
         if (!mapx[a.blockNumber]) {
             mapx[a.blockNumber] = {
@@ -66,6 +158,7 @@ export const getHistories = async (
         }
     });
 
+    // @ts-ignore
     result.receives.forEach(a => {
         if (!mapx[a.blockNumber]) {
             // type: TransactionType,
