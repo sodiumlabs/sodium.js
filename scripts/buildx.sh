@@ -14,6 +14,8 @@ readonly PROJECT_ROOT="$(dirname $DIR)"
 RUN_ROOT="$PROJECT_ROOT"
 cd $PROJECT_ROOT;
 
+export $(cat .buildxenv | xargs)
+
 readonly PROJECT_NAME="sodiumbundler";
 readonly RELEASE_NAME=${OMNIBUS_RELEASE:-"default"}
 readonly IMAGE_TAG=${VERSION:-$(git rev-parse --short HEAD)}

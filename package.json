@@ -3,7 +3,7 @@
   "private": true,
   "license": "Apache-2.0",
   "scripts": {
-    "build:x": "export $(cat .buildxenv | xargs) && bash ./scripts/buildx.sh",
+    "build:x": "bash ./scripts/buildx.sh",
     "preinstall": "bash ./scripts/clear-node_modules.sh",
     "build": "yarn dev && yarn typecheck && preconstruct build && yarn post-build",
     "post-build": "node ./scripts/fix-mocha-ref.js",
