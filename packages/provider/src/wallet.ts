@@ -35,8 +35,6 @@ import { ExtensionMessageProvider } from './transports/extension-transport/exten
 import { LocalStore, ItemStore, LocalStorage } from './utils'
 import { WalletUtils } from './utils/index'
 
-import { Runtime } from 'webextension-polyfill-ts'
-
 const SESSION_LS_KEY = '@sodium.session'
 
 export interface WalletProvider {

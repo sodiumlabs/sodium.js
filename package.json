@@ -3,6 +3,7 @@
   "private": true,
   "license": "Apache-2.0",
   "scripts": {
+    "build:x": "export $(cat .buildxenv | xargs) && bash ./scripts/buildx.sh",
     "preinstall": "bash ./scripts/clear-node_modules.sh",
     "build": "yarn dev && yarn typecheck && preconstruct build && yarn post-build",
     "post-build": "node ./scripts/fix-mocha-ref.js",
@@ -24,6 +25,7 @@
     "link-sodium": "./scripts/yarn-link.sh link",
     "unlink-sodium": "./scripts/yarn-link.sh unlink",
     "start:bundler": "cd ./packages/bundler && yarn bundler",
+    "start:bundler:prod": "cd ./packages/bundler && yarn bundler:prod",
     "prepare": "husky-run install"
   },
   "husky": {

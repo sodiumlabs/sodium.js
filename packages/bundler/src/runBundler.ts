@@ -4,7 +4,6 @@ import fs from 'fs'
 import { Command } from 'commander';
 import { erc4337RuntimeVersion } from '@0xsodium/utils';
 import { ethers, Wallet } from 'ethers';
-import { BaseProvider } from '@ethersproject/providers';
 import { BundlerConfig, bundlerConfigDefault, BundlerConfigShape } from './BundlerConfig';
 import { BundlerServer } from './BundlerServer';
 import { UserOpMethodHandler } from './UserOpMethodHandler';

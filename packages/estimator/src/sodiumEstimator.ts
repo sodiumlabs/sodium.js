@@ -24,10 +24,6 @@ export class SodiumEstimator implements Estimator {
     const from = context.entryPointAddress;
     const estimates = await Promise.all([
       ...encoded.map(async (tx, i) => {
-        // If the user specifies a gas limit, an additional amount is added as the cost of execution for the "execute" function.
-        if (BigNumber.from(tx.gasLimit).gt(0)) {
-          return BigNumber.from(tx.gasLimit).add(10000);
-        }
         return this.estimator.estimate({
           to: wallet,
           from: from,
