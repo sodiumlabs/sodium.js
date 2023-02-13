@@ -20,7 +20,7 @@ env:
 jobs:
   build-image:
     name: Build container
-    runs-on: [self-hosted, linux]
+    runs-on: ubuntu-latest
     environment: production
 
     steps:
