@@ -20,7 +20,7 @@ query QueryUserERC20($accountId: ID, $first: Int) {
 }`
 
 export const getUserERC20Tokens = async (account: string, chainId: number, first: number = 10): Promise<UserTokenInfo[]> => {
-    const client = new GraphQLClient("https://api.thegraph.com/subgraphs/name/alberthuang24/sodium80001erc20subgraph")
+    const client = new GraphQLClient(`https://api.thegraph.com/subgraphs/name/alberthuang24/sodium${chainId}erc20subgraph`)
     const result = await client.request(document, {
         accountId: account.toLowerCase(),
         first,

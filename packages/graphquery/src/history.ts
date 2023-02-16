@@ -99,7 +99,7 @@ export const getHistories = async (
     skip: number = 0,
     tokenAddress?: string
 ): Promise<TransactionHistory[]> => {
-    const client = new GraphQLClient("https://api.thegraph.com/subgraphs/name/alberthuang24/sodium80001erc20subgraph")
+    const client = new GraphQLClient(`https://api.thegraph.com/subgraphs/name/alberthuang24/sodium${chainId}erc20subgraph`)
     let result;
     if (tokenAddress) {
         result = await client.request(tokenDocument, {

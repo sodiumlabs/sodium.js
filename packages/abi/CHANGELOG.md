@@ -1,5 +1,23 @@
 # @0xsodium/abi
 
+## 0.19.0
+
+### Minor Changes
+
+- fix eip1271 sign
+
+## 0.18.0
+
+### Minor Changes
+
+- CrossChain Subgraph Support
+
+## 0.17.0
+
+### Minor Changes
+
+- 8568aa6: upgrade contract version
+
 ## 0.16.0
 
 ### Minor Changes

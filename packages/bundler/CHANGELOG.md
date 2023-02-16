@@ -1,5 +1,38 @@
 # @0xsodium/bundler
 
+## 0.19.0
+
+### Minor Changes
+
+- fix eip1271 sign
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/utils@0.19.0
+
+## 0.18.0
+
+### Minor Changes
+
+- CrossChain Subgraph Support
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/utils@0.18.0
+
+## 0.17.0
+
+### Minor Changes
+
+- 8568aa6: upgrade contract version
+
+### Patch Changes
+
+- Updated dependencies [8568aa6]
+  - @0xsodium/utils@0.17.0
+
 ## 0.16.0
 
 ### Minor Changes

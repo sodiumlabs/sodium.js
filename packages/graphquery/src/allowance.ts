@@ -29,7 +29,7 @@ export const getTokenAllowances = async (
     first: number = 100,
     skip: number = 0
 ): Promise<Allowance[]> => {
-    const client = new GraphQLClient("https://api.thegraph.com/subgraphs/name/alberthuang24/sodium80001erc20subgraph")
+    const client = new GraphQLClient(`https://api.thegraph.com/subgraphs/name/alberthuang24/sodium${chainId}erc20subgraph`)
     const result = await client.request(document, {
         accountId: account.toLowerCase(),
         first,

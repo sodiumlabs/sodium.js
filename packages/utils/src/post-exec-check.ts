@@ -1,7 +1,7 @@
 import { resolveProperties } from 'ethers/lib/utils';
 import { NotPromise } from './erc-4337-utils';
 import { EntryPoint } from '@0xsodium/wallet-contracts';
-import type { UserOperationStruct } from '@0xsodium/wallet-contracts/gen/adapter/EntryPoint';
+import type { UserOperationStruct } from '@0xsodium/wallet-contracts/gen/adapter/contracts/eip4337/core/EntryPoint';
 
 export async function postExecutionDump (entryPoint: EntryPoint, requestId: string): Promise<void> {
   const { gasPaid, gasUsed, success, userOp } = await postExecutionCheck(entryPoint, requestId);
@@ -36,11 +36,11 @@ export async function postExecutionCheck (entryPoint: EntryPoint, requestId: str
   const { ops } = entryPoint.interface.decodeFunctionData('handleOps', tx.data)
   const userOp = await resolveProperties(ops[0] as UserOperationStruct)
   const {
-    actualGasPrice,
+    actualGasUsed,
     actualGasCost,
     success
   } = req[0].args
-  const gasPaid = actualGasCost.div(actualGasPrice).toNumber()
+  const gasPaid = actualGasCost.div(actualGasUsed).toNumber()
   const gasUsed = transactionReceipt.gasUsed.toNumber()
   return {
     gasUsed,

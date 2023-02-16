@@ -1,7 +1,7 @@
 import { Provider, BlockTag, JsonRpcProvider as EthJsonRpcProvider, TransactionResponse } from '@ethersproject/providers'
 import { BigNumber, BigNumberish, ethers, Signer as AbstractSigner } from 'ethers';
 import { TypedDataDomain, TypedDataField } from '@ethersproject/abstract-signer';
-import { BytesLike } from '@ethersproject/bytes';
+import { BytesLike, joinSignature } from '@ethersproject/bytes';
 import { Deferrable } from '@ethersproject/properties';
 import { ConnectionInfo } from '@ethersproject/web';
 import {
@@ -35,7 +35,7 @@ import { encodeTypedDataDigest, subDigestOf } from '@0xsodium/utils';
 import { RemoteSigner } from './remote-signers';
 import { resolveArrayProperties } from './utils';
 import { Signer } from './signer';
-import { Sodium__factory } from '@0xsodium/wallet-contracts';
+import { CompatibilityFallbackHandler__factory } from '@0xsodium/wallet-contracts';
 
 // Wallet is a signer interface to a Smart Contract based Ethereum account.
 //
@@ -327,7 +327,10 @@ export class Wallet extends Signer {
     if (localSigners.length == 0) {
       throw new Error("not found local signer");
     }
-    return localSigners[0].signMessage(data);
+    const address = await this.getAddress();
+    const cfh = CompatibilityFallbackHandler__factory.connect(address, this.provider);
+    const signHash = await cfh.getMessageHash(data);
+    return localSigners[0].signMessage(signHash);
   }
 
   async signTypedData(
