@@ -272,10 +272,10 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@0xsodium/wallet-contracts@npm:^0.0.4-beta":
-  version: 0.0.4-beta
-  resolution: "@0xsodium/wallet-contracts@npm:0.0.4-beta"
-  checksum: 55c44718a14e9fae81fb3174455961b294c64f8275a50380e3533aae60a98621fd483149a0bbbb947528513a3f086a6f4995a23e799d11aecc49a173b46761ec
+"@0xsodium/wallet-contracts@npm:^0.0.5-beta":
+  version: 0.0.5-beta
+  resolution: "@0xsodium/wallet-contracts@npm:0.0.5-beta"
+  checksum: 01651c0b2aae0f7ab3dfb053f81246e08ff69552562f6837a0fc517f8e393126077c62f5a5cceae61fb1a11b32e06c49a176cf88d4607f08f10fcc8fc9dd3ebb
   languageName: node
   linkType: hard
 

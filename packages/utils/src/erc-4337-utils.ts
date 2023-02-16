@@ -1,5 +1,5 @@
 import { defaultAbiCoder, hexConcat, keccak256 } from 'ethers/lib/utils';
-import type { UserOperationStruct } from '@0xsodium/wallet-contracts/gen/adapter/EntryPoint';
+import type { UserOperationStruct } from '@0xsodium/wallet-contracts/gen/adapter/contracts/eip4337/core/EntryPoint';
 import { EntryPoint__factory } from '@0xsodium/wallet-contracts';
 import { ethers } from 'ethers';
 const Buffer = require('buffer').Buffer;
@@ -9,6 +9,7 @@ const entryPointAbi = EntryPoint__factory.abi;
 export const AddressZero = ethers.constants.AddressZero
 
 // UserOperation is the first parameter of simulateValidation
+// @ts-ignore
 const UserOpType = (entryPointAbi.find(entry => (entry.name || "") === 'simulateValidation')?.inputs || [])[0];
 
 // reverse "Deferrable" or "PromiseOrValue" fields

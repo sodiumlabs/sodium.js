@@ -2,7 +2,7 @@ import { BigNumber, Wallet, ethers } from 'ethers'
 import { JsonRpcProvider, JsonRpcSigner, Provider } from '@ethersproject/providers'
 import { BundlerConfig } from './BundlerConfig'
 import { EntryPoint } from '@0xsodium/wallet-contracts';
-import type { UserOperationStruct, UserOperationEventEvent } from '@0xsodium/wallet-contracts/gen/EntryPoint';
+import type { UserOperationStruct, UserOperationEventEvent } from '@0xsodium/wallet-contracts/gen/adapter/contracts/eip4337/core/EntryPoint';
 import { hexValue, resolveProperties } from 'ethers/lib/utils';
 import { rethrowError, AddressZero } from '@0xsodium/utils';
 import { deepHexlify, requireCond, RpcError } from './utils'

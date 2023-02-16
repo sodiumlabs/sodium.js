@@ -49,7 +49,6 @@ export const getWalletInitCode = async (localSigner: Signer, config: WalletConfi
     await localSigner.getAddress(),
     ethers.utils.hexDataSlice(ethers.utils.id(config.platform), 0, 4),
     context.defaultHandlerAddress,
-    context.entryPointAddress,
   ]);
   const salt = imageHash(config);
   return `${context.singletonAddress}${salt.slice(2)}${sodiumSetup.slice(2)}`;
@@ -59,8 +58,10 @@ export const addressOf = (config: WalletConfig, context: WalletContext, ignoreAd
   if (config.address && !ignoreAddress) {
     return config.address;
   }
+  const codeHash = ethers.utils.keccak256(
+    ethers.utils.solidityPack(['bytes', 'bytes32'], [WalletContractBytecode, ethers.utils.hexZeroPad(context.genesisSingletonAddress, 32)])
+  )
   const salt = imageHash(config);
-  const codeHash = ethers.utils.keccak256(WalletContractBytecode);
   const hash = ethers.utils.keccak256(
     ethers.utils.solidityPack(['bytes1', 'address', 'bytes32', 'bytes32'], ['0xff', context.walletCreatorAddress, salt, codeHash])
   );

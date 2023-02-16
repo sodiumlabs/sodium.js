@@ -1,7 +1,6 @@
 import { BigNumberish, Event } from 'ethers';
 import { TransactionReceipt } from '@ethersproject/providers';
 import { EntryPoint } from '@0xsodium/wallet-contracts';
-import { UserOperationEventEventObject } from '@0xsodium/wallet-contracts/gen/IEntryPoint';
 import { defaultAbiCoder } from 'ethers/lib/utils';
 import Debug from 'debug';
 

@@ -3,6 +3,7 @@
 export interface WalletContext {
   entryPointAddress: string;
   singletonAddress: string;
+  genesisSingletonAddress: string;
   defaultHandlerAddress: string;
   walletCreatorAddress: string;
 
@@ -18,17 +19,18 @@ export interface WalletContext {
 }
 
 export const sodiumContext: WalletContext = {
-  entryPointAddress: "0xd32cFD0A47069905444a6F49f66da2e9557E361a",
-  singletonAddress: "0xA5512e27D4F5178DA33750647944F7496b608F55",
-  defaultHandlerAddress: "0xd8CBB2C610f4877547077752c99B7D5ce2E5F115",
-  walletCreatorAddress: "0xFc9A2c3eCb53fB7aA1149bB3A0CC82232DC2A8ef",
+  entryPointAddress: "0x0aE1B76389397Dc81c16eB8e2dEb0C592D3C873c",
+  singletonAddress: "0x09f30e8aC8F1bb14858477b72643eDa238d24339",
+  genesisSingletonAddress: "0x09f30e8aC8F1bb14858477b72643eDa238d24339",
+  defaultHandlerAddress: "0x647ae3dfEc568260eB10f9d8Bc7aE35366027b33",
+  walletCreatorAddress: "0xCA25952469BBae82c63A7A75D8aBc7dBf9442e18",
 
   modules: {
     multicall: ""
   },
 
   utils: {
-    gasEstimator: "0xdF0e977EC85e0fD97daA4cB39869DCb7FCc26389"
+    gasEstimator: "0x67db13d7f40eFa5FFC6c6ba0217ACe7FD7df444F"
   },
 
   nonStrict: false

@@ -1,6 +1,7 @@
 import { BigNumber, BigNumberish, BytesLike } from 'ethers';
 import { TransactionRequest as EthersTransactionRequest, TransactionResponse as EthersTransactionResponse } from '@ethersproject/providers';
-import { TransactionStruct, UserOperationStruct } from '@0xsodium/wallet-contracts/gen/adapter/IWallet';
+import { UserOperationStruct } from '@0xsodium/wallet-contracts/gen/adapter/contracts/eip4337/interfaces/IAccount';
+import { TransactionStruct } from '@0xsodium/wallet-contracts/gen/adapter/contracts/Sodium';
 
 export interface Transaction {
   to: string

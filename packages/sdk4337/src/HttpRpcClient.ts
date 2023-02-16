@@ -1,7 +1,7 @@
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { ethers } from 'ethers';
 import { hexValue, resolveProperties } from 'ethers/lib/utils';
-import type { UserOperationStruct } from '@0xsodium/wallet-contracts/gen/EntryPoint';
+import type { UserOperationStruct } from '@0xsodium/wallet-contracts/gen/adapter/contracts/eip4337/core/EntryPoint';
 import Debug from 'debug'
 
 const debug = Debug('aa.rpc')

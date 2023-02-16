@@ -360,12 +360,6 @@ export class Wallet extends Signer {
   }
 
   async getBalance(chainId?: ChainIdLike, blockTag?: BlockTag | undefined): Promise<BigNumber> {
-    if (await this.isDeployed(chainId, blockTag)) {
-      const sodium = Sodium__factory.connect(this.address, this.provider);
-      return sodium.balanceOf({
-        blockTag: blockTag
-      });
-    }
     return this.provider.getBalance(this.address, blockTag);
   }
 

@@ -1,6 +1,6 @@
 import { ethers, BigNumberish } from 'ethers'
 import { Transaction, TransactionRequest, Transactionish, TransactionEncoded, NonceDependency, SignedTransaction } from './types'
-import { UserOperationStruct } from '@0xsodium/wallet-contracts/gen/adapter/IWallet';
+import { UserOperationStruct } from '@0xsodium/wallet-contracts/gen/adapter/contracts/eip4337/interfaces/IAccount';
 
 type FeeData = {
   maxFeePerGas?: ethers.BigNumberish

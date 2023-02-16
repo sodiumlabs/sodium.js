@@ -6,7 +6,7 @@ import {
 } from '@0xsodium/wallet-contracts';
 import type {
   UserOperationStruct
-} from '@0xsodium/wallet-contracts/gen/adapter/EntryPoint';
+} from '@0xsodium/wallet-contracts/gen/adapter/contracts/eip4337/core/EntryPoint';
 import { TransactionDetailsForUserOp } from './TransactionDetailsForUserOp';
 import { hexValue, resolveProperties } from 'ethers/lib/utils';
 import { PaymasterAPI } from './PaymasterAPI';
@@ -137,7 +137,9 @@ export abstract class BaseWalletAPI {
     const initCode = await this.getWalletInitCode()
     // use entryPoint to query wallet address (factory can provide a helper method to do the same, but
     // this method attempts to be generic
-    return await this.entryPoint.callStatic.getSenderAddress(initCode)
+    const address = await this.entryPoint.callStatic.senderCreator();
+    const creator = SenderCreator__factory.connect(address, this.provider);
+    return await creator.callStatic.getAddress(initCode);
   }
 
   /**

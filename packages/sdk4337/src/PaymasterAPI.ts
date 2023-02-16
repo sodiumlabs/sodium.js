@@ -1,4 +1,4 @@
-import type { UserOperationStruct } from '@0xsodium/wallet-contracts/gen/EntryPoint';
+import type { UserOperationStruct } from '@0xsodium/wallet-contracts/gen/adapter/contracts/eip4337/core/EntryPoint';
 
 /**
  * an API to external a UserOperation with paymaster info
