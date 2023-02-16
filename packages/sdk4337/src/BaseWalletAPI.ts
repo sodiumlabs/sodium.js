@@ -239,13 +239,14 @@ export abstract class BaseWalletAPI {
     } = getFeeData(info);
     if (maxFeePerGas == null || maxPriorityFeePerGas == null) {
       const feeData = await this.provider.getFeeData()
+      const gasPrice = await this.provider.getGasPrice();
 
       // TODO. how to fast send tx.
       if (maxFeePerGas == null) {
-        maxFeePerGas = feeData.maxFeePerGas ? feeData.maxFeePerGas.mul(2) : 0
+        maxFeePerGas = feeData.maxFeePerGas ? feeData.maxFeePerGas : 0
       }
       if (maxPriorityFeePerGas == null) {
-        maxPriorityFeePerGas = feeData.maxPriorityFeePerGas ? feeData.maxPriorityFeePerGas.mul(2) : 0
+        maxPriorityFeePerGas = gasPrice;
       }
     }
     const partialUserOp: any = {

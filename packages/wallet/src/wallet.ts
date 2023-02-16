@@ -330,7 +330,7 @@ export class Wallet extends Signer {
     const address = await this.getAddress();
     const cfh = CompatibilityFallbackHandler__factory.connect(address, this.provider);
     const signHash = await cfh.getMessageHash(data);
-    return localSigners[0].signMessage(signHash);
+    return localSigners[0].signMessage(ethers.utils.arrayify(signHash));
   }
 
   async signTypedData(

@@ -1,6 +1,6 @@
 {
   "name": "@0xsodium/multicall",
-  "version": "0.19.0",
+  "version": "0.21.0",
   "description": "multicall sub-package for Sequence",
   "repository": "https://github.com/sodiumlabs/sodium.js/tree/main/packages/multicall",
   "source": "src/index.ts",
@@ -13,14 +13,14 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@0xsodium/abi": "^0.19.0",
-    "@0xsodium/network": "^0.19.0",
-    "@0xsodium/utils": "^0.19.0",
+    "@0xsodium/abi": "^0.21.0",
+    "@0xsodium/network": "^0.21.0",
+    "@0xsodium/utils": "^0.21.0",
     "@ethersproject/providers": "^5.7.0",
     "ethers": "^5.7.0"
   },
   "devDependencies": {
-    "@0xsodium/wallet-contracts": "^0.0.4-beta",
+    "@0xsodium/wallet-contracts": "^0.0.5-beta",
     "@types/web3-provider-engine": "^14.0.1",
     "eth-json-rpc-middleware": "^8.0.0",
     "json-rpc-engine": "^6.1.0",

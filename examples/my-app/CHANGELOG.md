@@ -1,5 +1,27 @@
 # my-app
 
+## 1.5.0
+
+### Minor Changes
+
+- fix user op gas price
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@0.21.0
+
+## 1.4.0
+
+### Minor Changes
+
+- Fix eip1271 sign
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@0.20.0
+
 ## 1.3.0
 
 ### Minor Changes

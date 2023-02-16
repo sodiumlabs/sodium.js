@@ -1,5 +1,27 @@
 # @0xsodium/simulator
 
+## 0.21.0
+
+### Minor Changes
+
+- fix user op gas price
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/transactions@0.21.0
+
+## 0.20.0
+
+### Minor Changes
+
+- Fix eip1271 sign
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/transactions@0.20.0
+
 ## 0.19.0
 
 ### Minor Changes
