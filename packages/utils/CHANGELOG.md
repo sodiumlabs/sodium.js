@@ -1,5 +1,41 @@
 # @0xsodium/utils
 
+## 1.0.0
+
+### Major Changes
+
+- release
+
+## 0.1.0
+
+### Minor Changes
+
+- fix versions
+
+## 0.0.0
+
+### Minor Changes
+
+- fix bugs
+
+## 0.0.0-20230218225937
+
+### Minor Changes
+
+- Fix app provider
+
+## 0.0.0-20230218190034
+
+### Minor Changes
+
+- Support app provider transports
+
+## 0.0.0-20230218181618
+
+### Minor Changes
+
+- Support app provider transports
+
 ## 0.21.0
 
 ### Minor Changes

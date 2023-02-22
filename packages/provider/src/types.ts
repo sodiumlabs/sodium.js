@@ -87,6 +87,7 @@ export interface TransportSession {
   sessionId?: string | null
   networkId?: string | number | null
   intent?: OpenWalletIntent
+  openByApp?: string
 }
 
 export enum EventType {

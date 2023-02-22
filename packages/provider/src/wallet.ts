@@ -34,6 +34,7 @@ import { ethers } from 'ethers'
 import { ExtensionMessageProvider } from './transports/extension-transport/extension-message-provider'
 import { LocalStore, ItemStore, LocalStorage } from './utils'
 import { WalletUtils } from './utils/index'
+import { AppMessageProvider } from './transports/app-transport'
 
 const SESSION_LS_KEY = '@sodium.session'
 
@@ -91,6 +92,7 @@ export class Wallet implements WalletProvider {
     messageProvider?: MuxMessageProvider
     windowMessageProvider?: WindowMessageProvider
     iframeMessageProvider?: IframeMessageProvider
+    appMessageProvider?: AppMessageProvider
     proxyMessageProvider?: ProxyMessageProvider
     extensionMessageProvider?: ExtensionMessageProvider
     unrealMessageProvider?: UnrealMessageProvider
@@ -142,6 +144,10 @@ export class Wallet implements WalletProvider {
     if (this.config.transports?.iframeTransport?.enabled) {
       this.transport.iframeMessageProvider = new IframeMessageProvider(this.config.walletAppURL)
       this.transport.messageProvider.add(this.transport.iframeMessageProvider)
+    }
+    if (this.config.transports?.appTransport?.enabled) {
+      this.transport.appMessageProvider = new AppMessageProvider();
+      this.transport.messageProvider.add(this.transport.appMessageProvider);
     }
     if (this.config.transports?.proxyTransport?.enabled) {
       this.transport.proxyMessageProvider = new ProxyMessageProvider(this.config.transports.proxyTransport.appPort!)
@@ -656,11 +662,8 @@ export interface ProviderConfig {
   // For example, this option should be used when using React Native since window.localStorage is not available.
   localStorage?: ItemStore
 
-  // Sequence Wallet App URL, default: https://sequence.app
+  // Sodium Wallet App URL, default: https://sodium.app
   walletAppURL: string
-
-  // Sequence Wallet Session URL, default: https://session.sequence.app
-  // walletSessionURL: string
 
   // networks is a configuration list of networks used by the wallet. This list
   // is combined with the network list supplied from the wallet upon login,
@@ -692,6 +695,10 @@ export interface ProviderConfig {
       appPort?: ProxyMessageChannelPort
     }
 
+    appTransport?: {
+      enabled: boolean
+    }
+
     // // Unreal Engine transport (optional)
     // unrealTransport?: {
     //   enabled: boolean
@@ -710,7 +717,8 @@ export const DefaultProviderConfig: ProviderConfig = {
   transports: {
     windowTransport: { enabled: true },
     iframeTransport: { enabled: false },
-    proxyTransport: { enabled: false }
+    proxyTransport: { enabled: false },
+    appTransport: { enabled: false },
   }
 }
 

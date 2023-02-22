@@ -1,5 +1,71 @@
 # my-app
 
+## 1.0.0
+
+### Major Changes
+
+- release
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.0.0
+
+## 0.1.0
+
+### Minor Changes
+
+- fix versions
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@0.1.0
+
+## 0.0.0
+
+### Minor Changes
+
+- fix bugs
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@0.0.0
+
+## 0.0.0-20230218225937
+
+### Minor Changes
+
+- Fix app provider
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@0.0.0-20230218225937
+
+## 0.0.0-20230218190034
+
+### Minor Changes
+
+- Support app provider transports
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@0.0.0-20230218190034
+
+## 0.0.0-20230218181618
+
+### Minor Changes
+
+- Support app provider transports
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@0.0.0-20230218181618
+
 ## 1.5.0
 
 ### Minor Changes
