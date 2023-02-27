@@ -248,6 +248,12 @@ export abstract class BaseWalletAPI {
       if (maxPriorityFeePerGas == null) {
         maxPriorityFeePerGas = gasPrice;
       }
+
+      // fix 
+      // max priority fee per gas higher than max fee per gas
+      if (BigNumber.from(maxPriorityFeePerGas).gt(maxFeePerGas)) {
+        maxPriorityFeePerGas = maxFeePerGas;
+      }
     }
     const partialUserOp: any = {
       sender: this.getWalletAddress(),

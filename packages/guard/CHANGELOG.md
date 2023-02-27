@@ -1,5 +1,17 @@
 # @0xsodium/guard
 
+## 1.2.0
+
+### Minor Changes
+
+- fix price query
+
+## 1.1.0
+
+### Minor Changes
+
+- Support token logo & price query
+
 ## 1.0.0
 
 ### Major Changes

@@ -1,5 +1,27 @@
 # my-app
 
+## 1.2.0
+
+### Minor Changes
+
+- fix price query
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.2.0
+
+## 1.1.0
+
+### Minor Changes
+
+- Support token logo & price query
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.1.0
+
 ## 1.0.0
 
 ### Major Changes

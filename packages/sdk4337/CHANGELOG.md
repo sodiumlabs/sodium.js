@@ -1,5 +1,35 @@
 # @0xsodium/sdk4337
 
+## 1.2.0
+
+### Minor Changes
+
+- fix price query
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/config@1.2.0
+  - @0xsodium/estimator@1.2.0
+  - @0xsodium/network@1.2.0
+  - @0xsodium/transactions@1.2.0
+  - @0xsodium/utils@1.2.0
+
+## 1.1.0
+
+### Minor Changes
+
+- Support token logo & price query
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/config@1.1.0
+  - @0xsodium/estimator@1.1.0
+  - @0xsodium/network@1.1.0
+  - @0xsodium/transactions@1.1.0
+  - @0xsodium/utils@1.1.0
+
 ## 1.0.0
 
 ### Major Changes

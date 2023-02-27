@@ -22,7 +22,7 @@ export const sodiumContext: WalletContext = {
   entryPointAddress: "0x0aE1B76389397Dc81c16eB8e2dEb0C592D3C873c",
   singletonAddress: "0x09f30e8aC8F1bb14858477b72643eDa238d24339",
   genesisSingletonAddress: "0x09f30e8aC8F1bb14858477b72643eDa238d24339",
-  defaultHandlerAddress: "0x647ae3dfEc568260eB10f9d8Bc7aE35366027b33",
+  defaultHandlerAddress: "0xb961f9F277386e449f324A9B8A0b3FDE837BbF08",
   walletCreatorAddress: "0xCA25952469BBae82c63A7A75D8aBc7dBf9442e18",
 
   modules: {

@@ -15,7 +15,7 @@ import {
   ProviderEventTypes,
   TypedEventEmitter
 } from '../types';
-import { UserTokenInfo, getUserERC20Tokens, getHistories, getTokenAllowances } from '@0xsodium/graphquery';
+import { UserTokenInfo, getUserERC20Tokens, getTokenMetadataByAddress, getHistories, getTokenAllowances } from '@0xsodium/graphquery';
 import { ethers, utils } from 'ethers';
 import { ExternalProvider } from '@ethersproject/providers';
 import { NetworkConfig, JsonRpcHandler, JsonRpcRequest, JsonRpcResponseCallback, JsonRpcResponse } from '@0xsodium/network';
@@ -525,12 +525,13 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
           if (!first) {
             first = 10;
           }
+
           const nativeTokenBalance = await signer.getBalance(chainId);
           response.result = [
             {
               token: {
                 address: AddressZero,
-                chainId: 1337,
+                chainId: chainId,
                 isNativeToken: true,
                 name: "Polygon",
                 symbol: "MATIC",
@@ -545,7 +546,7 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
             }
           ] as UserTokenInfo[];
           const addressOfWallet = await signer.getAddress();
-          const erc20TokenInfos = await getUserERC20Tokens(addressOfWallet, chainId, first);
+          const erc20TokenInfos = await getUserERC20Tokens(addressOfWallet, chainId, first, signer);
           erc20TokenInfos.forEach(v => {
             response.result.push(v);
           })
@@ -565,44 +566,54 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
           // TODO tokenId coming soon when nft support
           const [skip, first, chainId] = request.params!
           const address = await signer.getAddress();
-          const result = await getTokenAllowances(address, chainId, first, skip);
+          const result = await getTokenAllowances(address, chainId, first, skip, signer);
           response.result = result;
           break;
         }
 
         case 'sodium_getTokenRates': {
-          const [ tokenAddressList ] = request.params!
+          let [tokenAddressList, chainId] = request.params!
 
-          // testnet mock
-          // mainnet using https://www.coingecko.com/api/documentations/v3#/simple/get_simple_price
-          response.result = tokenAddressList.map(() => {
-            return 0.00018314;
+          tokenAddressList = tokenAddressList.map((tokenAddress: string) => {
+            if (tokenAddress === AddressZero) {
+              return "0x0000000000000000000000000000000000001010"
+            }
+            return tokenAddress;
+          });
+
+          // TODO
+          // cross chain support
+
+          // default
+          let chain = "polygon-pos"
+          const query = `vs_currencies=usd&contract_addresses=${tokenAddressList.join(",")}`
+          const requestURL = `https://api.coingecko.com/api/v3/simple/token_price/${chain}?${query}`
+          const coingeckoRes = await fetch(requestURL)
+          const prices = await coingeckoRes.json()
+          response.result = tokenAddressList.map((tokenAddress: string) => {
+            const price = prices[tokenAddress.toLowerCase()]
+            return price ? price.usd : 0
           });
           break;
         }
 
         case 'sodium_getToken': {
-          const [ tokenAddress, chainId ] = request.params!
-          const erc20 = ERC20Token__factory.connect(tokenAddress, signer);
-          const tokenSymbol = await erc20.symbol();
-          const tokenDecimals = await erc20.decimals();
-          const tokenName = await erc20.name();
+          const [tokenAddress, chainId] = request.params!
+          const tokenMetadata = await getTokenMetadataByAddress(tokenAddress, chainId, signer);
           const tokenInfo: ERC20OrNativeTokenMetadata = {
             address: tokenAddress,
             chainId: chainId,
-            decimals: tokenDecimals,
-            symbol: tokenSymbol,
-            name: tokenName,
-            centerData: {
-
-            }
+            decimals: tokenMetadata.meta.decimals,
+            symbol: tokenMetadata.meta.symbol,
+            name: tokenMetadata.meta.name,
+            centerData: tokenMetadata.centerData,
           }
           response.result = tokenInfo;
           break;
         }
 
         case 'sodium_getPaymasterInfos': {
-          const [ transactions, chainId ] = request.params!
+          const [transactions, chainId] = request.params!
 
           // testnet mock
           // mainnet using https://www.coingecko.com/api/documentations/v3#/simple/get_simple_price

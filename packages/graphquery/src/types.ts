@@ -1,12 +1,24 @@
 import { ERC20OrNativeTokenMetadata } from "@0xsodium/utils";
 import { BigNumber } from 'ethers';
 
+export type TokenList = {
+    name: string,
+    logoURI: string,
+    tokens: {
+        address: string,
+        logoURI: string,
+        name: string,
+        symbol: string,
+        decimals: number,
+    }[]
+}
+
 export type UserTokenInfo = {
     balance: BigNumber,
     token: ERC20OrNativeTokenMetadata,
 }
 
-export type TransactionType = "failed" | "complete";
+export type TransactionType = "failed" | "completed";
 
 // sent = tx.input = Keccak256("transfer(address,uint256)") and erc20Transfers only 1 and from == this
 // received = erc20Transfers only 1 and to == this

@@ -1,5 +1,27 @@
 # @0xsodium/bundler
 
+## 1.2.0
+
+### Minor Changes
+
+- fix price query
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/utils@1.2.0
+
+## 1.1.0
+
+### Minor Changes
+
+- Support token logo & price query
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/utils@1.1.0
+
 ## 1.0.0
 
 ### Major Changes

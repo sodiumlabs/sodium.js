@@ -1,6 +1,6 @@
 {
   "name": "@0xsodium/graphquery",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "graphquery sub-package for sodium",
   "repository": "https://github.com/sodiumlabs/sodium.js/tree/main/packages/graphquery",
   "source": "src/index.ts",
@@ -12,6 +12,8 @@
     "build": "echo ok"
   },
   "dependencies": {
+    "@0xsodium/wallet-contracts": "^0.0.5-beta",
+    "@ethersproject/abstract-signer": "^5.7.0",
     "ethers": "^5.7.0",
     "graphql": "16.6.0",
     "graphql-request": "^5.1.0"

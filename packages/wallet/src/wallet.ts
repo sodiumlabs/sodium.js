@@ -327,6 +327,7 @@ export class Wallet extends Signer {
     if (localSigners.length == 0) {
       throw new Error("not found local signer");
     }
+    // localSigners[0].
     const address = await this.getAddress();
     const cfh = CompatibilityFallbackHandler__factory.connect(address, this.provider);
     const signHash = await cfh.getMessageHash(data);
