@@ -1,5 +1,17 @@
 # @0xsodium/abi
 
+## 1.4.0
+
+### Minor Changes
+
+- fix gas price
+
+## 1.3.0
+
+### Minor Changes
+
+- fix gas price
+
 ## 1.2.0
 
 ### Minor Changes

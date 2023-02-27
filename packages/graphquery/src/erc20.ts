@@ -4,7 +4,6 @@ import { GraphQLClient, gql } from 'graphql-request';
 import { ERC20Token__factory } from '@0xsodium/wallet-contracts';
 import { Signer } from '@ethersproject/abstract-signer';
 
-let tokenListPromises: { [chainId: number]: Promise<TokenList> } = {}
 let providerTokenMetadataCaches: {
   [chainId: number]: {
     [address: string]: {
@@ -15,24 +14,6 @@ let providerTokenMetadataCaches: {
   }
 } = {}
 
-const getTokenListURL = (chainId: number): string => {
-  // 80001 https://api-polygon-tokens.polygon.technology/tokenlists/testnet.tokenlist.json
-  // 137 https://api-polygon-tokens.polygon.technology/tokenlists/polygonTokens.tokenlist.json
-  if (chainId == 80001) {
-    return "https://api-polygon-tokens.polygon.technology/tokenlists/testnet.tokenlist.json"
-  } else if (chainId == 137) {
-    return "https://api-polygon-tokens.polygon.technology/tokenlists/polygonTokens.tokenlist.json"
-  }
-  throw new Error("Unsupported chainId")
-}
-export const getTokenList = async (chainId: number): Promise<TokenList> => {
-  if (!tokenListPromises[chainId]) {
-    const tokenListURL = getTokenListURL(chainId);
-    tokenListPromises[chainId] = fetch(tokenListURL).then(res => res.json())
-  }
-  return tokenListPromises[chainId]
-}
-
 const document = gql`
 query QueryUserERC20Balances($accountId: ID, $first: Int) {
   balances(first: $first, skip: 0, where: { value_gt: 0, account: $accountId }) {
@@ -41,12 +22,22 @@ query QueryUserERC20Balances($accountId: ID, $first: Int) {
   }
 }`
 
-export const getTokenMetadataByAddress = async (address: string, chainId: number, signer: Signer): Promise<{
-  meta: {
+const tokenMetadataByAddressCache: {
+  [cacheId: string]: {
     name: string;
     symbol: string;
     decimals: number;
-  },
+    centerData: {
+      logoURI?: string;
+      website?: string;
+      description?: string;
+    }
+  }
+} = {};
+export const getTokenMetadataByAddress = async (address: string, chainId: number, signer: Signer): Promise<{
+  name: string;
+  symbol: string;
+  decimals: number;
   centerData: {
     logoURI?: string;
     website?: string;
@@ -54,22 +45,31 @@ export const getTokenMetadataByAddress = async (address: string, chainId: number
   }
 }> => {
   address = address.toLowerCase();
-  const tryTokenList = async () => {
-    const tokenList = await getTokenList(chainId);
-    const token = tokenList.tokens.find(t => t.address.toLowerCase() == address);
-    if (!token) {
-      throw new Error("Token not found")
-    }
-    return {
-      meta: {
-        name: token.name,
-        symbol: token.symbol,
-        decimals: token.decimals,
-      },
+  const tryServer = async () => {
+    // https://subgraph-fallback.vercel.app/api/tokenmeta?chainId=137&tokenAddress=0xc2132D05D31c914a87C6611C10748AEb04B58e8F
+    const res = await fetch(`https://subgraph-fallback.vercel.app/api/tokenmeta?chainId=${chainId}&tokenAddress=${address}`);
+    const result: {
+      name: string;
+      symbol: string;
+      decimals: number;
       centerData: {
-        logoURI: token.logoURI,
+        logoURI?: string;
+        website?: string;
+        description?: string;
       }
+    } = await res.json();
+    return result;
+  }
+
+  const buildCacheId = () => {
+    return `${chainId}-${address}`
+  }
+  const tryCache = async () => {
+    const cacheId = buildCacheId();
+    if (tokenMetadataByAddressCache[cacheId]) {
+      return tokenMetadataByAddressCache[cacheId];
     }
+    throw new Error("cache miss");
   }
 
   const tryProvider = async () => {
@@ -84,11 +84,9 @@ export const getTokenMetadataByAddress = async (address: string, chainId: number
         metaPromises.decimals,
       ]);
       return {
-        meta: {
-          name,
-          symbol,
-          decimals,
-        },
+        name,
+        symbol,
+        decimals,
         centerData: {}
       }
     }
@@ -105,11 +103,9 @@ export const getTokenMetadataByAddress = async (address: string, chainId: number
       metaPromises.decimals,
     ]);
     return {
-      meta: {
-        name,
-        symbol,
-        decimals,
-      },
+      name,
+      symbol,
+      decimals,
       centerData: {
 
       }
@@ -117,10 +113,13 @@ export const getTokenMetadataByAddress = async (address: string, chainId: number
   }
 
   // 优先使用tokenlist
-  const tryQueue = [tryTokenList, tryProvider];
+  const tryQueue = [tryCache, tryServer, tryProvider];
   for (let i = 0; i < tryQueue.length; i++) {
     try {
-      return await tryQueue[i]();
+      const result = await tryQueue[i]();
+      const cacheId = buildCacheId();
+      tokenMetadataByAddressCache[cacheId] = result;
+      return result;
     } catch (e) {
       console.log("getTokenMetadataByAddress", e)
     }
@@ -129,7 +128,27 @@ export const getTokenMetadataByAddress = async (address: string, chainId: number
   throw new Error("getTokenMetadataByAddress failed")
 }
 
-export const getUserERC20Tokens = async (account: string, chainId: number, first: number = 10, signer: Signer): Promise<UserTokenInfo[]> => {
+// export const 
+// https://subgraph-fallback.vercel.app/api/balances?chainId=137&walletAddress=0xaF8033d40346A9315a385D53FaAeA2891a6443f0
+
+export const getUserERC20Tokens = (account: string, chainId: number, first: number = 10, signer: Signer): Promise<UserTokenInfo[]> => {
+  const queue = [
+    fallbackServer,
+    fallbackThegraph
+  ];
+
+  for (let i = 0; i < queue.length; i++) {
+    try {
+      return queue[i](account, chainId, first, signer);
+    } catch (e) {
+      console.log("getUserERC20Tokens", e)
+    }
+  }
+
+  throw new Error("getUserERC20Tokens failed")
+}
+
+async function fallbackThegraph(account: string, chainId: number, first: number = 10, signer: Signer): Promise<UserTokenInfo[]> {
   const client = new GraphQLClient(`https://api.thegraph.com/subgraphs/name/alberthuang24/sodium${chainId}erc20balance`)
   const result = await client.request<{
     balances: {
@@ -150,12 +169,36 @@ export const getUserERC20Tokens = async (account: string, chainId: number, first
       token: {
         chainId: chainId,
         address: b.tokenAddress,
-        symbol: metadata.meta.symbol,
-        decimals: metadata.meta.decimals,
-        name: metadata.meta.name,
+        symbol: metadata.symbol,
+        decimals: metadata.decimals,
+        name: metadata.name,
         centerData: metadata.centerData,
       },
       balance: BigNumber.from(b.value)
+    }
+  }));
+  return balances;
+}
+
+async function fallbackServer(account: string, chainId: number, first: number = 10, signer: Signer): Promise<UserTokenInfo[]> {
+  const res = await fetch(`https://subgraph-fallback.vercel.app/api/balances?chainId=${chainId}&walletAddress=${account}`);
+  const result: {
+    tokenAddress: string;
+    balance: string;
+  }[] = await res.json();
+  const balances = await Promise.all(result.map(async b => {
+    // get token metadata
+    const metadata = await getTokenMetadataByAddress(b.tokenAddress, chainId, signer);
+    return {
+      token: {
+        chainId: chainId,
+        address: b.tokenAddress,
+        symbol: metadata.symbol,
+        decimals: metadata.decimals,
+        name: metadata.name,
+        centerData: metadata.centerData,
+      },
+      balance: BigNumber.from(b.balance)
     }
   }));
   return balances;

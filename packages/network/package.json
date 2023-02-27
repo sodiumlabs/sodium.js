@@ -1,6 +1,6 @@
 {
   "name": "@0xsodium/network",
-  "version": "1.2.0",
+  "version": "1.4.0",
   "description": "network sub-package for Sequence",
   "repository": "https://github.com/sodiumlabs/sodium.js/tree/main/packages/network",
   "source": "src/index.ts",
@@ -13,7 +13,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@0xsodium/utils": "^1.2.0",
+    "@0xsodium/utils": "^1.4.0",
     "@ethersproject/providers": "^5.7.0",
     "ethers": "^5.7.0"
   },

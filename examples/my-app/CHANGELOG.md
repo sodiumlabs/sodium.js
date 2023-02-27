@@ -1,5 +1,27 @@
 # my-app
 
+## 1.4.0
+
+### Minor Changes
+
+- fix gas price
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.4.0
+
+## 1.3.0
+
+### Minor Changes
+
+- fix gas price
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.3.0
+
 ## 1.2.0
 
 ### Minor Changes

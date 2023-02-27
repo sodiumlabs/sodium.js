@@ -1,5 +1,39 @@
 # @0xsodium/wallet
 
+## 1.4.0
+
+### Minor Changes
+
+- fix gas price
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.4.0
+  - @0xsodium/config@1.4.0
+  - @0xsodium/guard@1.4.0
+  - @0xsodium/network@1.4.0
+  - @0xsodium/sdk4337@1.4.0
+  - @0xsodium/transactions@1.4.0
+  - @0xsodium/utils@1.4.0
+
+## 1.3.0
+
+### Minor Changes
+
+- fix gas price
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.3.0
+  - @0xsodium/config@1.3.0
+  - @0xsodium/guard@1.3.0
+  - @0xsodium/network@1.3.0
+  - @0xsodium/sdk4337@1.3.0
+  - @0xsodium/transactions@1.3.0
+  - @0xsodium/utils@1.3.0
+
 ## 1.2.0
 
 ### Minor Changes

@@ -120,10 +120,10 @@ export const getHistories = async (
           amount: a.amount,
           token: {
             chainId: chainId,
-            decimals: tokenMetadata.meta.decimals,
+            decimals: tokenMetadata.decimals,
             address: a.tokenAddress,
-            symbol: tokenMetadata.meta.symbol,
-            name: tokenMetadata.meta.name,
+            symbol: tokenMetadata.symbol,
+            name: tokenMetadata.name,
             centerData: tokenMetadata.centerData,
           }
         }

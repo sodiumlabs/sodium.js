@@ -603,9 +603,9 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
           const tokenInfo: ERC20OrNativeTokenMetadata = {
             address: tokenAddress,
             chainId: chainId,
-            decimals: tokenMetadata.meta.decimals,
-            symbol: tokenMetadata.meta.symbol,
-            name: tokenMetadata.meta.name,
+            decimals: tokenMetadata.decimals,
+            symbol: tokenMetadata.symbol,
+            name: tokenMetadata.name,
             centerData: tokenMetadata.centerData,
           }
           response.result = tokenInfo;

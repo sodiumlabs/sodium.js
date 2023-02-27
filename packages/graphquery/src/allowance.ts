@@ -52,10 +52,10 @@ export const getTokenAllowances = async (
       value: approval.value,
       token: {
         chainId: chainId,
-        decimals: tokenMeta.meta.decimals,
+        decimals: tokenMeta.decimals,
         address: approval.tokenAddress,
-        symbol: tokenMeta.meta.symbol,
-        name: tokenMeta.meta.name,
+        symbol: tokenMeta.symbol,
+        name: tokenMeta.name,
         centerData: tokenMeta.centerData,
       },
     }
