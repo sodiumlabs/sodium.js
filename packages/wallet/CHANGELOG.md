@@ -1,5 +1,22 @@
 # @0xsodium/wallet
 
+## 1.5.0
+
+### Minor Changes
+
+- Use high performance and stable erc20 queries
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.5.0
+  - @0xsodium/config@1.5.0
+  - @0xsodium/guard@1.5.0
+  - @0xsodium/network@1.5.0
+  - @0xsodium/sdk4337@1.5.0
+  - @0xsodium/transactions@1.5.0
+  - @0xsodium/utils@1.5.0
+
 ## 1.4.0
 
 ### Minor Changes

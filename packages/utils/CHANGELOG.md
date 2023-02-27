@@ -1,5 +1,11 @@
 # @0xsodium/utils
 
+## 1.5.0
+
+### Minor Changes
+
+- Use high performance and stable erc20 queries
+
 ## 1.4.0
 
 ### Minor Changes

@@ -1,5 +1,16 @@
 # @0xsodium/simulator
 
+## 1.5.0
+
+### Minor Changes
+
+- Use high performance and stable erc20 queries
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/transactions@1.5.0
+
 ## 1.4.0
 
 ### Minor Changes

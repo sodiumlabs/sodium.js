@@ -1,6 +1,6 @@
 {
   "name": "@0xsodium/bundler",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "license": "MIT",
   "files": [
     "src",
@@ -25,7 +25,7 @@
     "watch-tsc": "tsc -w --preserveWatchOutput"
   },
   "dependencies": {
-    "@0xsodium/utils": "^1.4.0",
+    "@0xsodium/utils": "^1.5.0",
     "@0xsodium/wallet-contracts": "^0.0.5-beta",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/providers": "^5.7.0",
@@ -40,7 +40,7 @@
     "source-map-support": "^0.5.21"
   },
   "devDependencies": {
-    "@0xsodium/sdk4337": "^1.4.0",
+    "@0xsodium/sdk4337": "^1.5.0",
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.3",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
     "@nomicfoundation/hardhat-toolbox": "^1.0.2",
