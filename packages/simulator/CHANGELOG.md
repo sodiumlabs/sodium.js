@@ -1,5 +1,16 @@
 # @0xsodium/simulator
 
+## 1.6.0
+
+### Minor Changes
+
+- fix sign typedata
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/transactions@1.6.0
+
 ## 1.5.0
 
 ### Minor Changes

@@ -24,7 +24,7 @@ import {
   sortNetworks
 } from '@0xsodium/network';
 import { Wallet } from './wallet';
-import { encodeTypedDataDigest } from '@0xsodium/utils';
+import { encodeTypedDataDigest, encodeTypedDataHash } from '@0xsodium/utils';
 import { PaymasterInfo } from '@0xsodium/sdk4337';
 
 export interface AccountOptions {
@@ -172,7 +172,7 @@ export class Account extends Signer {
     chainId?: ChainIdLike,
   ): Promise<string> {
     const wallet = chainId ? this.getWalletByNetwork(chainId).wallet : this.mainWallet().wallet
-    const digest = encodeTypedDataDigest({ domain, types, message })
+    const digest = encodeTypedDataHash({ domain, types, message })
     return this.signMessage(digest, wallet)
   }
 

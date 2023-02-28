@@ -1,5 +1,18 @@
 # @0xsodium/multicall
 
+## 1.6.0
+
+### Minor Changes
+
+- fix sign typedata
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/utils@1.6.0
+  - @0xsodium/abi@1.6.0
+  - @0xsodium/network@1.6.0
+
 ## 1.5.0
 
 ### Minor Changes
