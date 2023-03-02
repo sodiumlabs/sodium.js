@@ -121,8 +121,8 @@ export const getHistories = async (
 
   // @ts-ignore
   result.transfers.forEach(a => {
-    if (!mapx[a.blockNumber]) {
-      mapx[a.blockNumber] = {
+    if (!mapx[a.txnHash]) {
+      mapx[a.txnHash] = {
         type: 'completed',
         transactionHash: a.txnHash,
         input: "",
@@ -159,19 +159,8 @@ export const getHistories = async (
 
   // @ts-ignore
   result.receives.forEach(a => {
-    if (!mapx[a.blockNumber]) {
-      // type: TransactionType,
-      // transactionHash: string,
-      // input: string,
-      // block: TransactionBlock,
-      // userOpHash: string,
-      // erc20Transfers: TransactionERC20Transfer[]
-      // // coming soon
-      // erc1155Transfers: any[]
-      // // coming soon
-      // erc721Transfers: any[]
-      // prefix: TransactionPrefixName
-      mapx[a.blockNumber] = {
+    if (!mapx[a.txnHash]) {
+      mapx[a.txnHash] = {
         type: 'completed',
         transactionHash: a.txnHash,
         input: "",
@@ -203,8 +192,30 @@ export const getHistories = async (
         erc721Transfers: [],
         prefix: "received"
       }
+    } else {
+      mapx[a.txnHash].erc20Transfers.push({
+        from: a.from.id,
+        to: a.to.id,
+        token: {
+          chainId: chainId,
+          decimals: a.token.decimals,
+          address: a.token.id,
+          symbol: a.token.symbol,
+          name: a.token.name,
+
+          // TODO 使用nextjs单独配置中心化信息并采集
+          centerData: {
+
+          }
+        },
+        amount: a.amount
+      })
+
+      mapx[a.txnHash].prefix = "Swap"
     }
   });
+
+  console.debug("mapx", mapx)
 
   return Object.values(mapx);
 }

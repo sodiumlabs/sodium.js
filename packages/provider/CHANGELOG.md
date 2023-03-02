@@ -1,5 +1,23 @@
 # @0xsodium/provider
 
+## 1.7.0
+
+### Minor Changes
+
+- query token price use cache
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/graphquery@1.7.0
+  - @0xsodium/abi@1.7.0
+  - @0xsodium/auth@1.7.0
+  - @0xsodium/config@1.7.0
+  - @0xsodium/network@1.7.0
+  - @0xsodium/transactions@1.7.0
+  - @0xsodium/utils@1.7.0
+  - @0xsodium/wallet@1.7.0
+
 ## 1.6.0
 
 ### Minor Changes

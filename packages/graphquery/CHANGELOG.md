@@ -1,5 +1,11 @@
 # @0xsodium/graphquery
 
+## 1.7.0
+
+### Minor Changes
+
+- query token price use cache
+
 ## 1.6.0
 
 ### Minor Changes

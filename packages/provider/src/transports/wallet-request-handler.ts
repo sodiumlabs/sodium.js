@@ -24,7 +24,28 @@ import { TransactionRequest, isSignedTransaction } from '@0xsodium/transactions'
 import { signAuthorization, AuthorizationOptions } from '@0xsodium/auth';
 import { logger, TypedData, AddressZero, ERC20OrNativeTokenMetadata } from '@0xsodium/utils';
 import { prefixEIP191Message, isWalletUpToDate } from '../utils';
-import { ERC20Token__factory } from '@0xsodium/wallet-contracts';
+import moize from 'moize';
+
+const getTokenPrices = async (chain: string, tokenAddressList: string[]): Promise<{ [tokenAddress: string]: { usd: number } }> => {
+  const query = `vs_currencies=usd&contract_addresses=${tokenAddressList.join(",")}`
+  const requestURL = `https://api.coingecko.com/api/v3/simple/token_price/${chain}?${query}`
+  const coingeckoRes = await fetch(requestURL)
+  const prices = await coingeckoRes.json()
+  return prices;
+}
+
+// const hasOneProperty = (cacheKeyArg: any, keyArg: any) => {
+//   console.debug("has one property", cacheKeyArg, keyArg)
+//   return true
+// }
+const getTokenPricesWithCache = moize(getTokenPrices, {
+  // matchesArg: hasOneProperty,
+  isDeepEqual: true,
+  isPromise: true,
+  // 30 seconds
+  maxAge: 30 * 1000,
+});
+
 
 const SIGNER_READY_TIMEOUT = 10000
 
@@ -574,6 +595,15 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
         case 'sodium_getTokenRates': {
           let [tokenAddressList, chainId] = request.params!
 
+          // TODO
+          // cross chain support
+          if (chainId != 137) {
+            response.result = tokenAddressList.map((tokenAddress: string) => {
+              return 0
+            }); 
+            break;
+          }
+
           tokenAddressList = tokenAddressList.map((tokenAddress: string) => {
             if (tokenAddress === AddressZero) {
               return "0x0000000000000000000000000000000000001010"
@@ -581,15 +611,11 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
             return tokenAddress;
           });
 
-          // TODO
-          // cross chain support
+          
 
           // default
           let chain = "polygon-pos"
-          const query = `vs_currencies=usd&contract_addresses=${tokenAddressList.join(",")}`
-          const requestURL = `https://api.coingecko.com/api/v3/simple/token_price/${chain}?${query}`
-          const coingeckoRes = await fetch(requestURL)
-          const prices = await coingeckoRes.json()
+          const prices = await getTokenPricesWithCache(chain, tokenAddressList);
           response.result = tokenAddressList.map((tokenAddress: string) => {
             const price = prices[tokenAddress.toLowerCase()]
             return price ? price.usd : 0

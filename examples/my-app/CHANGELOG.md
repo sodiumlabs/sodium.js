@@ -1,5 +1,16 @@
 # my-app
 
+## 1.7.0
+
+### Minor Changes
+
+- query token price use cache
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.7.0
+
 ## 1.6.0
 
 ### Minor Changes

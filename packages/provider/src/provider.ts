@@ -211,7 +211,7 @@ export class Web3Signer extends Signer implements TypedDataSigner {
       'sodium_getTokenRates',
       [
         tokenAddress,
-        maybeChainId(chainId)
+        maybeChainId(chainId) || this.defaultChainId
       ],
       maybeChainId(chainId) || this.defaultChainId
     )

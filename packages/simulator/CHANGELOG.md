@@ -1,5 +1,16 @@
 # @0xsodium/simulator
 
+## 1.7.0
+
+### Minor Changes
+
+- query token price use cache
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/transactions@1.7.0
+
 ## 1.6.0
 
 ### Minor Changes
