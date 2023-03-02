@@ -1,5 +1,17 @@
 # @0xsodium/guard
 
+## 1.9.0
+
+### Minor Changes
+
+- retry release
+
+## 1.8.0
+
+### Minor Changes
+
+- fix app transport
+
 ## 1.7.0
 
 ### Minor Changes

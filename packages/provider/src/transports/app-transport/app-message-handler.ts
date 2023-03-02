@@ -51,13 +51,7 @@ export class AppMessageHandler extends BaseWalletTransport {
   sendMessage(message: ProviderMessage<any>) {
     // prepare payload
     const payload = JSON.stringify(message)
-    // post-message to app.
-    // only for init requests, we send to '*' origin
-    if (message.type === EventType.INIT) {
-      this.postMessage(payload, true)
-    } else {
-      this.postMessage(payload)
-    }
+    this.postMessage(payload)
   }
 
   get isPopup(): boolean {
@@ -65,9 +59,8 @@ export class AppMessageHandler extends BaseWalletTransport {
   }
 
   private postMessage(message: any, init = false) {
-    if (init !== true && this._init !== InitState.OK) {
-      logger.error('impossible state, should not be calling postMessage until inited')
-      return
+    if (this._registered) {
+      this.postMessageToWebView(message);
     }
   }
 }

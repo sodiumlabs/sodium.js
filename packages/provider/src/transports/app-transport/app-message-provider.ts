@@ -94,10 +94,6 @@ export class AppMessageProvider extends BaseProviderTransport {
       throw new Error('ProviderMessage object is empty')
     }
 
-    if (message.origin !== location.href) {
-      return
-    }
-
     // handle message with base message provider
     this.handleMessage(message)
   }

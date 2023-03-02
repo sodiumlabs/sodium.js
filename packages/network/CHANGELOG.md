@@ -1,5 +1,27 @@
 # @0xsodium/network
 
+## 1.9.0
+
+### Minor Changes
+
+- retry release
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/utils@1.9.0
+
+## 1.8.0
+
+### Minor Changes
+
+- fix app transport
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/utils@1.8.0
+
 ## 1.7.0
 
 ### Minor Changes

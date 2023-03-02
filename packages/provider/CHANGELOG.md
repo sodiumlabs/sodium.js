@@ -1,5 +1,41 @@
 # @0xsodium/provider
 
+## 1.9.0
+
+### Minor Changes
+
+- retry release
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.9.0
+  - @0xsodium/auth@1.9.0
+  - @0xsodium/config@1.9.0
+  - @0xsodium/graphquery@1.9.0
+  - @0xsodium/network@1.9.0
+  - @0xsodium/transactions@1.9.0
+  - @0xsodium/utils@1.9.0
+  - @0xsodium/wallet@1.9.0
+
+## 1.8.0
+
+### Minor Changes
+
+- fix app transport
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.8.0
+  - @0xsodium/auth@1.8.0
+  - @0xsodium/config@1.8.0
+  - @0xsodium/graphquery@1.8.0
+  - @0xsodium/network@1.8.0
+  - @0xsodium/transactions@1.8.0
+  - @0xsodium/utils@1.8.0
+  - @0xsodium/wallet@1.8.0
+
 ## 1.7.0
 
 ### Minor Changes
