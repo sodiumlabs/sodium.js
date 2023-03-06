@@ -20,7 +20,7 @@ import { ethers, utils } from 'ethers';
 import { ExternalProvider } from '@ethersproject/providers';
 import { NetworkConfig, JsonRpcHandler, JsonRpcRequest, JsonRpcResponseCallback, JsonRpcResponse } from '@0xsodium/network';
 import { Signer } from '@0xsodium/wallet';
-import { TransactionRequest, isSignedTransaction } from '@0xsodium/transactions';
+import { Transactionish, isSignedTransaction, flattenAuxTransactions } from '@0xsodium/transactions';
 import { signAuthorization, AuthorizationOptions } from '@0xsodium/auth';
 import { logger, TypedData, AddressZero, ERC20OrNativeTokenMetadata } from '@0xsodium/utils';
 import { prefixEIP191Message, isWalletUpToDate } from '../utils';
@@ -265,6 +265,11 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
       const provider = await signer.getProvider(chainId)
       if (!provider) throw new Error(`WalletRequestHandler: wallet provider is not configured for chainId ${chainId}`)
 
+      if (!chainId) {
+        const network = await provider.getNetwork();
+        chainId = network.chainId;
+      }
+
       switch (request.method) {
         case 'net_version': {
           const result = await provider.send('net_version', [])
@@ -385,20 +390,27 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
           const [transactionParams] = request.params!
 
           // eth_sendTransaction uses 'gas'
-          // ethers and sequence use 'gasLimit'
+          // ethers and sodium use 'gasLimit'
           if ('gas' in transactionParams && transactionParams.gasLimit === undefined) {
             transactionParams.gasLimit = transactionParams.gas
             delete transactionParams.gas
           }
 
+          let transactions = flattenAuxTransactions(transactionParams);
+
+          if (!isWalletUpToDate(signer, chainId)) {
+            const walletUpgradeTransactions = await signer.getWalletUpgradeTransactions(chainId);
+            transactions = [...walletUpgradeTransactions, ...transactions];
+          }
+
           let txnHash = ''
           if (this.prompter === null) {
             // prompter is null, so we'll send from here
-            const txnResponse = await signer.sendTransaction(transactionParams, chainId)
+            const txnResponse = await signer.sendTransaction(transactions, chainId)
             txnHash = txnResponse.hash
           } else {
             // prompt user to provide the response
-            txnHash = await this.prompter.promptSendTransaction(transactionParams, chainId, this.connectOptions)
+            txnHash = await this.prompter.promptSendTransaction(transactions, chainId, this.connectOptions)
           }
 
           if (txnHash) {
@@ -930,14 +942,9 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
   private async handleConfirmWalletDeployPrompt(
     prompter: WalletUserPrompter,
     signer: Signer,
-    chainId?: number
+    chainId: number
   ): Promise<boolean> {
-    // check if wallet is deployed and up to date, if not, prompt user to deploy
-    // if no chainId is provided, we'll assume the wallet is auth chain wallet and is up to date
-    if (chainId === undefined) {
-      return true
-    }
-    const isUpToDate = await isWalletUpToDate(signer, chainId!)
+    const isUpToDate = await isWalletUpToDate(signer, chainId)
     if (isUpToDate) {
       return true
     }
@@ -959,8 +966,8 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
 export interface WalletUserPrompter {
   promptConnect(options?: ConnectOptions): Promise<PromptConnectDetails>
   promptSignMessage(message: MessageToSign, options?: ConnectOptions): Promise<string>
-  promptSignTransaction(txn: TransactionRequest, chaindId?: number, options?: ConnectOptions): Promise<string>
-  promptSendTransaction(txn: TransactionRequest, chaindId?: number, options?: ConnectOptions): Promise<string>
+  promptSignTransaction(txn: Transactionish, chaindId?: number, options?: ConnectOptions): Promise<string>
+  promptSendTransaction(txn: Transactionish, chaindId?: number, options?: ConnectOptions): Promise<string>
 
   // 合约部署或者更新session时调用.
   promptConfirmWalletDeploy(chainId: number, options?: ConnectOptions): Promise<boolean>

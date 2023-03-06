@@ -5,6 +5,7 @@ import { ethers } from "ethers"
 
 export interface Estimator {
   estimateGasLimits(
+    entryPointAddress: string,
     config: WalletConfig,
     context: WalletContext,
     ...transactions: Transaction[]

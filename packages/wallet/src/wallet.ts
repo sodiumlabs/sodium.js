@@ -1,7 +1,7 @@
 import { Provider, BlockTag, JsonRpcProvider as EthJsonRpcProvider, TransactionResponse } from '@ethersproject/providers'
 import { BigNumber, BigNumberish, ethers, Signer as AbstractSigner } from 'ethers';
 import { TypedDataDomain, TypedDataField } from '@ethersproject/abstract-signer';
-import { BytesLike, joinSignature } from '@ethersproject/bytes';
+import { BytesLike } from '@ethersproject/bytes';
 import { Deferrable } from '@ethersproject/properties';
 import { ConnectionInfo } from '@ethersproject/web';
 import {
@@ -35,7 +35,11 @@ import { encodeTypedDataDigest, subDigestOf } from '@0xsodium/utils';
 import { RemoteSigner } from './remote-signers';
 import { resolveArrayProperties } from './utils';
 import { Signer } from './signer';
-import { CompatibilityFallbackHandler__factory } from '@0xsodium/wallet-contracts';
+import {
+  CompatibilityFallbackHandler__factory,
+  Sodium__factory
+} from '@0xsodium/wallet-contracts';
+import { AbiCoder, defaultAbiCoder } from '@ethersproject/abi';
 
 // Wallet is a signer interface to a Smart Contract based Ethereum account.
 //
@@ -119,10 +123,6 @@ export class Wallet extends Signer {
     });
   }
 
-  async init(): Promise<void> {
-    await this.wallet4337API.init();
-  }
-
   connect(provider: Provider): Wallet {
     if (isJsonRpcProvider(provider)) {
       return new Wallet({ config: this.config, context: this.context }, ...this._signers)
@@ -132,12 +132,14 @@ export class Wallet extends Signer {
     }
   }
 
-  getPaymasterInfos(transactions: TransactionRequest, chainId?: ChainIdLike): Promise<PaymasterInfo[]> {
-    return this.wallet4337API.getPaymasterInfos(transactions);
+  async getPaymasterInfos(transactions: TransactionRequest, chainId?: ChainIdLike): Promise<PaymasterInfo[]> {
+    const entryPointAddress = await this.getEntrypointAddress();
+    return this.wallet4337API.getPaymasterInfos(entryPointAddress, transactions);
   }
 
-  waitForTransaction(transactionHash: string, confirmations?: number | undefined, timeout?: number | undefined): Promise<ethers.providers.TransactionReceipt> {
-    return this.wallet4337API.waitForTransaction(transactionHash, confirmations, timeout);
+  async waitForTransaction(transactionHash: string, confirmations?: number | undefined, timeout?: number | undefined): Promise<ethers.providers.TransactionReceipt> {
+    const entryPointAddress = await this.getEntrypointAddress();
+    return this.wallet4337API.waitForTransaction(entryPointAddress, transactionHash, confirmations, timeout);
   }
 
   setBundler(bundlerUrl: string, chainId: number): Wallet {
@@ -183,16 +185,41 @@ export class Wallet extends Signer {
   }
 
   async getWalletState(_?: ChainIdLike): Promise<WalletState[]> {
-    const [address, chainId, isDeployed] = await Promise.all([this.getAddress(), this.getChainId(), this.isDeployed()])
+    const [address, chainId, isDeployed, entryPointAddress, singlotion] = await Promise.all([
+      this.getAddress(),
+      this.getChainId(),
+      this.isDeployed(),
+      this.getEntrypointAddress(),
+      this.getSinglotonAddress()
+    ])
     const state: WalletState = {
       context: this.context,
       config: this.config,
+      entrypoint: entryPointAddress,
+      singlotion: singlotion,
       address: address,
       chainId: chainId,
       deployed: isDeployed,
       imageHash: this.imageHash,
     }
     return [state]
+  }
+
+  async getWalletUpgradeTransactions(chainId?: ChainIdLike): Promise<Transaction[]> {
+    const sointerface = Sodium__factory.createInterface();
+    const abi = sointerface.encodeFunctionData("upgradeTo", [this.context.singletonAddress]);
+    return [
+      {
+        to: "0x7a55948FCF36613CBD699f299BEce89F42581C92",
+        data: abi,
+        op: 1
+      }
+    ];
+    // return [{
+    //   to: this.address,
+    //   data: abi,
+    //   op: 0,
+    // }];
   }
 
   // connected reports if json-rpc provider has been connected
@@ -215,6 +242,40 @@ export class Wallet extends Signer {
   // The getAddress method is defined on the AbstractSigner
   async getAddress(): Promise<string> {
     return this.address
+  }
+
+  async getEntrypointAddress(): Promise<string> {
+    const walletIsDeployed = await this.isDeployed();
+
+    // TODO: remove this
+    if (!walletIsDeployed) {
+      return "0x0aE1B76389397Dc81c16eB8e2dEb0C592D3C873c";
+    }
+
+    const getSinglotonAddress = await this.getSinglotonAddress();
+
+    if (getSinglotonAddress.toLocaleLowerCase() === this.context.genesisSingletonAddress.toLocaleLowerCase()) {
+      return "0x0aE1B76389397Dc81c16eB8e2dEb0C592D3C873c";
+    }
+
+    return this.context.entryPointAddress;
+  }
+
+  async getSinglotonAddress(): Promise<string> {
+    const walletIsDeployed = await this.isDeployed();
+    if (!walletIsDeployed) {
+      return this.context.genesisSingletonAddress;
+    }
+    const walletSingloton = await this.provider.getStorageAt(this.address, this.address);
+    const result = defaultAbiCoder.decode(["address"], walletSingloton);
+
+    console.debug("getSinglotonAddress", result);
+
+    if (result.length > 0) {
+      return result[0];
+    }
+    // TODO: should we throw an error here?
+    throw new Error("failed to get singlotion address");
   }
 
   // getSigners returns the list of public account addresses to the currently connected
@@ -278,11 +339,9 @@ export class Wallet extends Signer {
     chainId?: ChainIdLike,
     paymasterId?: string,
   ): Promise<TransactionResponse> {
+    const entryPointAddress = await this.getEntrypointAddress();
     const signedTxs = await this.signTransactions(transaction, chainId);
-    const tr = await this.wallet4337API.sendSignedTransaction(signedTxs);
-    // const receipt = await tr.wait();
-    // console.debug(receipt.transactionHash, "receipt.transactionHash")
-    // tr.hash = receipt.transactionHash;
+    const tr = await this.wallet4337API.sendSignedTransaction(entryPointAddress, signedTxs);
     return tr;
   }
 
@@ -302,36 +361,36 @@ export class Wallet extends Signer {
     txs1: Deferrable<Transactionish>,
     chainId?: ChainIdLike
   ): Promise<SignedTransaction> {
+    const entryPointAddress = await this.getEntrypointAddress();
     const signChainId = await this.getChainIdNumber(chainId);
     const txs = await resolveArrayProperties<Transactionish>(txs1);
     if (!this.provider) {
       throw new Error('missing provider');
     }
-    return this.wallet4337API.signTransactions(txs, signChainId);
+    console.debug("signTransactions", txs);
+    return this.wallet4337API.signTransactions(entryPointAddress, txs, signChainId);
   }
 
   async sendSignedTransactions(
-    signedTxs: SignedTransaction, 
+    signedTxs: SignedTransaction,
     chainId?: ChainIdLike,
     paymasterId?: string
   ): Promise<TransactionResponse> {
     await this.getChainIdNumber(chainId)
-    return this.wallet4337API.sendSignedTransaction(signedTxs);
+    const entryPointAddress = await this.getEntrypointAddress();
+    return this.wallet4337API.sendSignedTransaction(entryPointAddress, signedTxs);
   }
 
   // signMessage will sign a message for a particular chainId with the wallet signers
   // NOTE: signMessage(message: Bytes | string): Promise<string> is defined on AbstractSigner
   async signMessage(message: BytesLike): Promise<string> {
     const data = typeof message === 'string' && !message.startsWith('0x') ? ethers.utils.toUtf8Bytes(message) : message;
-    const localSigners = this._signers.filter(s => !RemoteSigner.isRemoteSigner(s));
-    if (localSigners.length == 0) {
-      throw new Error("not found local signer");
-    }
+    const localSigner = this.getLocalSigner();
     // localSigners[0].
     const address = await this.getAddress();
     const cfh = CompatibilityFallbackHandler__factory.connect(address, this.provider);
     const signHash = await cfh.getMessageHash(data);
-    return localSigners[0].signMessage(ethers.utils.arrayify(signHash));
+    return localSigner.signMessage(ethers.utils.arrayify(signHash));
   }
 
   async signTypedData(

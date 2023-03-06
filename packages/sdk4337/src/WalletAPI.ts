@@ -81,31 +81,32 @@ export class WalletAPI extends BaseWalletAPI {
   /**
    * encode a method call from entryPoint to our contract
    */
-  async encodeExecute(transactions: TransactionDetailsForUserOp): Promise<string> {
+  async encodeExecute(entryPointAddress: string, transactions: TransactionDetailsForUserOp): Promise<string> {
     const walletContract = await this._getWalletContract();
     const txs = await toSodiumTransactions(flattenAuxTransactions(transactions));
+    const encodeTxs = sodiumTxAbiEncode(txs);
 
-    console.debug(txs, "txs");
+    console.debug('encodeExecute', encodeTxs);
 
     return walletContract.interface.encodeFunctionData(
       'execute',
       [
-        sodiumTxAbiEncode(txs)
+        encodeTxs
       ]
     );
   }
 
-  async encodeGasLimit(transactions: TransactionRequest): Promise<[Transaction[], BigNumber]> {
+  async encodeGasLimit(entryPointAddress: string, transactions: TransactionRequest): Promise<[Transaction[], BigNumber]> {
     const txs = await toSodiumTransactions(flattenAuxTransactions(transactions));
-    const estimateResult = await this.sodiumEstimator.estimateGasLimits(this.walletConfig, this.walletContext, ...txs);
+    const estimateResult = await this.sodiumEstimator.estimateGasLimits(entryPointAddress, this.walletConfig, this.walletContext, ...txs);
     return [
       estimateResult.transactions,
       estimateResult.total
     ];
   }
 
-  async getPaymasterInfos(transactions: TransactionRequest): Promise<PaymasterInfo[]> {
-    const tempOp = await this.createUnsignedUserOp(transactions);
+  async getPaymasterInfos(entryPointAddress: string, transactions: TransactionRequest): Promise<PaymasterInfo[]> {
+    const tempOp = await this.createUnsignedUserOp(entryPointAddress, transactions);
     const op = await resolveProperties(tempOp);
     const totalLimit = BigNumber.from(op.verificationGasLimit).add(op.callGasLimit);
     const gasPrice = BigNumber.from(op.maxFeePerGas).mul(totalLimit);

@@ -20,7 +20,8 @@ import {
   TransactionRequest,
   TransactionResponse,
   SignedTransaction,
-  GasSuggest
+  GasSuggest,
+  Transaction
 } from '@0xsodium/transactions'
 import { WalletRequestHandler } from './transports/wallet-request-handler'
 import { UserTokenInfo } from '@0xsodium/graphquery';
@@ -132,6 +133,10 @@ export class Web3Signer extends Signer implements TypedDataSigner {
   }
 
   waitForTransaction(transactionHash: string, confirmations?: number | undefined, timeout?: number | undefined): Promise<ethers.providers.TransactionReceipt> {
+    throw new Error('Method not implemented.')
+  }
+
+  getWalletUpgradeTransactions(chainId?: ChainIdLike | undefined): Promise<Transaction[]> {
     throw new Error('Method not implemented.')
   }
 

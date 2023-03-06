@@ -204,6 +204,12 @@ export class Account extends Signer {
     return wallet.getBalance(chainId, blockTag);
   }
 
+  // abstract getWalletUpgradeTransactions(chainId?: ChainIdLike): Promise<Transaction[]>;
+  async getWalletUpgradeTransactions(chainId?: ChainIdLike): Promise<Transaction[]> {
+    const wallet = chainId ? this.getWalletByNetwork(chainId).wallet : this.mainWallet().wallet
+    return wallet.getWalletUpgradeTransactions(chainId);
+  }
+
   async sendTransactionBatch(
     transactions: Deferrable<TransactionRequest[] | Transaction[]>,
     chainId?: ChainIdLike,

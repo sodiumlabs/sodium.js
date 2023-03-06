@@ -13,7 +13,6 @@ export class HttpRpcClient {
 
   constructor(
     readonly bundlerUrl: string,
-    readonly entryPointAddress: string,
     readonly chainId: number
   ) {
     this.userOpJsonRpcProvider = new ethers.providers.JsonRpcProvider(this.bundlerUrl, {
@@ -37,7 +36,10 @@ export class HttpRpcClient {
    * @param userOp1
    * @return requestId the id of this operation, for getUserOperationTransaction
    */
-  async sendUserOpToBundler(userOp1: UserOperationStruct): Promise<string> {
+  async sendUserOpToBundler(
+    entryPointAddress: string,
+    userOp1: UserOperationStruct
+  ): Promise<string> {
     await this.initializing
     const userOp = await resolveProperties(userOp1)
     const hexifiedUserOp: any =
@@ -54,9 +56,9 @@ export class HttpRpcClient {
           [k]: v
         }), {})
     console.debug("ready send", userOp);
-    const jsonRequestData: [UserOperationStruct, string] = [hexifiedUserOp, this.entryPointAddress]
+    const jsonRequestData: [UserOperationStruct, string] = [hexifiedUserOp, entryPointAddress]
     await this.printUserOperation(jsonRequestData)
-    return await this.userOpJsonRpcProvider.send('eth_sendUserOperation', [hexifiedUserOp, this.entryPointAddress])
+    return await this.userOpJsonRpcProvider.send('eth_sendUserOperation', [hexifiedUserOp, entryPointAddress])
   }
 
   async getTransactionHashByUserOpHash(userOpHash: string): Promise<string> {

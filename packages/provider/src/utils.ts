@@ -1,5 +1,5 @@
 import { ethers, BigNumberish, BytesLike } from 'ethers'
-import { WalletContext } from '@0xsodium/network'
+import { WalletContext, sodiumContext } from '@0xsodium/network'
 import { WalletConfig, addressOf, isConfigEqual } from '@0xsodium/config'
 import { packMessageData, encodeMessageDigest, TypedData, encodeTypedDataDigest } from '@0xsodium/utils'
 import { Web3Provider } from './provider'
@@ -91,7 +91,7 @@ export const isValidTypedDataSignature = (
 export const isBrowserExtension = (): boolean =>
   window.location.protocol === 'chrome-extension:' || window.location.protocol === 'moz-extension:'
 
-export const isUnityPlugin = (): boolean => !!navigator.userAgent.match(/UnitySequence/i)
+export const isUnityPlugin = (): boolean => !!navigator.userAgent.match(/UnitySodium/i)
 
 export interface ItemStore {
   getItem(key: string): Promise<string | null>
@@ -102,7 +102,7 @@ export interface ItemStore {
 export class LocalStorage {
   private static _instance: ItemStore
 
-  private constructor() {}
+  private constructor() { }
 
   static getInstance(): ItemStore {
     if (!LocalStorage._instance) {
@@ -127,35 +127,29 @@ export class LocalStorage {
  * @param {number} chainId
  * @return {Promise<boolean>} Promise that returns true if the wallet is up to date, false otherwise
  */
- export const isWalletUpToDate = async (signer: Signer, chainId: number): Promise<boolean> => {
+export const isWalletUpToDate = async (signer: Signer, chainId: number): Promise<boolean> => {
   const walletState = await signer.getWalletState()
   const networks = await signer.getNetworks()
-
   const walletStateForRequiredChain = walletState.find(state => state.chainId === chainId)
   if (!walletStateForRequiredChain) {
     throw new Error(`WalletRequestHandler: could not find wallet state for chainId ${chainId} ${JSON.stringify(walletState)}`)
   }
-
   const isDeployed = walletStateForRequiredChain.deployed
-
   if (!networks) {
     throw new Error(`isWalletUpToDate util: could not get networks from signer`)
-  }
-  const authChain = networks.find(network => network.isAuthChain)
-  if (!authChain) {
-    throw new Error(`isWalletUpToDate util: could not get auth chain network information`)
-  }
-  const authChainId = authChain.chainId
-  const authChainConfig = walletState.find(state => state.chainId === authChainId)?.config
-  if (!authChainConfig) {
-    throw new Error(`isWalletUpToDate util: could not get auth chain config`)
   }
   const requiredChainConfig = walletStateForRequiredChain.config
   if (!requiredChainConfig) {
     throw new Error(`isWalletUpToDate util: could not get config for chainId ${chainId}`)
   }
+  let isUpToDate = true;
 
-  const isUpToDate = isConfigEqual(authChainConfig, requiredChainConfig)
+  if (
+    walletStateForRequiredChain.singlotion.toLocaleLowerCase() 
+    !== sodiumContext.singletonAddress.toLocaleLowerCase()
+  ) {
+    isUpToDate = false;
+  }
 
   return isDeployed && isUpToDate
 }

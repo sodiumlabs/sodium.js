@@ -22,6 +22,7 @@ export abstract class Signer extends AbstractSigner {
   abstract getNetworks(): Promise<NetworkConfig[]>
   abstract getPaymasterInfos(transactions: TransactionRequest, chainId?: ChainIdLike): Promise<PaymasterInfo[]>;
   abstract waitForTransaction(transactionHash: string, confirmations?: number, timeout?: number): Promise<TransactionReceipt>;
+  abstract getWalletUpgradeTransactions(chainId?: ChainIdLike): Promise<Transaction[]>;
   // getSigners returns a list of available / attached signers to the interface. Note: you need
   // enough signers in order to meet the signing threshold that satisfies a wallet config.
   // abstract getSigners(): Promise<string[]>

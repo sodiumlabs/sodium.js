@@ -1,6 +1,4 @@
-import * as multicall from '@0xsodium/multicall'
 import { BytesLike, ethers } from "ethers"
-import { WalletConfig } from "."
 
 export type DecodedSignature = {
   threshold: number
@@ -82,7 +80,7 @@ export const decodeSignature = (signature: string | DecodedSignature): DecodedSi
   const threshold = ethers.BigNumber.from(`0x${auxsig.slice(0, 4)}`).toNumber()
   const signers: DecodedSignaturePart[] = []
 
-  for (let rindex = 4; rindex < auxsig.length; ) {
+  for (let rindex = 4; rindex < auxsig.length;) {
     const signatureType = ethers.BigNumber.from(auxsig.slice(rindex, rindex + 2)).toNumber() as SignatureType
     rindex += 2
 
@@ -93,13 +91,13 @@ export const decodeSignature = (signature: string | DecodedSignature): DecodedSi
       case SignatureType.Address:
         const addr = ethers.utils.getAddress(auxsig.slice(rindex, rindex + 40))
         rindex += 40
-  
+
         signers.push({
           weight: weight,
           address: addr
         })
         break;
-    
+
       case SignatureType.EOA:
         const sig = ethers.utils.arrayify(`0x${auxsig.slice(rindex, rindex + 132)}`)
         rindex += 132
@@ -108,9 +106,9 @@ export const decodeSignature = (signature: string | DecodedSignature): DecodedSi
         const r = split.r
         const s = split.s
         const v = split.v
-  
+
         const t = ethers.BigNumber.from(sig[sig.length - 1]).toNumber()
-  
+
         signers.push({
           weight: weight,
           signature: sig,
@@ -169,7 +167,7 @@ export const splitDecodedEOASigner = (sig: DecodedEOASigner): DecodedEOASplitSig
 export const recoverEOASigner = (digest: BytesLike, sig: DecodedEOASigner | DecodedEOASplitSigner) => {
   const signature = isDecodedEOASplitSigner(sig) ? sig : splitDecodedEOASigner(sig)
 
-  switch (signature.t) {
+  switch (signature.t) {
     case SIG_TYPE_EIP712:
       return ethers.utils.recoverAddress(digest, {
         r: signature.r,
@@ -231,7 +229,7 @@ export const encodeSignature = (sig: DecodedSignature | string): string => {
 
     if (isDecodedEOASigner(s)) {
       return ethers.utils.solidityPack(
-        ['uint8', 'uint8', 'bytes'], 
+        ['uint8', 'uint8', 'bytes'],
         [SignatureType.EOA, s.weight, s.signature]
       )
     }

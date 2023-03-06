@@ -110,6 +110,6 @@ export class OverwriterEstimator {
       throw Error(`Failed gas estimation with ${tryDecodeError(decoded.result)}`)
     }
     const rv = ethers.BigNumber.from(decoded.gas).add(this.txBaseCost(data))
-    return rv;
+    return rv.add(100000);
   }
 }

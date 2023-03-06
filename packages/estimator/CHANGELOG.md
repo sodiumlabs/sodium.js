@@ -1,5 +1,19 @@
 # @0xsodium/estimator
 
+## 1.10.0
+
+### Minor Changes
+
+- support temp upgrade
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/config@1.10.0
+  - @0xsodium/network@1.10.0
+  - @0xsodium/transactions@1.10.0
+  - @0xsodium/utils@1.10.0
+
 ## 1.9.0
 
 ### Minor Changes

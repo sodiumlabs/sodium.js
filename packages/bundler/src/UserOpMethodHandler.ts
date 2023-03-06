@@ -127,9 +127,9 @@ export class UserOpMethodHandler {
 
   async sendUserOperation (userOp1: UserOperationStruct, entryPointInput: string): Promise<string> {
     const userOp = await resolveProperties(userOp1)
-    if (entryPointInput.toLowerCase() !== this.config.entryPoint.toLowerCase()) {
-      throw new Error(`The EntryPoint at "${entryPointInput}" is not supported. This bundler uses ${this.config.entryPoint}`)
-    }
+    // if (entryPointInput.toLowerCase() !== this.config.entryPoint.toLowerCase()) {
+    //   throw new Error(`The EntryPoint at "${entryPointInput}" is not supported. This bundler uses ${this.config.entryPoint}`)
+    // }
     console.log(`UserOperation: Sender=${userOp.sender} EntryPoint=${entryPointInput} Paymaster=${hexValue(userOp.paymasterAndData)}`)
     // await this.simulateUserOp(userOp1, entryPointInput)
     const beneficiary = await this.selectBeneficiary()

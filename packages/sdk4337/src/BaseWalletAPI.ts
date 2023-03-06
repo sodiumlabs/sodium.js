@@ -47,7 +47,6 @@ export interface UserOpResult {
 export abstract class BaseWalletAPI {
   private senderAddress!: string
   private isPhantom = true
-  private entryPoint: EntryPoint
 
   walletConfig: WalletConfig;
   walletContext: WalletContext;
@@ -55,7 +54,6 @@ export abstract class BaseWalletAPI {
   chainId: number;
   provider: JsonRpcProvider
   overheads?: Partial<GasOverheads>
-  entryPointAddress: string
   walletAddress?: string
   paymasterAPI?: PaymasterAPI
   httpRpcClient: HttpRpcClient
@@ -66,27 +64,26 @@ export abstract class BaseWalletAPI {
    */
   protected constructor(params: BaseApiParams) {
     this.overheads = params.overheads;
-    this.entryPointAddress = params.entryPointAddress;
     this.walletConfig = params.config;
     this.walletContext = params.context;
-    this.paymasterAPI = params.paymasterAPI;
+    // this.paymasterAPI = params.paymasterAPI;
+    this.paymasterAPI = new PaymasterAPI();
   }
 
-  async init(): Promise<this> {
-    if (await this.provider.getCode(this.entryPointAddress) === '0x') {
-      throw new Error(`entryPoint not deployed at ${this.entryPointAddress}`)
-    }
-    await this.getWalletAddress()
-    return this
-  }
+  // async init(): Promise<this> {
+  //   if (await this.provider.getCode(this.entryPointAddress) === '0x') {
+  //     throw new Error(`entryPoint not deployed at ${this.entryPointAddress}`)
+  //   }
+  //   await this.getWalletAddress()
+  //   return this
+  // }
 
   setProvider(provider: JsonRpcProvider): void {
     this.provider = provider;
-    this.entryPoint = EntryPoint__factory.connect(this.entryPointAddress, provider);
   }
 
   setBundler(bundlerUrl: string, chainId: number) {
-    this.httpRpcClient = new HttpRpcClient(bundlerUrl, this.entryPointAddress, chainId);
+    this.httpRpcClient = new HttpRpcClient(bundlerUrl, chainId);
     this.chainId = chainId;
   }
 
@@ -102,9 +99,9 @@ export abstract class BaseWalletAPI {
   abstract getNonce(): Promise<BigNumber>
 
   // encode the call from entryPoint through our wallet to the target contract.
-  abstract encodeExecute(transactions: TransactionDetailsForUserOp): Promise<string>
+  abstract encodeExecute(entryPointAddress: string, transactions: TransactionDetailsForUserOp): Promise<string>
 
-  abstract encodeGasLimit(transactions: TransactionDetailsForUserOp): Promise<[Transaction[], BigNumber]>
+  abstract encodeGasLimit(entryPointAddress: string, transactions: TransactionDetailsForUserOp): Promise<[Transaction[], BigNumber]>
 
   /**
    * sign a userOp's hash (requestId).
@@ -130,6 +127,10 @@ export abstract class BaseWalletAPI {
     return this.isPhantom
   }
 
+  async getEntryPoint(entryPointAddress: string): Promise<EntryPoint> {
+    return EntryPoint__factory.connect(entryPointAddress, this.provider);
+  }
+
   /**
    * calculate the wallet address even before it is deployed
    */
@@ -137,8 +138,7 @@ export abstract class BaseWalletAPI {
     const initCode = await this.getWalletInitCode()
     // use entryPoint to query wallet address (factory can provide a helper method to do the same, but
     // this method attempts to be generic
-    const address = await this.entryPoint.callStatic.senderCreator();
-    const creator = SenderCreator__factory.connect(address, this.provider);
+    const creator = SenderCreator__factory.connect(this.walletContext.walletCreatorAddress, this.provider);
     return await creator.callStatic.getAddress(initCode);
   }
 
@@ -177,9 +177,9 @@ export abstract class BaseWalletAPI {
     return packUserOp(userOp, false)
   }
 
-  async encodeUserOpCallDataAndGasLimit(detailsForUserOp: TransactionDetailsForUserOp): Promise<{ callData: string, callGasLimit: BigNumber }> {
-    const [newTxs, callGasLimit] = await this.encodeGasLimit(detailsForUserOp);
-    const callData = await this.encodeExecute(newTxs)
+  async encodeUserOpCallDataAndGasLimit(entryPointAddress: string, detailsForUserOp: TransactionDetailsForUserOp): Promise<{ callData: string, callGasLimit: BigNumber }> {
+    const [newTxs, callGasLimit] = await this.encodeGasLimit(entryPointAddress,detailsForUserOp);
+    const callData = await this.encodeExecute(entryPointAddress, newTxs)
     return {
       callData,
       callGasLimit
@@ -191,9 +191,9 @@ export abstract class BaseWalletAPI {
    * This value matches entryPoint.getRequestId (calculated off-chain, to avoid a view call)
    * @param userOp userOperation, (signature field ignored)
    */
-  async getRequestId(userOp: UserOperationStruct, chainId: number): Promise<string> {
+  async getRequestId(entryPointAddress: string, userOp: UserOperationStruct, chainId: number): Promise<string> {
     const op = await resolveProperties(userOp);
-    return getRequestId(op, this.entryPointAddress, chainId)
+    return getRequestId(op, entryPointAddress, chainId)
   }
 
   /**
@@ -211,11 +211,11 @@ export abstract class BaseWalletAPI {
     return this.senderAddress;
   }
 
-  async createUnsignedUserOp(info: TransactionDetailsForUserOp): Promise<UserOperationStruct> {
+  async createUnsignedUserOp(entryPointAddress: string, info: TransactionDetailsForUserOp): Promise<UserOperationStruct> {
     const {
       callData,
       callGasLimit
-    } = await this.encodeUserOpCallDataAndGasLimit(info);
+    } = await this.encodeUserOpCallDataAndGasLimit(entryPointAddress, info);
     const initCode = await this.getInitCode();
     let verificationGasLimit = BigNumber.from(await this.getVerificationGasLimit())
     if (initCode.length > 2) {
@@ -272,7 +272,7 @@ export abstract class BaseWalletAPI {
         ...partialUserOp,
         preVerificationGas: this.getPreVerificationGas(partialUserOp)
       }
-      const temp = await this.paymasterAPI.getPaymasterAndData(userOpForPm);
+      const temp = await this.paymasterAPI.getPaymasterAndData(this.chainId, userOpForPm);
       partialUserOp.paymasterAndData = temp ?? '0x';
     }
     return {
@@ -286,8 +286,8 @@ export abstract class BaseWalletAPI {
    * Sign the filled userOp.
    * @param userOp the UserOperation to sign (with signature field ignored)
    */
-  async signUserOp(userOp: UserOperationStruct, chainId: number): Promise<UserOperationStruct> {
-    const requestId = await this.getRequestId(userOp, chainId)
+  async signUserOp(entrypointAddress: string, userOp: UserOperationStruct, chainId: number): Promise<UserOperationStruct> {
+    const requestId = await this.getRequestId(entrypointAddress, userOp, chainId)
     const signature = this.signRequestId(requestId)
     return {
       ...userOp,
@@ -295,9 +295,9 @@ export abstract class BaseWalletAPI {
     }
   }
   
-  async signTransactions(info: TransactionDetailsForUserOp, chainId: number): Promise<SignedTransaction> {
-    const userOp = await this.createUnsignedUserOp(info);
-    const requestId = await this.getRequestId(userOp, chainId);
+  async signTransactions(entryPointAddress: string, info: TransactionDetailsForUserOp, chainId: number): Promise<SignedTransaction> {
+    const userOp = await this.createUnsignedUserOp(entryPointAddress, info);
+    const requestId = await this.getRequestId(entryPointAddress, userOp, chainId);
     const signature = this.signRequestId(requestId);
     const txs = flattenAuxTransactions(info);
     return {
@@ -311,8 +311,8 @@ export abstract class BaseWalletAPI {
    * helper method: create and sign a user operation.
    * @param info transaction details for the userOp
    */
-  async createSignedUserOp(info: TransactionDetailsForUserOp, chainId: number): Promise<UserOperationStruct> {
-    return await this.signUserOp(await this.createUnsignedUserOp(info), chainId);
+  async createSignedUserOp(entryPointAddress: string, info: TransactionDetailsForUserOp, chainId: number): Promise<UserOperationStruct> {
+    return await this.signUserOp(entryPointAddress, await this.createUnsignedUserOp(entryPointAddress, info), chainId);
   }
 
   /**
@@ -322,10 +322,11 @@ export abstract class BaseWalletAPI {
    * @param interval time to wait between polls.
    * @return the transactionHash this userOp was mined, or null if not found.
    */
-  async getUserOpReceipt(requestId: string, timeout = 30000, interval = 5000): Promise<string | null> {
+  async getUserOpReceipt(entryPointAddress: string, requestId: string, timeout = 30000, interval = 5000): Promise<string | null> {
+    const entryPoint = await this.getEntryPoint(entryPointAddress);
     const endtime = Date.now() + timeout
     while (Date.now() < endtime) {
-      const events = await this.entryPoint.queryFilter(this.entryPoint.filters.UserOperationEvent(requestId))
+      const events = await entryPoint.queryFilter(entryPoint.filters.UserOperationEvent(requestId))
       if (events.length > 0) {
         return events[0].transactionHash
       }
@@ -355,11 +356,11 @@ export abstract class BaseWalletAPI {
     return errorIn
   }
 
-  async sendSignedTransaction(tx: SignedTransaction) {
+  async sendSignedTransaction(entryPointAddress: string, tx: SignedTransaction) {
     const userOp = toUserOp(tx);
-    const transactionResponse = await this.constructUserOpTransactionResponse(userOp)
+    const transactionResponse = await this.constructUserOpTransactionResponse(entryPointAddress, userOp)
     try {
-      const userOpHash = await this.httpRpcClient.sendUserOpToBundler(userOp);
+      const userOpHash = await this.httpRpcClient.sendUserOpToBundler(entryPointAddress, userOp);
       
       // TODO
       // temp impl
@@ -372,28 +373,31 @@ export abstract class BaseWalletAPI {
     return transactionResponse
   }
 
-  async getTransactionReceipt(transactionHash: string | Promise<string>): Promise<TransactionReceipt> {
+  async getTransactionReceipt(entryPointAddress: string, transactionHash: string | Promise<string>): Promise<TransactionReceipt> {
+    const entryPoint = await this.getEntryPoint(entryPointAddress);
     const requestId = await transactionHash
     const sender = await this.getWalletAddress();
     return await new Promise<TransactionReceipt>((resolve, reject) => {
       new UserOperationEventListener(
-        resolve, reject, this.entryPoint, sender, requestId,
+        resolve, reject, entryPoint, sender, requestId,
       ).start()
     })
   }
 
-  async waitForTransaction(transactionHash: string, confirmations?: number, timeout?: number): Promise<TransactionReceipt> {
+  async waitForTransaction(entryPointAddress: string, transactionHash: string, confirmations?: number, timeout?: number): Promise<TransactionReceipt> {
+    const entryPoint = await this.getEntryPoint(entryPointAddress);
     const sender = await this.getWalletAddress()
     return await new Promise<TransactionReceipt>((resolve, reject) => {
-      const listener = new UserOperationEventListener(resolve, reject, this.entryPoint, sender, transactionHash, undefined, timeout)
+      const listener = new UserOperationEventListener(resolve, reject, entryPoint, sender, transactionHash, undefined, timeout)
       listener.start()
     })
   }
 
   // fabricate a response in a format usable by ethers users...
-  async constructUserOpTransactionResponse(userOp1: UserOperationStruct): Promise<TransactionResponse> {
+  async constructUserOpTransactionResponse(entryPointAddress: string, userOp1: UserOperationStruct): Promise<TransactionResponse> {
+    const entryPoint = await this.getEntryPoint(entryPointAddress);
     const userOp = await resolveProperties(userOp1)
-    const requestId = getRequestId(userOp, this.entryPointAddress, this.chainId);
+    const requestId = getRequestId(userOp, entryPointAddress, this.chainId);
     let waitPromise: Promise<TransactionReceipt> | null
     return {
       hash: requestId,
@@ -408,7 +412,7 @@ export abstract class BaseWalletAPI {
         if (!waitPromise) {
           waitPromise = new Promise<TransactionReceipt>((resolve, reject) => {
             new UserOperationEventListener(
-              resolve, reject, this.entryPoint, userOp.sender, requestId, userOp.nonce
+              resolve, reject, entryPoint, userOp.sender, requestId, userOp.nonce
             ).start()
           });
         }

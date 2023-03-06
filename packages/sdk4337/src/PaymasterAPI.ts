@@ -10,7 +10,16 @@ export class PaymasterAPI {
    *  paymasterAndData value, which will only be returned by this method..
    * @returns the value to put into the PaymasterAndData, undefined to leave it empty
    */
-  async getPaymasterAndData (userOp: Partial<UserOperationStruct>): Promise<string | undefined> {
-    return '0x'
+  async getPaymasterAndData (chainId: number, userOp: Partial<UserOperationStruct>): Promise<string | undefined> {
+    const initCode = await userOp.initCode;
+    if (initCode === '0x') {
+      return "0x";
+    }
+    
+    if (chainId != 80001) {
+      return "0x";
+    }
+
+    return "0x2227c3dfA06fc484b77d45f34cc422d1E3EeF953";
   }
 }

@@ -71,8 +71,7 @@
     "wsrun": "^5.2.4"
   },
   "resolutions": {
-    "node-fetch": "^2.6.7",
-    "@0xsodium/wallet-contracts": "^0.0.5-beta"
+    "node-fetch": "^2.6.7"
   },
   "workspaces": [
     "packages/*",

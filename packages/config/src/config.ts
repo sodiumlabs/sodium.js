@@ -25,6 +25,11 @@ export interface WalletState {
   // the chainId of the network
   chainId: number
 
+  // entrypoint
+  entrypoint: string
+
+  singlotion: string
+
   // whether the wallet has been ever deployed
   deployed: boolean
 
@@ -51,7 +56,7 @@ export const getWalletInitCode = async (localSigner: Signer, config: WalletConfi
     context.defaultHandlerAddress,
   ]);
   const salt = imageHash(config);
-  return `${context.singletonAddress}${salt.slice(2)}${sodiumSetup.slice(2)}`;
+  return `${context.genesisSingletonAddress}${salt.slice(2)}${sodiumSetup.slice(2)}`;
 }
 
 export const addressOf = (config: WalletConfig, context: WalletContext, ignoreAddress: boolean = false): string => {

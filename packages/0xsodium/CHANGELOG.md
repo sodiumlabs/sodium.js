@@ -1,5 +1,19 @@
 # 0xsodium
 
+## 1.9.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/config@1.10.0
+  - @0xsodium/multicall@1.10.0
+  - @0xsodium/network@1.10.0
+  - @0xsodium/provider@1.10.0
+  - @0xsodium/transactions@1.10.0
+  - @0xsodium/utils@1.10.0
+  - @0xsodium/wallet@1.10.0
+  - @0xsodium/auth@1.10.0
+
 ## 1.9.0
 
 ### Minor Changes
