@@ -172,8 +172,7 @@ export class Account extends Signer {
     chainId?: ChainIdLike,
   ): Promise<string> {
     const wallet = chainId ? this.getWalletByNetwork(chainId).wallet : this.mainWallet().wallet
-    const digest = encodeTypedDataHash({ domain, types, message })
-    return this.signMessage(digest, wallet)
+    return wallet.signTypedData(domain, types, message)
   }
 
   async _signTypedData(

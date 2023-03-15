@@ -1,5 +1,3 @@
-
-
 export interface BundlerConfig {
     beneficiary: string
     entryPoint: string

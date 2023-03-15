@@ -1,6 +1,6 @@
 {
   "name": "@0xsodium/sdk4337",
-  "version": "1.10.0",
+  "version": "1.12.0",
   "main": "dist/0xsodium-sdk4337.cjs.js",
   "module": "dist/0xsodium-sdk4337.esm.js",
   "license": "MIT",
@@ -19,11 +19,11 @@
     "watch-tsc": "tsc -w --preserveWatchOutput"
   },
   "dependencies": {
-    "@0xsodium/config": "^1.10.0",
-    "@0xsodium/estimator": "^1.10.0",
-    "@0xsodium/network": "^1.10.0",
-    "@0xsodium/transactions": "^1.10.0",
-    "@0xsodium/utils": "^1.10.0",
+    "@0xsodium/config": "^1.12.0",
+    "@0xsodium/estimator": "^1.12.0",
+    "@0xsodium/network": "^1.12.0",
+    "@0xsodium/transactions": "^1.12.0",
+    "@0xsodium/utils": "^1.12.0",
     "@0xsodium/wallet-contracts": "0.0.6-beta",
     "@ethersproject/abstract-provider": "^5.7.0",
     "@ethersproject/abstract-signer": "^5.7.0",

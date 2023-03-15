@@ -1,4 +1,4 @@
-import { OpenWalletIntent, ProviderMessage, InitState, EventType, WindowSessionParams } from '../../types'
+import { OpenWalletIntent, ProviderMessage, InitState, EventType, WindowSessionParams, OpenState } from '../../types'
 import { BaseProviderTransport } from '../base-provider-transport'
 import { logger, base64EncodeObject } from '@0xsodium/utils'
 import { isBrowserExtension, isUnityPlugin } from '../../utils'
@@ -30,6 +30,7 @@ export class IframeMessageProvider extends BaseProviderTransport {
     // open heartbeat
     this.on('open', () => {
       if (this.iframe) {
+        this.state = OpenState.OPENED
         this.iframe.addEventListener('close', () => {
           this.close();
         });
@@ -60,9 +61,16 @@ export class IframeMessageProvider extends BaseProviderTransport {
   }
 
   openWallet = (path?: string, intent?: OpenWalletIntent, networkId?: string | number): void => {
-    if (this.iframe && this.isOpened()) {
+    const sessionId = `${performance.now()}`
+    if (this.iframe) {
       this.iframe.style.display = 'block';
       this.iframe.focus()
+      this.state = OpenState.OPENING;
+      this.sendMessage({
+        idx: -1, type: EventType.OPEN, data: {
+          path, intent, networkId, sessionId
+        }
+      })
       return
     }
 
@@ -76,7 +84,7 @@ export class IframeMessageProvider extends BaseProviderTransport {
 
     // Set session, intent and network id on walletURL
     this._init = InitState.NIL
-    this._sessionId = `${performance.now()}`
+    this._sessionId = sessionId
     windowSessionParams.set('sid', this._sessionId)
 
     if (intent) {

@@ -63,10 +63,14 @@ export const addressOf = (config: WalletConfig, context: WalletContext, ignoreAd
   if (config.address && !ignoreAddress) {
     return config.address;
   }
+  const salt = imageHash(config);
+  return addressOfSalt(salt, context);
+}
+
+export const addressOfSalt = (salt: string, context: WalletContext): string => {
   const codeHash = ethers.utils.keccak256(
     ethers.utils.solidityPack(['bytes', 'bytes32'], [WalletContractBytecode, ethers.utils.hexZeroPad(context.genesisSingletonAddress, 32)])
   )
-  const salt = imageHash(config);
   const hash = ethers.utils.keccak256(
     ethers.utils.solidityPack(['bytes1', 'address', 'bytes32', 'bytes32'], ['0xff', context.walletCreatorAddress, salt, codeHash])
   );

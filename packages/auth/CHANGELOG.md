@@ -1,5 +1,35 @@
 # @0xsodium/auth
 
+## 1.12.0
+
+### Minor Changes
+
+- fix iframe transport
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.12.0
+  - @0xsodium/config@1.12.0
+  - @0xsodium/network@1.12.0
+  - @0xsodium/utils@1.12.0
+  - @0xsodium/wallet@1.12.0
+
+## 1.11.0
+
+### Minor Changes
+
+- fix iframe transports
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/config@1.11.0
+  - @0xsodium/wallet@1.11.0
+  - @0xsodium/abi@1.11.0
+  - @0xsodium/network@1.11.0
+  - @0xsodium/utils@1.11.0
+
 ## 1.10.0
 
 ### Patch Changes

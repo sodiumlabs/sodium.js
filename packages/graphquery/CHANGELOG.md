@@ -1,5 +1,17 @@
 # @0xsodium/graphquery
 
+## 1.12.0
+
+### Minor Changes
+
+- fix iframe transport
+
+## 1.11.0
+
+### Minor Changes
+
+- fix iframe transports
+
 ## 1.10.0
 
 ### Minor Changes

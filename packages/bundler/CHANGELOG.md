@@ -1,5 +1,27 @@
 # @0xsodium/bundler
 
+## 1.12.0
+
+### Minor Changes
+
+- fix iframe transport
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/utils@1.12.0
+
+## 1.11.0
+
+### Minor Changes
+
+- fix iframe transports
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/utils@1.11.0
+
 ## 1.10.0
 
 ### Minor Changes

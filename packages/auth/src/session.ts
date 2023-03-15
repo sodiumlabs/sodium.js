@@ -1,11 +1,7 @@
 // import { SequenceAPIClient } from '@0xsodium/api'
 import {
-  ConfigFinder,
-  // SequenceUtilsFinder,
   WalletConfig,
   decodeSignature,
-  // editConfig,
-  // genConfig,
   isDecodedSigner
 } from '@0xsodium/config'
 import { ETHAuth, Proof } from '@0xsequence/ethauth'

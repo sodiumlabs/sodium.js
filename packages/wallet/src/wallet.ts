@@ -386,11 +386,17 @@ export class Wallet extends Signer {
   async signMessage(message: BytesLike): Promise<string> {
     const data = typeof message === 'string' && !message.startsWith('0x') ? ethers.utils.toUtf8Bytes(message) : message;
     const localSigner = this.getLocalSigner();
-    // localSigners[0].
     const address = await this.getAddress();
-    const cfh = CompatibilityFallbackHandler__factory.connect(address, this.provider);
-    const signHash = await cfh.getMessageHash(data);
-    return localSigner.signMessage(ethers.utils.arrayify(signHash));
+    const isDeployed = await this.isDeployed();
+
+    if (isDeployed) {
+      const cfh = CompatibilityFallbackHandler__factory.connect(address, this.provider);
+      const signHash = await cfh.getMessageHash(data);
+      return localSigner.signMessage(ethers.utils.arrayify(signHash));
+    }
+
+    const sig = await localSigner.signMessage(data);
+    return sig + this.config.sodiumUserId;
   }
 
   async signTypedData(
