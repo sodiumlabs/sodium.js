@@ -308,14 +308,7 @@ export class Wallet extends Signer {
   }
 
   async getNetworks(): Promise<NetworkConfig[]> {
-    const chainId = await this.getChainId()
-    return [
-      {
-        chainId: chainId,
-        name: '',
-        rpcUrl: ''
-      }
-    ]
+    throw new Error("not implemented wallet getNetworks");
   }
 
   // getNonce returns the transaction nonce for this wallet, via the relayer
