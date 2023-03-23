@@ -71,6 +71,7 @@ type TransferEvent = {
 }
 
 export const getHistories = async (
+  subgraphHost: string,
   account: string,
   chainId: number,
   first: number = 100,
@@ -78,7 +79,7 @@ export const getHistories = async (
   signer: Signer,
   tokenAddress?: string
 ): Promise<TransactionHistory[]> => {
-  const client = new GraphQLClient(`https://api.thegraph.com/subgraphs/name/alberthuang24/sodium${chainId}erc20transfer`)
+  const client = new GraphQLClient(`${subgraphHost}/subgraphs/name/alberthuang24/sodium${chainId}erc20transfer`)
   let result: {
     transfers: TransferEvent[],
     receives: TransferEvent[]

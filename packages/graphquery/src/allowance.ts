@@ -19,13 +19,14 @@ query QueryUserAllowances($accountId: String, $first: Int, $skip: Int) {
 `
 
 export const getTokenAllowances = async (
+  subgraphHost: string,
   account: string,
   chainId: number,
   first: number = 100,
   skip: number = 0,
   signer: Signer
 ): Promise<Allowance[]> => {
-  const client = new GraphQLClient(`https://api.thegraph.com/subgraphs/name/alberthuang24/sodium${chainId}erc20approve`)
+  const client = new GraphQLClient(`${subgraphHost}/subgraphs/name/alberthuang24/sodium${chainId}erc20approve`)
   const result = await client.request<{
     tokenApprovals: {
       logIndex: number

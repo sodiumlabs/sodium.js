@@ -46,9 +46,11 @@ export enum ChainId {
 }
 
 export interface NetworkConfig {
-  title?: string
+  title: string
   name: string
+  nativeTokenSymbol: string
   chainId: number
+  subgraphHost?: string
   testnet?: boolean
   blockExplorer?: BlockExplorerConfig
   rpcUrl?: string
@@ -82,6 +84,7 @@ export const networks: Record<ChainId, NetworkConfig> = {
     chainId: ChainId.MAINNET,
     name: 'mainnet',
     title: 'Ethereum',
+    nativeTokenSymbol: 'ETH',
     blockExplorer: {
       name: 'Etherscan',
       rootUrl: 'https://etherscan.io/'
@@ -91,6 +94,7 @@ export const networks: Record<ChainId, NetworkConfig> = {
     chainId: ChainId.ROPSTEN,
     name: 'ropsten',
     title: 'Ropsten',
+    nativeTokenSymbol: 'ETH',
     testnet: true,
     blockExplorer: {
       name: 'Etherscan (Ropsten)',
@@ -101,6 +105,7 @@ export const networks: Record<ChainId, NetworkConfig> = {
     chainId: ChainId.RINKEBY,
     name: 'rinkeby',
     title: 'Rinkeby',
+    nativeTokenSymbol: 'ETH',
     testnet: true,
     blockExplorer: {
       name: 'Etherscan (Rinkeby)',
@@ -112,6 +117,7 @@ export const networks: Record<ChainId, NetworkConfig> = {
     chainId: ChainId.GOERLI,
     name: 'goerli',
     title: 'Goerli',
+    nativeTokenSymbol: 'ETH',
     testnet: true,
     blockExplorer: {
       name: 'Etherscan (Goerli)',
@@ -122,6 +128,7 @@ export const networks: Record<ChainId, NetworkConfig> = {
     chainId: ChainId.KOVAN,
     name: 'kovan',
     title: 'Kovan',
+    nativeTokenSymbol: 'ETH',
     testnet: true,
     blockExplorer: {
       name: 'Etherscan (Kovan)',
@@ -132,6 +139,7 @@ export const networks: Record<ChainId, NetworkConfig> = {
     chainId: ChainId.POLYGON,
     name: 'polygon',
     title: 'Polygon',
+    nativeTokenSymbol: 'MATIC',
     blockExplorer: {
       name: 'Polygonscan',
       rootUrl: 'https://polygonscan.com/'
@@ -141,6 +149,7 @@ export const networks: Record<ChainId, NetworkConfig> = {
     chainId: ChainId.POLYGON_MUMBAI,
     name: 'mumbai',
     title: 'Polygon Mumbai',
+    nativeTokenSymbol: 'MATIC',
     testnet: true,
     blockExplorer: {
       name: 'Polygonscan (Mumbai)',
@@ -150,6 +159,7 @@ export const networks: Record<ChainId, NetworkConfig> = {
   [ChainId.BSC]: {
     chainId: ChainId.BSC,
     name: 'bsc',
+    nativeTokenSymbol: 'BNB',
     title: 'BNB Smart Chain',
     blockExplorer: {
       name: 'BSCScan',
@@ -160,6 +170,7 @@ export const networks: Record<ChainId, NetworkConfig> = {
     chainId: ChainId.BSC_TESTNET,
     name: 'bsc-testnet',
     title: 'BNB Smart Chain Testnet',
+    nativeTokenSymbol: 'BNB',
     testnet: true,
     blockExplorer: {
       name: 'BSCScan (Testnet)',
@@ -170,6 +181,7 @@ export const networks: Record<ChainId, NetworkConfig> = {
     chainId: ChainId.OPTIMISM,
     name: 'optimism',
     title: 'Optimism',
+    nativeTokenSymbol: 'ETH',
     blockExplorer: {
       name: 'Etherscan (Optimism)',
       rootUrl: 'https://optimistic.etherscan.io/'
@@ -179,6 +191,7 @@ export const networks: Record<ChainId, NetworkConfig> = {
     chainId: ChainId.OPTIMISM_TESTNET,
     name: 'optimism-testnet',
     title: 'Optimistic Kovan',
+    nativeTokenSymbol: 'ETH',
     testnet: true,
     blockExplorer: {
       name: 'Etherscan (Optimism Testnet)',
@@ -189,6 +202,7 @@ export const networks: Record<ChainId, NetworkConfig> = {
     chainId: ChainId.ARBITRUM,
     name: 'arbitrum',
     title: 'Arbitrum One',
+    nativeTokenSymbol: 'ETH',
     blockExplorer: {
       name: 'Arbiscan',
       rootUrl: 'https://arbiscan.io/'
@@ -198,6 +212,7 @@ export const networks: Record<ChainId, NetworkConfig> = {
     chainId: ChainId.ARBITRUM_TESTNET,
     name: 'arbitrum-testnet',
     title: 'Arbitrum Testnet',
+    nativeTokenSymbol: 'ETH',
     testnet: true,
     blockExplorer: {
       name: 'Arbiscan (Testnet)',
@@ -208,6 +223,7 @@ export const networks: Record<ChainId, NetworkConfig> = {
     chainId: ChainId.ARBITRUM_NOVA,
     name: 'arbitrum-nova',
     title: 'Arbitrum Nova',
+    nativeTokenSymbol: 'ETH',
     blockExplorer: {
       name: 'Nova Explorer',
       rootUrl: 'https://nova-explorer.arbitrum.io/'
@@ -217,6 +233,7 @@ export const networks: Record<ChainId, NetworkConfig> = {
     chainId: ChainId.AVALANCHE,
     name: 'avalanche',
     title: 'Avalanche',
+    nativeTokenSymbol: 'AVAX',
     blockExplorer: {
       name: 'Snowtrace',
       rootUrl: 'https://snowtrace.io/'
@@ -226,6 +243,7 @@ export const networks: Record<ChainId, NetworkConfig> = {
     chainId: ChainId.AVALANCHE_TESTNET,
     name: 'avalanche-testnet',
     title: 'Avalanche Testnet',
+    nativeTokenSymbol: 'AVAX',
     testnet: true,
     blockExplorer: {
       name: 'Snowtrace (Testnet)',
@@ -236,6 +254,7 @@ export const networks: Record<ChainId, NetworkConfig> = {
     chainId: ChainId.FANTOM,
     name: 'fantom',
     title: 'Fantom',
+    nativeTokenSymbol: 'FTM',
     blockExplorer: {
       name: 'FTMScan',
       rootUrl: 'https://ftmscan.com/'
@@ -245,6 +264,7 @@ export const networks: Record<ChainId, NetworkConfig> = {
     chainId: ChainId.FANTOM_TESTNET,
     name: 'fantom-testnet',
     title: 'Fantom Testnet',
+    nativeTokenSymbol: 'FTM',
     testnet: true,
     blockExplorer: {
       name: 'FTMScan (Testnet)',
@@ -255,6 +275,7 @@ export const networks: Record<ChainId, NetworkConfig> = {
     chainId: ChainId.GNOSIS,
     name: 'gnosis',
     title: 'Gnosis Chain',
+    nativeTokenSymbol: 'GNO',
     blockExplorer: {
       name: 'Gnosis Chain Explorer',
       rootUrl: 'https://blockscout.com/xdai/mainnet/'
@@ -264,6 +285,7 @@ export const networks: Record<ChainId, NetworkConfig> = {
     chainId: ChainId.AURORA,
     name: 'aurora',
     title: 'Aurora',
+    nativeTokenSymbol: 'NEAR',
     blockExplorer: {
       name: 'Aurora Explorer',
       rootUrl: 'https://aurorascan.dev/'
@@ -273,6 +295,7 @@ export const networks: Record<ChainId, NetworkConfig> = {
     chainId: ChainId.AURORA_TESTNET,
     name: 'aurora-testnet',
     title: 'Aurora Testnet',
+    nativeTokenSymbol: 'NEAR',
     blockExplorer: {
       name: 'Aurora Explorer (Testnet)',
       rootUrl: 'https://testnet.aurorascan.dev/'

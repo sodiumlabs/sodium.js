@@ -113,7 +113,7 @@ export const getTokenMetadataByAddress = async (address: string, chainId: number
   }
 
   // 优先使用tokenlist
-  const tryQueue = [tryCache, tryServer, tryProvider];
+  const tryQueue = [tryCache, tryProvider, tryServer];
   for (let i = 0; i < tryQueue.length; i++) {
     try {
       const result = await tryQueue[i]();
@@ -131,15 +131,15 @@ export const getTokenMetadataByAddress = async (address: string, chainId: number
 // export const 
 // https://subgraph-fallback.vercel.app/api/balances?chainId=137&walletAddress=0xaF8033d40346A9315a385D53FaAeA2891a6443f0
 
-export const getUserERC20Tokens = (account: string, chainId: number, first: number = 10, signer: Signer): Promise<UserTokenInfo[]> => {
+export const getUserERC20Tokens = (subgraphHost: string, account: string, chainId: number, first: number = 10, signer: Signer): Promise<UserTokenInfo[]> => {
   const queue = [
-    fallbackServer,
-    fallbackThegraph
+    fallbackThegraph,
+    fallbackServer
   ];
 
   for (let i = 0; i < queue.length; i++) {
     try {
-      return queue[i](account, chainId, first, signer);
+      return queue[i](subgraphHost, account, chainId, first, signer);
     } catch (e) {
       console.log("getUserERC20Tokens", e)
     }
@@ -148,8 +148,14 @@ export const getUserERC20Tokens = (account: string, chainId: number, first: numb
   throw new Error("getUserERC20Tokens failed")
 }
 
-async function fallbackThegraph(account: string, chainId: number, first: number = 10, signer: Signer): Promise<UserTokenInfo[]> {
-  const client = new GraphQLClient(`https://api.thegraph.com/subgraphs/name/alberthuang24/sodium${chainId}erc20balance`)
+async function fallbackThegraph(
+  subgraphHost: string,
+  account: string,
+  chainId: number,
+  first: number = 10,
+  signer: Signer,
+): Promise<UserTokenInfo[]> {
+  const client = new GraphQLClient(`${subgraphHost}/subgraphs/name/alberthuang24/sodium${chainId}erc20balance`)
   const result = await client.request<{
     balances: {
       tokenAddress: string,
@@ -180,7 +186,13 @@ async function fallbackThegraph(account: string, chainId: number, first: number 
   return balances;
 }
 
-async function fallbackServer(account: string, chainId: number, first: number = 10, signer: Signer): Promise<UserTokenInfo[]> {
+async function fallbackServer(
+  subgraphHost: string,
+  account: string,
+  chainId: number,
+  first: number = 10,
+  signer: Signer
+): Promise<UserTokenInfo[]> {
   const res = await fetch(`https://subgraph-fallback.vercel.app/api/balances?chainId=${chainId}&walletAddress=${account}`);
   const result: {
     tokenAddress: string;

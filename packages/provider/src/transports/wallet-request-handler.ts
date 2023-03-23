@@ -558,16 +558,21 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
           if (!first) {
             first = 10;
           }
-
+          
           const nativeTokenBalance = await signer.getBalance(chainId);
+          const networks = await this.getNetworks();
+          const network = networks.find((network) => network.chainId === chainId);
+          if (!network) {
+            throw new Error(`unable to find network with chainId ${chainId}`);
+          }
           response.result = [
             {
               token: {
                 address: AddressZero,
                 chainId: chainId,
                 isNativeToken: true,
-                name: "Polygon",
-                symbol: "MATIC",
+                name: network.name,
+                symbol: network.nativeTokenSymbol,
                 decimals: 18,
                 centerData: {
                   website: "https://polygon.technology/",
@@ -579,7 +584,13 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
             }
           ] as UserTokenInfo[];
           const addressOfWallet = await signer.getAddress();
-          const erc20TokenInfos = await getUserERC20Tokens(addressOfWallet, chainId, first, signer);
+          const erc20TokenInfos = await getUserERC20Tokens(
+            network.subgraphHost ?? 'https://api.thegraph.com',
+            addressOfWallet,
+            chainId,
+            first, 
+            signer,
+          );
           erc20TokenInfos.forEach(v => {
             response.result.push(v);
           })
@@ -589,8 +600,22 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
         case 'sodium_getTransactionHistory': {
           // TODO tokenId coming soon when nft support
           const [skip, first, chainId, tokenAddress, tokenId] = request.params!
+
+          const networks = await this.getNetworks();
+          const network = networks.find((network) => network.chainId === chainId);
+          if (!network) {
+            throw new Error(`unable to find network with chainId ${chainId}`);
+          }
+
           const address = await signer.getAddress();
-          const result = await getHistories(address, chainId, first, skip, tokenAddress);
+          const result = await getHistories(
+            network.subgraphHost ?? 'https://api.thegraph.com',
+            address, 
+            chainId, 
+            first, 
+            skip, 
+            tokenAddress
+          );
           response.result = result;
           break;
         }
@@ -598,8 +623,22 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
         case 'sodium_getAccountAllowances': {
           // TODO tokenId coming soon when nft support
           const [skip, first, chainId] = request.params!
+
+          const networks = await this.getNetworks();
+          const network = networks.find((network) => network.chainId === chainId);
+          if (!network) {
+            throw new Error(`unable to find network with chainId ${chainId}`);
+          }
+
           const address = await signer.getAddress();
-          const result = await getTokenAllowances(address, chainId, first, skip, signer);
+          const result = await getTokenAllowances(
+            network.subgraphHost ?? 'https://api.thegraph.com',
+            address, 
+            chainId,
+            first, 
+            skip,
+            signer,
+          );
           response.result = result;
           break;
         }
