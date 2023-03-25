@@ -246,7 +246,7 @@ export abstract class BaseWalletAPI {
         maxFeePerGas = feeData.maxFeePerGas ? feeData.maxFeePerGas : 0
       }
       if (maxPriorityFeePerGas == null) {
-        maxPriorityFeePerGas = gasPrice;
+        maxPriorityFeePerGas = gasPrice.mul(3);
       }
 
       // fix 

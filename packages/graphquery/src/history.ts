@@ -1,7 +1,6 @@
-// import { getBuiltGraphSDK } from './.graphclient';
 import { TransactionHistory } from './types';
 import { GraphQLClient, gql } from 'graphql-request';
-import { Signer } from '@ethersproject/abstract-signer';
+import { Provider } from '@ethersproject/abstract-provider';
 import { getTokenMetadataByAddress } from './erc20';
 
 const allDocument = gql`
@@ -76,7 +75,7 @@ export const getHistories = async (
   chainId: number,
   first: number = 100,
   skip: number = 0,
-  signer: Signer,
+  provider: Provider,
   tokenAddress?: string
 ): Promise<TransactionHistory[]> => {
   const client = new GraphQLClient(`${subgraphHost}/subgraphs/name/alberthuang24/sodium${chainId}erc20transfer`)
@@ -104,7 +103,7 @@ export const getHistories = async (
   } = {};
 
   const convertTransferEvent2TransactionHistory = async (a: TransferEvent, prefix: string): Promise<TransactionHistory> => {
-    const tokenMetadata = await getTokenMetadataByAddress(a.tokenAddress, chainId, signer);
+    const tokenMetadata = await getTokenMetadataByAddress(a.tokenAddress, chainId, provider);
     return {
       type: 'completed',
       transactionHash: a.txnHash,

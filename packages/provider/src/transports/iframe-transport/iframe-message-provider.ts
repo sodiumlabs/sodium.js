@@ -168,11 +168,11 @@ export class IframeMessageProvider extends BaseProviderTransport {
   }
 
   sendMessage(message: ProviderMessage<any>) {
-    if (this.iframe === null) {
+    if (!this.iframe) {
       logger.warn('IframeMessageProvider: sendMessage failed as iframe is unavailable')
       return
     }
-    if (this.iframe.contentWindow === null) {
+    if (!this.iframe.contentWindow) {
       logger.warn('IframeMessageProvider: sendMessage failed as iframe window is unavailable')
       return
     }

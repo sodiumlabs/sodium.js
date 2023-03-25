@@ -185,12 +185,13 @@ export class Wallet extends Signer {
   }
 
   async getWalletState(_?: ChainIdLike): Promise<WalletState[]> {
-    const [address, chainId, isDeployed, entryPointAddress, singlotion] = await Promise.all([
+    const [address, chainId, isDeployed, entryPointAddress, singlotion, handler] = await Promise.all([
       this.getAddress(),
       this.getChainId(),
       this.isDeployed(),
       this.getEntrypointAddress(),
-      this.getSinglotonAddress()
+      this.getSinglotonAddress(),
+      this.getCurrentHandler(),
     ])
     const state: WalletState = {
       context: this.context,
@@ -198,6 +199,7 @@ export class Wallet extends Signer {
       entrypoint: entryPointAddress,
       singlotion: singlotion,
       address: address,
+      handler: handler,
       chainId: chainId,
       deployed: isDeployed,
       imageHash: this.imageHash,
@@ -205,21 +207,34 @@ export class Wallet extends Signer {
     return [state]
   }
 
-  async getWalletUpgradeTransactions(chainId?: ChainIdLike): Promise<Transaction[]> {
+  async getWalletUpgradeTransactions(_?: ChainIdLike): Promise<Transaction[]> {
+    const currentSingletonAddress = await this.getSinglotonAddress();
+    const walletAddress = await this.getAddress();
+    const eqNotFoo = (a: string, b: string) => a.toLowerCase() !== b.toLowerCase();
     const sointerface = Sodium__factory.createInterface();
-    const abi = sointerface.encodeFunctionData("upgradeTo", [this.context.singletonAddress]);
-    return [
-      {
-        to: "0x7a55948FCF36613CBD699f299BEce89F42581C92",
+    const txs: Transaction[] = [];
+    if (eqNotFoo(currentSingletonAddress, this.context.singletonAddress)) {
+      const abi = sointerface.encodeFunctionData("upgradeTo", [this.context.singletonAddress]);
+      txs.push({
+        to: walletAddress,
         data: abi,
-        op: 1
-      }
-    ];
-    // return [{
-    //   to: this.address,
-    //   data: abi,
-    //   op: 0,
-    // }];
+        op: 0,
+      });
+    }
+
+    const currentHandlerAddress = await this.getCurrentHandler();
+
+    console.debug("currentHandlerAddress", currentHandlerAddress, "defaultHandlerAddress", this.context.defaultHandlerAddress);
+    if (eqNotFoo(currentHandlerAddress, this.context.defaultHandlerAddress)) {
+      const abi = sointerface.encodeFunctionData("setFallbackHandler", [this.context.defaultHandlerAddress]);
+      txs.push({
+        to: walletAddress,
+        data: abi,
+        op: 0,
+      });
+    }
+
+    return txs;
   }
 
   // connected reports if json-rpc provider has been connected
@@ -245,19 +260,6 @@ export class Wallet extends Signer {
   }
 
   async getEntrypointAddress(): Promise<string> {
-    const walletIsDeployed = await this.isDeployed();
-
-    // TODO: remove this
-    if (!walletIsDeployed) {
-      return "0x0aE1B76389397Dc81c16eB8e2dEb0C592D3C873c";
-    }
-
-    const getSinglotonAddress = await this.getSinglotonAddress();
-
-    if (getSinglotonAddress.toLocaleLowerCase() === this.context.genesisSingletonAddress.toLocaleLowerCase()) {
-      return "0x0aE1B76389397Dc81c16eB8e2dEb0C592D3C873c";
-    }
-
     return this.context.entryPointAddress;
   }
 
@@ -269,12 +271,43 @@ export class Wallet extends Signer {
     const walletSingloton = await this.provider.getStorageAt(this.address, this.address);
     const result = defaultAbiCoder.decode(["address"], walletSingloton);
 
-    console.debug("getSinglotonAddress", result);
-
     if (result.length > 0) {
       return result[0];
     }
     // TODO: should we throw an error here?
+    throw new Error("failed to get singlotion address");
+  }
+
+  async getCurrentHandler(): Promise<string> {
+    const walletIsDeployed = await this.isDeployed();
+    if (!walletIsDeployed) {
+      return this.context.defaultHandlerAddress;
+    }
+
+    const handlerSlot = "0x6c9a6c4a39284e37ed1cf53d337577d14212a4870fb976a4366c693b939918d5";
+    const walletSingloton = await this.provider.getStorageAt(this.address, handlerSlot);
+    const result = defaultAbiCoder.decode(["address"], walletSingloton);
+
+    if (result.length > 0) {
+      return result[0];
+    }
+
+    throw new Error("failed to get handler address");
+  } 
+
+  async getHandlerAddress(): Promise<string> {
+    const walletIsDeployed = await this.isDeployed();
+    if (!walletIsDeployed) {
+      return this.context.defaultHandlerAddress;
+    }
+
+    const walletSingloton = await this.provider.getStorageAt(this.address, this.address);
+    const result = defaultAbiCoder.decode(["address"], walletSingloton);
+
+    if (result.length > 0) {
+      return result[0];
+    }
+
     throw new Error("failed to get singlotion address");
   }
 
@@ -303,7 +336,6 @@ export class Wallet extends Signer {
       throw new Error('provider is not set, first connect a provider')
     }
     this.chainId = (await this.provider.getNetwork()).chainId
-    console.debug("request chainId");
     return this.chainId
   }
 
@@ -360,7 +392,6 @@ export class Wallet extends Signer {
     if (!this.provider) {
       throw new Error('missing provider');
     }
-    console.debug("signTransactions", txs);
     return this.wallet4337API.signTransactions(entryPointAddress, txs, signChainId);
   }
 

@@ -19,10 +19,10 @@ export interface WalletContext {
 }
 
 export const sodiumContext: WalletContext = {
-  entryPointAddress: "0xDCa3e88DE9f6A2d55917d1DFE0C81aEDD363c0f9",
-  singletonAddress: "0x5754BDe51007daC3CADD085E6047e38E30249D1B",
-  genesisSingletonAddress: "0x09f30e8aC8F1bb14858477b72643eDa238d24339",
-  defaultHandlerAddress: "0x8436173e1D2599Ed3d0aF23C5e231cAee39d67c9",
+  entryPointAddress: "0x4A34499C75F5313265aDaf740B03222D66C264BB",
+  singletonAddress: "0xb252e7e84EC2EaA97BEe684B7a58BBC37c44F5c4",
+  genesisSingletonAddress: "0xb252e7e84EC2EaA97BEe684B7a58BBC37c44F5c4",
+  defaultHandlerAddress: "0xef38f0b0AE4FD66D1BA869697f93A8A05e1708d1",
   walletCreatorAddress: "0xCA25952469BBae82c63A7A75D8aBc7dBf9442e18",
 
   modules: {
@@ -30,7 +30,7 @@ export const sodiumContext: WalletContext = {
   },
 
   utils: {
-    gasEstimator: "0x67db13d7f40eFa5FFC6c6ba0217ACe7FD7df444F"
+    gasEstimator: "0x4A34499C75F5313265aDaf740B03222D66C264BB"
   },
 
   nonStrict: false

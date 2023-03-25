@@ -28,7 +28,10 @@ export interface WalletState {
   // entrypoint
   entrypoint: string
 
+  // singlotion
   singlotion: string
+
+  handler: string
 
   // whether the wallet has been ever deployed
   deployed: boolean

@@ -43,7 +43,7 @@ const getTokenPricesWithCache = moize(getTokenPrices, {
   isDeepEqual: true,
   isPromise: true,
   // 30 seconds
-  maxAge: 30 * 1000,
+  maxAge: 50 * 1000,
 });
 
 
@@ -546,7 +546,10 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
 
         case 'sodium_getTokens': {
           let [walletAddress, chainId, first] = request.params!;
-
+          const provider = await signer.getProvider(chainId)
+          if (!provider) {
+            throw new Error(`unable to find provider with chainId ${chainId}`);
+          }
           if (!walletAddress) {
             walletAddress = await signer.getAddress();
           }
@@ -588,8 +591,8 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
             network.subgraphHost ?? 'https://api.thegraph.com',
             addressOfWallet,
             chainId,
-            first, 
-            signer,
+            first,
+            provider,
           );
           erc20TokenInfos.forEach(v => {
             response.result.push(v);
@@ -623,7 +626,10 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
         case 'sodium_getAccountAllowances': {
           // TODO tokenId coming soon when nft support
           const [skip, first, chainId] = request.params!
-
+          const provider = await signer.getProvider(chainId)
+          if (!provider) {
+            throw new Error(`unable to find provider with chainId ${chainId}`);
+          }
           const networks = await this.getNetworks();
           const network = networks.find((network) => network.chainId === chainId);
           if (!network) {
@@ -637,7 +643,7 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
             chainId,
             first, 
             skip,
-            signer,
+            provider,
           );
           response.result = result;
           break;
@@ -651,7 +657,7 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
           if (chainId != 137) {
             response.result = tokenAddressList.map((tokenAddress: string) => {
               return 0
-            }); 
+            });
             break;
           }
 
@@ -661,8 +667,6 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
             }
             return tokenAddress;
           });
-
-          
 
           // default
           let chain = "polygon-pos"
@@ -676,7 +680,11 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
 
         case 'sodium_getToken': {
           const [tokenAddress, chainId] = request.params!
-          const tokenMetadata = await getTokenMetadataByAddress(tokenAddress, chainId, signer);
+          const provider = await signer.getProvider(chainId)
+          if (!provider) {
+            throw new Error(`unable to find provider with chainId ${chainId}`);
+          }
+          const tokenMetadata = await getTokenMetadataByAddress(tokenAddress, chainId, provider);
           const tokenInfo: ERC20OrNativeTokenMetadata = {
             address: tokenAddress,
             chainId: chainId,

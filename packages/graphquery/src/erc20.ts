@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers';
 import { UserTokenInfo, TokenList } from './types';
 import { GraphQLClient, gql } from 'graphql-request';
 import { ERC20Token__factory } from '@0xsodium/wallet-contracts';
-import { Signer } from '@ethersproject/abstract-signer';
+import { Provider } from '@ethersproject/abstract-provider';
 
 let providerTokenMetadataCaches: {
   [chainId: number]: {
@@ -16,7 +16,7 @@ let providerTokenMetadataCaches: {
 
 const document = gql`
 query QueryUserERC20Balances($accountId: ID, $first: Int) {
-  balances(first: $first, skip: 0, where: { value_gt: 0, account: $accountId }) {
+  tokenBalances(first: $first, skip: 0, where: { value_gt: 0, account: $accountId }) {
       value
       tokenAddress
   }
@@ -34,7 +34,7 @@ const tokenMetadataByAddressCache: {
     }
   }
 } = {};
-export const getTokenMetadataByAddress = async (address: string, chainId: number, signer: Signer): Promise<{
+export const getTokenMetadataByAddress = async (address: string, chainId: number, provider: Provider): Promise<{
   name: string;
   symbol: string;
   decimals: number;
@@ -90,7 +90,13 @@ export const getTokenMetadataByAddress = async (address: string, chainId: number
         centerData: {}
       }
     }
-    const contract = ERC20Token__factory.connect(address, signer);
+    
+    
+    const signerChainId = await provider.getNetwork().then((network) => network.chainId);
+
+    console.debug("fetching token metadata from provider", address, chainId, signerChainId)
+
+    const contract = ERC20Token__factory.connect(address, provider);
     const metaPromises = {
       name: contract.name(),
       symbol: contract.symbol(),
@@ -131,7 +137,7 @@ export const getTokenMetadataByAddress = async (address: string, chainId: number
 // export const 
 // https://subgraph-fallback.vercel.app/api/balances?chainId=137&walletAddress=0xaF8033d40346A9315a385D53FaAeA2891a6443f0
 
-export const getUserERC20Tokens = (subgraphHost: string, account: string, chainId: number, first: number = 10, signer: Signer): Promise<UserTokenInfo[]> => {
+export const getUserERC20Tokens = (subgraphHost: string, account: string, chainId: number, first: number = 10, provider: Provider): Promise<UserTokenInfo[]> => {
   const queue = [
     fallbackThegraph,
     fallbackServer
@@ -139,7 +145,7 @@ export const getUserERC20Tokens = (subgraphHost: string, account: string, chainI
 
   for (let i = 0; i < queue.length; i++) {
     try {
-      return queue[i](subgraphHost, account, chainId, first, signer);
+      return queue[i](subgraphHost, account, chainId, first, provider);
     } catch (e) {
       console.log("getUserERC20Tokens", e)
     }
@@ -153,11 +159,11 @@ async function fallbackThegraph(
   account: string,
   chainId: number,
   first: number = 10,
-  signer: Signer,
+  provider: Provider,
 ): Promise<UserTokenInfo[]> {
   const client = new GraphQLClient(`${subgraphHost}/subgraphs/name/alberthuang24/sodium${chainId}erc20balance`)
   const result = await client.request<{
-    balances: {
+    tokenBalances: {
       tokenAddress: string,
       value: string,
     }[]
@@ -165,12 +171,12 @@ async function fallbackThegraph(
     accountId: account.toLowerCase(),
     first,
   });
-  if (result.balances.length == 0) {
+  if (result.tokenBalances.length == 0) {
     return [];
   }
-  const balances = await Promise.all(result.balances.map(async b => {
+  const balances = await Promise.all(result.tokenBalances.map(async b => {
     // get token metadata
-    const metadata = await getTokenMetadataByAddress(b.tokenAddress, chainId, signer);
+    const metadata = await getTokenMetadataByAddress(b.tokenAddress, chainId, provider);
     return {
       token: {
         chainId: chainId,
@@ -191,7 +197,7 @@ async function fallbackServer(
   account: string,
   chainId: number,
   first: number = 10,
-  signer: Signer
+  provider: Provider
 ): Promise<UserTokenInfo[]> {
   const res = await fetch(`https://subgraph-fallback.vercel.app/api/balances?chainId=${chainId}&walletAddress=${account}`);
   const result: {
@@ -200,7 +206,7 @@ async function fallbackServer(
   }[] = await res.json();
   const balances = await Promise.all(result.map(async b => {
     // get token metadata
-    const metadata = await getTokenMetadataByAddress(b.tokenAddress, chainId, signer);
+    const metadata = await getTokenMetadataByAddress(b.tokenAddress, chainId, provider);
     return {
       token: {
         chainId: chainId,

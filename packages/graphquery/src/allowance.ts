@@ -1,6 +1,6 @@
 import { Allowance } from './types';
 import { GraphQLClient, gql } from 'graphql-request';
-import { Signer } from '@ethersproject/abstract-signer';
+import { Provider } from '@ethersproject/abstract-provider';
 import { getTokenMetadataByAddress } from './erc20';
 
 const document = gql`
@@ -24,7 +24,7 @@ export const getTokenAllowances = async (
   chainId: number,
   first: number = 100,
   skip: number = 0,
-  signer: Signer
+  provider: Provider
 ): Promise<Allowance[]> => {
   const client = new GraphQLClient(`${subgraphHost}/subgraphs/name/alberthuang24/sodium${chainId}erc20approve`)
   const result = await client.request<{
@@ -44,7 +44,7 @@ export const getTokenAllowances = async (
     skip
   });
   const allowances: Allowance[] = await Promise.all(result.tokenApprovals.map<Promise<Allowance>>(async approval => {
-    const tokenMeta = await getTokenMetadataByAddress(approval.tokenAddress, chainId, signer);
+    const tokenMeta = await getTokenMetadataByAddress(approval.tokenAddress, chainId, provider);
     return {
       transactionHash: approval.txnHash,
       blockNumber: approval.blockNumber,

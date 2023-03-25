@@ -151,6 +151,12 @@ export const isWalletUpToDate = async (signer: Signer, chainId: number): Promise
     isUpToDate = false;
   }
 
+  if (walletStateForRequiredChain.handler.toLowerCase()
+    !== sodiumContext.defaultHandlerAddress.toLowerCase()
+  ) {
+    isUpToDate = false;
+  }
+
   return isDeployed && isUpToDate
 }
 
