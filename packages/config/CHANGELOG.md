@@ -1,5 +1,19 @@
 # @0xsodium/config
 
+## 1.13.0
+
+### Minor Changes
+
+- 84c6e2b: fix bugs
+
+### Patch Changes
+
+- Updated dependencies [84c6e2b]
+  - @0xsodium/network@1.13.0
+  - @0xsodium/abi@1.13.0
+  - @0xsodium/multicall@1.13.0
+  - @0xsodium/utils@1.13.0
+
 ## 1.12.0
 
 ### Minor Changes

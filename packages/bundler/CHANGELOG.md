@@ -1,5 +1,16 @@
 # @0xsodium/bundler
 
+## 1.13.0
+
+### Minor Changes
+
+- 84c6e2b: fix bugs
+
+### Patch Changes
+
+- Updated dependencies [84c6e2b]
+  - @0xsodium/utils@1.13.0
+
 ## 1.12.0
 
 ### Minor Changes
