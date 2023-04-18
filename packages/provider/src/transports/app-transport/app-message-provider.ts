@@ -99,11 +99,11 @@ export class AppMessageProvider extends BaseProviderTransport {
   }
 
   sendMessage(message: ProviderMessage<any>) {
-    if (window.ReactNativeWebView === undefined) {
-      logger.warn('AppMessageProvider: sendMessage failed as iframe is unavailable')
-      return
-    }
     const postedMessage = typeof message !== 'string' ? JSON.stringify(message) : message
-    window.ReactNativeWebView.postMessage(postedMessage);
+    if (window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage(postedMessage)
+    } else {
+      window.parent.postMessage(postedMessage, '*')
+    }
   }
 }

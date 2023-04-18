@@ -1,5 +1,16 @@
 # @0xsodium/network
 
+## 1.14.0
+
+### Minor Changes
+
+- Support web iframe app transports
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/utils@1.14.0
+
 ## 1.13.0
 
 ### Minor Changes

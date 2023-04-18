@@ -1,5 +1,16 @@
 # my-app
 
+## 1.13.0
+
+### Minor Changes
+
+- Support web iframe app transports
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.14.0
+
 ## 1.12.0
 
 ### Minor Changes

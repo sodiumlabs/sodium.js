@@ -6,14 +6,20 @@ import { isBrowserExtension, isUnityPlugin } from '../../utils'
 // ..
 let registeredWindowMessageProvider: IframeMessageProvider | undefined
 
+type WindowSize = {
+  width: number,
+  height: number
+}
 export class IframeMessageProvider extends BaseProviderTransport {
   private walletURL: URL
 
   private iframe: HTMLIFrameElement | null;
+  private windowSize: WindowSize
 
-  constructor(walletAppURL: string) {
+  constructor(walletAppURL: string, windowSize: WindowSize) {
     super()
-    this.walletURL = new URL(walletAppURL)
+    this.walletURL = new URL(walletAppURL);
+    this.windowSize = windowSize;
   }
 
   register = () => {
@@ -111,10 +117,10 @@ export class IframeMessageProvider extends BaseProviderTransport {
 
     windowSessionParams.set('iframe', 'true');
 
-    const windowSize = [450, 750]
+    const windowSize = [this.windowSize.width, this.windowSize.height];
     const windowPos = [
-      Math.abs(window.screenX + window.innerWidth / 2 - windowSize[0] / 2),
-      Math.abs(35)
+      Math.abs(window.innerWidth / 2 - windowSize[0] / 2),
+      Math.abs(window.innerHeight / 2 - windowSize[1] / 2)
     ]
 
     // serialize params
@@ -144,7 +150,6 @@ export class IframeMessageProvider extends BaseProviderTransport {
 
   // onmessage, receives ProviderMessageResponse from the wallet post-message transport
   private onWindowEvent = (event: MessageEvent) => {
-    console.debug(event);
     // Security check, ensure message is coming from wallet origin url
     if (event.origin !== this.walletURL.origin) {
       // Safetly can skip events not from the wallet

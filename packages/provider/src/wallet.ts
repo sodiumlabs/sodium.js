@@ -142,7 +142,10 @@ export class Wallet implements WalletProvider {
       this.transport.messageProvider.add(this.transport.windowMessageProvider)
     }
     if (this.config.transports?.iframeTransport?.enabled) {
-      this.transport.iframeMessageProvider = new IframeMessageProvider(this.config.walletAppURL)
+      this.transport.iframeMessageProvider = new IframeMessageProvider(
+        this.config.walletAppURL, 
+        this.config.transports.iframeTransport.windowSize ?? { width: 450, height: 750 }
+      )
       this.transport.messageProvider.add(this.transport.iframeMessageProvider)
     }
     if (this.config.transports?.appTransport?.enabled) {
@@ -687,6 +690,10 @@ export interface ProviderConfig {
 
     iframeTransport?: {
       enabled: boolean
+      windowSize?: {
+        width: number
+        height: number
+      }
     }
 
     // ProxyMessage transport (optional)

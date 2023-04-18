@@ -1,5 +1,11 @@
 # @0xsodium/guard
 
+## 1.14.0
+
+### Minor Changes
+
+- Support web iframe app transports
+
 ## 1.13.0
 
 ### Minor Changes
