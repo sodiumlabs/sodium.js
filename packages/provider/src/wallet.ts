@@ -144,7 +144,9 @@ export class Wallet implements WalletProvider {
     if (this.config.transports?.iframeTransport?.enabled) {
       this.transport.iframeMessageProvider = new IframeMessageProvider(
         this.config.walletAppURL, 
-        this.config.transports.iframeTransport.windowSize ?? { width: 450, height: 750 }
+        this.config.transports.iframeTransport.getWindowSize ?? function() {
+          return { width: 450, height: 750 };
+        }
       )
       this.transport.messageProvider.add(this.transport.iframeMessageProvider)
     }
@@ -690,7 +692,7 @@ export interface ProviderConfig {
 
     iframeTransport?: {
       enabled: boolean
-      windowSize?: {
+      getWindowSize?: () => {
         width: number
         height: number
       }
@@ -722,8 +724,8 @@ export interface ProviderConfig {
 export const DefaultProviderConfig: ProviderConfig = {
   walletAppURL: 'https://sodium-two.vercel.app',
   transports: {
-    windowTransport: { enabled: true },
-    iframeTransport: { enabled: false },
+    windowTransport: { enabled: false },
+    iframeTransport: { enabled: true },
     proxyTransport: { enabled: false },
     appTransport: { enabled: false },
   }

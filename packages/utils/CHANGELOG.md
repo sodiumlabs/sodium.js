@@ -1,5 +1,11 @@
 # @0xsodium/utils
 
+## 1.15.0
+
+### Minor Changes
+
+- Support dynamic iframe size
+
 ## 1.14.0
 
 ### Minor Changes

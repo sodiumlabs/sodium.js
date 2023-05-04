@@ -406,11 +406,17 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
           let txnHash = ''
           if (this.prompter === null) {
             // prompter is null, so we'll send from here
+            // TODO: 开发者模式下，不需要用户确认
+            // 只支持API session调用.
             const txnResponse = await signer.sendTransaction(transactions, chainId)
             txnHash = txnResponse.hash
           } else {
             // prompt user to provide the response
-            txnHash = await this.prompter.promptSendTransaction(transactions, chainId, this.connectOptions)
+            txnHash = await this.prompter.promptSendTransaction(
+              transactions,
+              chainId,
+              this.connectOptions
+            );
           }
 
           if (txnHash) {

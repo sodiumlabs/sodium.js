@@ -1,5 +1,18 @@
 # @0xsodium/multicall
 
+## 1.15.0
+
+### Minor Changes
+
+- Support dynamic iframe size
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/network@1.15.0
+  - @0xsodium/abi@1.15.0
+  - @0xsodium/utils@1.15.0
+
 ## 1.14.0
 
 ### Minor Changes

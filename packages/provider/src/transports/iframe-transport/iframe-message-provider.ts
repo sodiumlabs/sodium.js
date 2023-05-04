@@ -14,12 +14,12 @@ export class IframeMessageProvider extends BaseProviderTransport {
   private walletURL: URL
 
   private iframe: HTMLIFrameElement | null;
-  private windowSize: WindowSize
+  private getWindowSize: () => WindowSize;
 
-  constructor(walletAppURL: string, windowSize: WindowSize) {
+  constructor(walletAppURL: string, getWindowSize: () => WindowSize) {
     super()
     this.walletURL = new URL(walletAppURL);
-    this.windowSize = windowSize;
+    this.getWindowSize = getWindowSize;
   }
 
   register = () => {
@@ -53,6 +53,21 @@ export class IframeMessageProvider extends BaseProviderTransport {
     this._registered = true
   }
 
+  setIframeSizeAndPosition = () => {
+    if (!this.iframe) {
+      return;
+    }
+    const windowSize = this.getWindowSize();
+    const windowPos = [
+      Math.abs(window.innerWidth / 2 - windowSize.width / 2),
+      Math.abs(window.innerHeight / 2 - windowSize.height / 2)
+    ]
+    this.iframe.style.width = `${windowSize.width}px`;
+    this.iframe.style.height = `${windowSize.height}px`;
+    this.iframe.style.top = `${windowPos[1]}px`;
+    this.iframe.style.left = `${windowPos[0]}px`;
+  }
+
   unregister = () => {
     this._registered = false
     this.closeWallet()
@@ -67,9 +82,11 @@ export class IframeMessageProvider extends BaseProviderTransport {
   }
 
   openWallet = (path?: string, intent?: OpenWalletIntent, networkId?: string | number): void => {
+    const windowSize = this.getWindowSize();
     const sessionId = `${performance.now()}`
     if (this.iframe) {
       this.iframe.style.display = 'block';
+      this.setIframeSizeAndPosition();
       this.iframe.focus()
       this.state = OpenState.OPENING;
       this.sendMessage({
@@ -117,12 +134,6 @@ export class IframeMessageProvider extends BaseProviderTransport {
 
     windowSessionParams.set('iframe', 'true');
 
-    const windowSize = [this.windowSize.width, this.windowSize.height];
-    const windowPos = [
-      Math.abs(window.innerWidth / 2 - windowSize[0] / 2),
-      Math.abs(window.innerHeight / 2 - windowSize[1] / 2)
-    ]
-
     // serialize params
     walletURL.search = windowSessionParams.toString()
 
@@ -132,13 +143,10 @@ export class IframeMessageProvider extends BaseProviderTransport {
     iframe.style.border = 'none';
     iframe.style.display = 'block';
     iframe.style.zIndex = '10000';
-    iframe.style.width = `${windowSize[0]}px`;
-    iframe.style.height = `${windowSize[1]}px`;
-    iframe.style.top = `${windowPos[1]}px`;
-    iframe.style.left = `${windowPos[0]}px`;
     iframe.title = 'sodium.app';
-    document.body.appendChild(iframe);
     this.iframe = iframe;
+    this.setIframeSizeAndPosition();
+    document.body.appendChild(iframe);
   }
 
   closeWallet() {

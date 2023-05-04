@@ -1,5 +1,16 @@
 # my-app
 
+## 1.14.0
+
+### Minor Changes
+
+- Support dynamic iframe size
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.15.0
+
 ## 1.13.0
 
 ### Minor Changes
