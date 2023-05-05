@@ -114,7 +114,7 @@ export class WalletAPI extends BaseWalletAPI {
     //TODO support more token with paymasterAPI
     return [
       {
-        id: "self",
+        id: "0x",
         token: {
           address: AddressZero,
           chainId: 1337,

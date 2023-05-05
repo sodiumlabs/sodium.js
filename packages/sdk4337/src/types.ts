@@ -3,7 +3,12 @@ import { BigNumber } from 'ethers';
 export type PaymasterInfo = {
     id: string
     token: ERC20OrNativeTokenMetadata
-
+    sponsorship?: {
+        sponsor: {
+            name: string,
+            icon: string
+        }
+    }
     // wei
     amount: BigNumber
     expiry: number
