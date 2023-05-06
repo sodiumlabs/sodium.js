@@ -92,7 +92,7 @@ __metadata:
     commander: ^9.4.0
     cors: ^2.8.5
     ethers: ^5.7.0
-    express: ^4.18.1
+    express: ^4.17.3
     hardhat: ^2.11.0
     hardhat-deploy: ^0.11.11
     hardhat-gas-reporter: ^1.0.8
@@ -15224,7 +15224,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express@npm:^4.14.0, express@npm:^4.17.1, express@npm:^4.17.2":
+"express@npm:^4.14.0, express@npm:^4.17.1":
   version: 4.17.2
   resolution: "express@npm:4.17.2"
   dependencies:
@@ -15262,7 +15262,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express@npm:^4.18.1":
+"express@npm:^4.17.3":
   version: 4.18.2
   resolution: "express@npm:4.18.2"
   dependencies:
@@ -25118,7 +25118,7 @@ __metadata:
     eslint-config-prettier: ^8.3.0
     eslint-plugin-import: ^2.25.3
     eslint-plugin-prettier: ^4.0.0
-    express: ^4.17.2
+    express: ^4.17.3
     ganache-cli: ^6.12.2
     hardhat: 2.1.2
     husky: 4.3.8
