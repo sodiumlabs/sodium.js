@@ -1,5 +1,20 @@
 # @0xsodium/auth
 
+## 1.16.0
+
+### Minor Changes
+
+- Support sponsorship gas
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.16.0
+  - @0xsodium/config@1.16.0
+  - @0xsodium/network@1.16.0
+  - @0xsodium/utils@1.16.0
+  - @0xsodium/wallet@1.16.0
+
 ## 1.15.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # @0xsodium/graphquery
 
+## 1.16.0
+
+### Minor Changes
+
+- Support sponsorship gas
+
 ## 1.15.0
 
 ### Minor Changes

@@ -66,6 +66,11 @@ export interface NetworkConfig {
   isAuthChain?: boolean
   // Disabled / deprecated chain
   disabled?: boolean
+  centerData?: {
+    logoURI?: string;
+    website?: string;
+    description?: string;
+  }
 }
 
 export type BlockExplorerConfig = {

@@ -34,12 +34,7 @@ const getTokenPrices = async (chain: string, tokenAddressList: string[]): Promis
   return prices;
 }
 
-// const hasOneProperty = (cacheKeyArg: any, keyArg: any) => {
-//   console.debug("has one property", cacheKeyArg, keyArg)
-//   return true
-// }
 const getTokenPricesWithCache = moize(getTokenPrices, {
-  // matchesArg: hasOneProperty,
   isDeepEqual: true,
   isPromise: true,
   // 30 seconds
@@ -567,7 +562,7 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
           if (!first) {
             first = 10;
           }
-          
+
           const nativeTokenBalance = await signer.getBalance(chainId);
           const networks = await this.getNetworks();
           const network = networks.find((network) => network.chainId === chainId);
@@ -619,10 +614,10 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
           const address = await signer.getAddress();
           const result = await getHistories(
             network.subgraphHost ?? 'https://api.thegraph.com',
-            address, 
-            chainId, 
-            first, 
-            skip, 
+            address,
+            chainId,
+            first,
+            skip,
             tokenAddress
           );
           response.result = result;
@@ -645,9 +640,9 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
           const address = await signer.getAddress();
           const result = await getTokenAllowances(
             network.subgraphHost ?? 'https://api.thegraph.com',
-            address, 
+            address,
             chainId,
-            first, 
+            first,
             skip,
             provider,
           );

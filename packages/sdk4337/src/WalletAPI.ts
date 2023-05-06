@@ -13,6 +13,7 @@ import { SodiumEstimator, OverwriterEstimator, OverwriterEstimatorDefaults } fro
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { PaymasterInfo } from './types';
 import { AddressZero } from '@0xsodium/utils';
+import { NetworkConfig } from '@0xsodium/network';
 
 /**
  * constructor params, added no top of base params:
@@ -86,8 +87,6 @@ export class WalletAPI extends BaseWalletAPI {
     const txs = await toSodiumTransactions(flattenAuxTransactions(transactions));
     const encodeTxs = sodiumTxAbiEncode(txs);
 
-    console.debug('encodeExecute', encodeTxs);
-
     return walletContract.interface.encodeFunctionData(
       'execute',
       [
@@ -105,7 +104,7 @@ export class WalletAPI extends BaseWalletAPI {
     ];
   }
 
-  async getPaymasterInfos(entryPointAddress: string, transactions: TransactionRequest): Promise<PaymasterInfo[]> {
+  async getPaymasterInfos(network: NetworkConfig, entryPointAddress: string, transactions: TransactionRequest): Promise<PaymasterInfo[]> {
     const tempOp = await this.createUnsignedUserOp(entryPointAddress, transactions);
     const op = await resolveProperties(tempOp);
     const totalLimit = BigNumber.from(op.verificationGasLimit).add(op.callGasLimit);
@@ -117,19 +116,15 @@ export class WalletAPI extends BaseWalletAPI {
         id: "0x",
         token: {
           address: AddressZero,
-          chainId: 1337,
+          chainId: this.chainId,
           isNativeToken: true,
-          name: "Polygon",
-          symbol: "MATIC",
+          name: network.name,
+          symbol: network.nativeTokenSymbol,
           decimals: 18,
-          centerData: {
-            website: "https://polygon.technology/",
-            description: "Matic Network provides scalable, secure and instant Ethereum transactions. It is built on an implementation of the PLASMA framework and functions as an off chain scaling solution. Matic Network offers scalability solutions along with other tools to the developer ecosystem, which enable Matic to seamlessly integrate with dApps while helping developers create an enhanced user experience.",
-            logoURI: "https://tokens.1inch.io/0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0.png"
-          },
+          centerData: network.centerData ?? {},
         },
         amount: gasPrice,
-        expiry: parseInt(`${new Date().getTime()/1000}`) + 86400
+        expiry: parseInt(`${new Date().getTime() / 1000}`) + 86400
       }
     ];
   }

@@ -78,6 +78,8 @@ export class Wallet extends Signer {
 
   wallet4337API: WalletAPI
 
+  network: NetworkConfig;
+
   // relayer dispatches transactions to an Ethereum node directly
   // or through a remote transaction Web Service.
   // relayer: Relayer
@@ -134,7 +136,10 @@ export class Wallet extends Signer {
 
   async getPaymasterInfos(transactions: TransactionRequest, chainId?: ChainIdLike): Promise<PaymasterInfo[]> {
     const entryPointAddress = await this.getEntrypointAddress();
-    return this.wallet4337API.getPaymasterInfos(entryPointAddress, transactions);
+    if (!this.network) {
+      throw new Error("not found network config");
+    }
+    return this.wallet4337API.getPaymasterInfos(this.network, entryPointAddress, transactions);
   }
 
   async waitForTransaction(transactionHash: string, confirmations?: number | undefined, timeout?: number | undefined): Promise<ethers.providers.TransactionReceipt> {
@@ -162,6 +167,9 @@ export class Wallet extends Signer {
       this.sender = new JsonRpcSender(jsonProvider)
     }
     this.chainId = network?.chainId;
+    if (network) {
+      this.network = network;
+    }
     this.wallet4337API.setProvider(this.provider);
     return this
   }

@@ -1,5 +1,16 @@
 # @0xsodium/simulator
 
+## 1.16.0
+
+### Minor Changes
+
+- Support sponsorship gas
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/transactions@1.16.0
+
 ## 1.15.0
 
 ### Minor Changes
