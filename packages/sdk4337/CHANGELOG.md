@@ -1,5 +1,20 @@
 # @0xsodium/sdk4337
 
+## 1.17.0
+
+### Minor Changes
+
+- fix paymaster info
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/config@1.17.0
+  - @0xsodium/estimator@1.17.0
+  - @0xsodium/network@1.17.0
+  - @0xsodium/transactions@1.17.0
+  - @0xsodium/utils@1.17.0
+
 ## 1.16.0
 
 ### Minor Changes

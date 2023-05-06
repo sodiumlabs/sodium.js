@@ -1,5 +1,16 @@
 # my-app
 
+## 1.16.0
+
+### Minor Changes
+
+- fix paymaster info
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.17.0
+
 ## 1.15.0
 
 ### Minor Changes

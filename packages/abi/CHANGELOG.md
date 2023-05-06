@@ -1,5 +1,11 @@
 # @0xsodium/abi
 
+## 1.17.0
+
+### Minor Changes
+
+- fix paymaster info
+
 ## 1.16.0
 
 ### Minor Changes
