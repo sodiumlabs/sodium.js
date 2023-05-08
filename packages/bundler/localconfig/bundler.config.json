@@ -1,9 +1,0 @@
-{
-  "gasFactor": "1",
-  "port": "3002",
-  "network": "https://polygon-mumbai.g.alchemy.com/v2/fIbA8DRSTQXPAhcHKiPFo19SPqhHNHam",
-  "entryPoint": "0x0aE1B76389397Dc81c16eB8e2dEb0C592D3C873c",
-  "beneficiary": "0xb3F9D1614E806e9C47C93f13B838124eC05bFFD0",
-  "minBalance": "1",
-  "mnemonic": "./localconfig/mnemonic.txt"
-}
