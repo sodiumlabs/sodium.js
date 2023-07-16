@@ -16,7 +16,7 @@ import {
 
 import { WalletRequestHandler } from './wallet-request-handler'
 
-import { NetworkConfig, WalletContext, JsonRpcRequest, JsonRpcResponseCallback } from '@0xsodium/network'
+import { NetworkConfig, SodiumContext, JsonRpcRequest, JsonRpcResponseCallback } from '@0xsodium/network'
 import { logger, sanitizeAlphanumeric, sanitizeHost, sanitizeNumberString } from '@0xsodium/utils'
 import { AuthorizationOptions } from '@0xsodium/auth'
 
@@ -70,7 +70,7 @@ export abstract class BaseWalletTransport implements WalletTransport {
       }
     })
 
-    this.walletRequestHandler.on('walletContext', (walletContext: WalletContext) => {
+    this.walletRequestHandler.on('walletContext', (walletContext: SodiumContext) => {
       if (!this.registered || !walletContext) return
       this.notifyWalletContext(walletContext)
     })
@@ -231,7 +231,7 @@ export abstract class BaseWalletTransport implements WalletTransport {
     })
   }
 
-  notifyWalletContext(walletContext: WalletContext) {
+  notifyWalletContext(walletContext: SodiumContext) {
     this.sendMessage({
       idx: -1,
       type: EventType.WALLET_CONTEXT,

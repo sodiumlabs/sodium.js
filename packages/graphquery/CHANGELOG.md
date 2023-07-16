@@ -1,5 +1,23 @@
 # @0xsodium/graphquery
 
+## 1.20.0
+
+### Minor Changes
+
+- fix wait
+
+## 1.19.0
+
+### Minor Changes
+
+- fix 4337
+
+## 1.18.0
+
+### Minor Changes
+
+- 1.1
+
 ## 1.17.0
 
 ### Minor Changes

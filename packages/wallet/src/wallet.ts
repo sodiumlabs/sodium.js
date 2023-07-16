@@ -1,35 +1,29 @@
-import { Provider, BlockTag, JsonRpcProvider as EthJsonRpcProvider, TransactionResponse } from '@ethersproject/providers'
+import { Provider, BlockTag, JsonRpcProvider as EthJsonRpcProvider, TransactionResponse, TransactionReceipt } from '@ethersproject/providers'
 import { BigNumber, BigNumberish, ethers, Signer as AbstractSigner } from 'ethers';
 import { TypedDataDomain, TypedDataField } from '@ethersproject/abstract-signer';
 import { BytesLike } from '@ethersproject/bytes';
-import { Deferrable } from '@ethersproject/properties';
+import { Deferrable, resolveProperties } from '@ethersproject/properties';
 import { ConnectionInfo } from '@ethersproject/web';
 import {
-  decodeNonce,
   Transactionish,
   TransactionRequest,
-  SignedTransaction,
   Transaction
 } from '@0xsodium/transactions';
-import { PaymasterInfo, WalletAPI } from '@0xsodium/sdk4337';
 
 import {
   ChainIdLike,
-  WalletContext,
   JsonRpcSender,
   NetworkConfig,
-  isJsonRpcProvider,
   JsonRpcProvider,
-  sodiumContext,
+  SodiumContext,
   getChainId,
+  createContext,
 } from '@0xsodium/network';
 
 import {
   WalletConfig,
   WalletState,
-  addressOf,
   sortConfig,
-  imageHash,
 } from '@0xsodium/config';
 import { encodeTypedDataDigest, subDigestOf } from '@0xsodium/utils';
 import { RemoteSigner } from './remote-signers';
@@ -40,7 +34,13 @@ import {
   Sodium__factory
 } from '@0xsodium/wallet-contracts';
 import { AbiCoder, defaultAbiCoder } from '@ethersproject/abi';
-
+import {
+  SodiumUserOpBuilder,
+  IClient,
+  Client
+} from './userop';
+import { SodiumNetworkAuthProof } from './utils';
+import { IUserOperation, IUserOperationBuilder } from 'userop';
 // Wallet is a signer interface to a Smart Contract based Ethereum account.
 //
 // Wallet allows managing the account/wallet sub-keys, wallet address, signing
@@ -56,27 +56,27 @@ export interface WalletOptions {
   config: WalletConfig
 
   // context is the WalletContext of deployed wallet-contract modules for the Smart Wallet
-  context?: WalletContext
+  context?: Partial<SodiumContext>
 
   // strict mode will ensure the WalletConfig is usable otherwise throw (on by default)
   strict?: boolean
 }
 
 export class Wallet extends Signer {
-  readonly context: WalletContext
+  readonly context: SodiumContext
   readonly config: WalletConfig
 
-  private readonly _signers: AbstractSigner[]
+  private readonly _signer: AbstractSigner
 
   // provider is an Ethereum Json RPC provider that is connected to a particular network (aka chain)
   // and access to the signer for signing transactions.
   provider: EthJsonRpcProvider
 
+  bundlerURL: string
+
   // sender is a minimal Json RPC sender interface. It's here for convenience for other web3
   // interfaces to use.
   sender: JsonRpcSender
-
-  wallet4337API: WalletAPI
 
   network: NetworkConfig;
 
@@ -89,66 +89,57 @@ export class Wallet extends Signer {
 
   _isDeployed?: boolean
 
-  constructor(options: WalletOptions, ...signers: (BytesLike | AbstractSigner)[]) {
+  private opBuilderPromise: Promise<SodiumUserOpBuilder>
+  private opClientPromise: Promise<IClient>
+
+  constructor(
+    options: WalletOptions,
+    signer: (BytesLike | AbstractSigner),
+    private sodiumNetworkAuthProof?: SodiumNetworkAuthProof
+  ) {
     super()
 
-    const { config, context, strict } = options
+    const { config, context } = options
 
-    if (context) {
-      this.context = { ...context }
-    } else {
-      // default context is to use @0xsequence/network deployed context
-      this.context = { ...sodiumContext }
-    }
-
-    if (strict === true) {
-      this.context.nonStrict = undefined
-    } else if (strict === false) {
-      this.context.nonStrict = true
-    }
-    // if (!this.context.nonStrict && !isUsableConfig(config)) {
-    //   throw new Error('wallet config is not usable (strict mode)')
-    // }
+    this.context = createContext(context)
     this.config = sortConfig(config)
-    this._signers = signers.map(s => (AbstractSigner.isSigner(s) ? s : new ethers.Wallet(s)))
-
-    // cache wallet config for future imageHash lookups
-    this.imageHash;
-
-    const localSigner = this.getLocalSigner();
-
-    this.wallet4337API = new WalletAPI({
-      signer: localSigner,
-      entryPointAddress: this.context.entryPointAddress,
-      config: this.config,
-      context: this.context
-    });
+    this._signer = AbstractSigner.isSigner(signer) ? signer : new ethers.Wallet(signer)
   }
 
-  connect(provider: Provider): Wallet {
-    if (isJsonRpcProvider(provider)) {
-      return new Wallet({ config: this.config, context: this.context }, ...this._signers)
-        .setProvider(provider);
-    } else {
-      throw new Error('Wallet provider argument is expected to be a JsonRpcProvider')
-    }
+  getUserOpBuilder(): Promise<SodiumUserOpBuilder> {
+    return this.opBuilderPromise;
   }
 
-  async getPaymasterInfos(transactions: TransactionRequest, chainId?: ChainIdLike): Promise<PaymasterInfo[]> {
-    const entryPointAddress = await this.getEntrypointAddress();
-    if (!this.network) {
-      throw new Error("not found network config");
-    }
-    return this.wallet4337API.getPaymasterInfos(this.network, entryPointAddress, transactions);
+  getUserOpClient(): Promise<IClient> {
+    return this.opClientPromise;
   }
 
-  async waitForTransaction(transactionHash: string, confirmations?: number | undefined, timeout?: number | undefined): Promise<ethers.providers.TransactionReceipt> {
-    const entryPointAddress = await this.getEntrypointAddress();
-    return this.wallet4337API.waitForTransaction(entryPointAddress, transactionHash, confirmations, timeout);
+  connect(_: Provider): Wallet {
+    throw new Error('Wallet provider argument is expected to be a JsonRpcProvider');
   }
 
   setBundler(bundlerUrl: string, chainId: number): Wallet {
-    this.wallet4337API.setBundler(bundlerUrl, chainId);
+    this.bundlerURL = bundlerUrl;
+    this.chainId = chainId;
+    return this;
+  }
+
+  initEIP4337(): Wallet {
+    if (!this.bundlerURL) {
+      throw new Error('bundlerURL is not set');
+    }
+    if (!this.provider.connection.url) {
+      throw new Error('provider url is not set');
+    }
+
+    this.opBuilderPromise = this.newUserOpBuilder();
+
+    this.opClientPromise = Client.init(
+      this.bundlerURL,
+      this.provider.connection.url,
+      this.context.entryPointAddress,
+    );
+
     return this;
   }
 
@@ -170,7 +161,6 @@ export class Wallet extends Signer {
     if (network) {
       this.network = network;
     }
-    this.wallet4337API.setProvider(this.provider);
     return this
   }
 
@@ -179,7 +169,7 @@ export class Wallet extends Signer {
     return this.provider
   }
 
-  async getWalletContext(): Promise<WalletContext> {
+  async getWalletContext(chainId?: ChainIdLike): Promise<SodiumContext> {
     return this.context
   }
 
@@ -210,18 +200,46 @@ export class Wallet extends Signer {
       handler: handler,
       chainId: chainId,
       deployed: isDeployed,
-      imageHash: this.imageHash,
     }
     return [state]
+  }
+
+  async newUserOpBuilder(
+    chainId?: ChainIdLike,
+  ): Promise<SodiumUserOpBuilder> {
+    let opBuilderPromise: Promise<SodiumUserOpBuilder>;
+    let isDeployed = await this.isDeployed();
+    if (this.sodiumNetworkAuthProof) {
+      opBuilderPromise = SodiumUserOpBuilder.initWithSession(
+        this.context,
+        this.config,
+        this._signer,
+        this.sodiumNetworkAuthProof.addSessionStruct!,
+        this.sodiumNetworkAuthProof.authProof,
+        this.bundlerURL,
+        this.provider.connection.url,
+        isDeployed
+      );
+    } else {
+      opBuilderPromise = SodiumUserOpBuilder.initWithEOA(
+        this.context,
+        this.config,
+        this._signer,
+        this.bundlerURL,
+        this.provider.connection.url,
+        isDeployed
+      );
+    }
+    return opBuilderPromise;
   }
 
   async getWalletUpgradeTransactions(_?: ChainIdLike): Promise<Transaction[]> {
     const currentSingletonAddress = await this.getSinglotonAddress();
     const walletAddress = await this.getAddress();
-    const eqNotFoo = (a: string, b: string) => a.toLowerCase() !== b.toLowerCase();
+    const eqNotf = (a: string, b: string) => a.toLowerCase() !== b.toLowerCase();
     const sointerface = Sodium__factory.createInterface();
     const txs: Transaction[] = [];
-    if (eqNotFoo(currentSingletonAddress, this.context.singletonAddress)) {
+    if (eqNotf(currentSingletonAddress, this.context.singletonAddress)) {
       const abi = sointerface.encodeFunctionData("upgradeTo", [this.context.singletonAddress]);
       txs.push({
         to: walletAddress,
@@ -231,10 +249,8 @@ export class Wallet extends Signer {
     }
 
     const currentHandlerAddress = await this.getCurrentHandler();
-
-    console.debug("currentHandlerAddress", currentHandlerAddress, "defaultHandlerAddress", this.context.defaultHandlerAddress);
-    if (eqNotFoo(currentHandlerAddress, this.context.defaultHandlerAddress)) {
-      const abi = sointerface.encodeFunctionData("setFallbackHandler", [this.context.defaultHandlerAddress]);
+    if (eqNotf(currentHandlerAddress, this.context.fallbackHandlerAddress)) {
+      const abi = sointerface.encodeFunctionData("setFallbackHandler", [this.context.fallbackHandlerAddress]);
       txs.push({
         to: walletAddress,
         data: abi,
@@ -252,12 +268,7 @@ export class Wallet extends Signer {
 
   // address returns the address of the wallet account address
   get address(): string {
-    return addressOf(this.config, this.context, true)
-  }
-
-  // imageHash is the unique hash of the WalletConfig
-  get imageHash(): string {
-    return imageHash(this.config)
+    return this.config.address;
   }
 
   // getAddress returns the address of the wallet account address
@@ -274,7 +285,7 @@ export class Wallet extends Signer {
   async getSinglotonAddress(): Promise<string> {
     const walletIsDeployed = await this.isDeployed();
     if (!walletIsDeployed) {
-      return this.context.genesisSingletonAddress;
+      return this.context.singletonAddress;
     }
     const walletSingloton = await this.provider.getStorageAt(this.address, this.address);
     const result = defaultAbiCoder.decode(["address"], walletSingloton);
@@ -289,7 +300,7 @@ export class Wallet extends Signer {
   async getCurrentHandler(): Promise<string> {
     const walletIsDeployed = await this.isDeployed();
     if (!walletIsDeployed) {
-      return this.context.defaultHandlerAddress;
+      return this.context.fallbackHandlerAddress;
     }
 
     const handlerSlot = "0x6c9a6c4a39284e37ed1cf53d337577d14212a4870fb976a4366c693b939918d5";
@@ -301,40 +312,10 @@ export class Wallet extends Signer {
     }
 
     throw new Error("failed to get handler address");
-  } 
-
-  async getHandlerAddress(): Promise<string> {
-    const walletIsDeployed = await this.isDeployed();
-    if (!walletIsDeployed) {
-      return this.context.defaultHandlerAddress;
-    }
-
-    const walletSingloton = await this.provider.getStorageAt(this.address, this.address);
-    const result = defaultAbiCoder.decode(["address"], walletSingloton);
-
-    if (result.length > 0) {
-      return result[0];
-    }
-
-    throw new Error("failed to get singlotion address");
-  }
-
-  // getSigners returns the list of public account addresses to the currently connected
-  // signer objects for this wallet. Note: for a complete list of configured signers
-  // on the wallet, query getWalletConfig()
-  async getSigners(): Promise<string[]> {
-    if (!this._signers || this._signers.length === 0) {
-      return [];
-    }
-    return Promise.all(this._signers.map(s => s.getAddress().then(s => ethers.utils.getAddress(s))))
   }
 
   getLocalSigner(): AbstractSigner {
-    const localSigners = this._signers.filter(s => !RemoteSigner.isRemoteSigner(s));
-    if (localSigners.length == 0) {
-      throw new Error("not found local signer");
-    }
-    return localSigners[0];
+    return this._signer;
   }
 
   // chainId returns the network connected to this wallet instance
@@ -351,19 +332,17 @@ export class Wallet extends Signer {
     throw new Error("not implemented wallet getNetworks");
   }
 
-  // getNonce returns the transaction nonce for this wallet, via the relayer
-  async getNonce(blockTag?: BlockTag, space?: BigNumberish): Promise<BigNumberish> {
-    // return this.relayer.getNonce(this.config, this.context, space, blockTag)
-    return 0;
-  }
-
   // getTransactionCount returns the number of transactions (aka nonce)
   //
   // getTransactionCount method is defined on the AbstractSigner
   async getTransactionCount(blockTag?: BlockTag): Promise<number> {
-    const encodedNonce = await this.getNonce(blockTag, 0)
-    const [_, decodedNonce] = decodeNonce(encodedNonce)
-    return ethers.BigNumber.from(decodedNonce).toNumber()
+    // TODO
+    return 0;
+  }
+
+  async waitForUserOpHash(userOpHash: string, confirmations?: number | undefined, timeout?: number | undefined, chainId?: ChainIdLike): Promise<TransactionReceipt> {
+    const client = await this.opClientPromise;
+    return client.waitUserOp(userOpHash, confirmations, timeout);
   }
 
   // sendTransaction will dispatch the transaction to the relayer for submission to the network.
@@ -372,10 +351,44 @@ export class Wallet extends Signer {
     chainId?: ChainIdLike,
     paymasterId?: string,
   ): Promise<TransactionResponse> {
-    const entryPointAddress = await this.getEntrypointAddress();
-    const signedTxs = await this.signTransactions(transaction, chainId);
-    const tr = await this.wallet4337API.sendSignedTransaction(entryPointAddress, signedTxs);
-    return tr;
+    const xchainId = await this.getChainId();
+    // check chain id
+    if (chainId && getChainId(chainId) != xchainId) {
+      throw new Error(`chainId mismatch, expected ${chainId} but got ${xchainId}`)
+    }
+    const opBuilder = await this.opBuilderPromise;
+    const opClient = await this.opClientPromise;
+    const txs = await resolveArrayProperties<Transactionish>(transaction);
+    await opBuilder.executeTransactionsWithPaymasterId(txs, paymasterId);
+
+    const response = await opClient.sendUserOperation(opBuilder);
+    return {
+      ...response,
+      wait: (confirmations?: number | undefined): Promise<TransactionReceipt> => {
+        return this.waitForUserOpHash(response.userOpHash, confirmations, 0, chainId);
+      }
+    } as TransactionResponse;
+  }
+
+  async sendUserOperationRaw(
+    userOp: IUserOperation,
+    chainId?: ChainIdLike,
+  ): Promise<TransactionResponse> {
+    const xchainId = await this.getChainId();
+    // check chain id
+    if (chainId && getChainId(chainId) != xchainId) {
+      throw new Error(`chainId mismatch, expected ${chainId} but got ${xchainId}`)
+    }
+    const opBuilder = await this.opBuilderPromise;
+    const opClient = await this.opClientPromise;
+    const signedUserOp = await opBuilder.signUserOp(userOp);
+    const response = await opClient.sendUserOperationRaw(signedUserOp);
+    return {
+      ...response,
+      wait: (confirmations?: number | undefined): Promise<TransactionReceipt> => {
+        return this.waitForUserOpHash(response.userOpHash, confirmations, 0, chainId);
+      }
+    } as TransactionResponse;
   }
 
   // sendTransactionBatch is a sugar for better readability, but is the same as sendTransaction
@@ -385,32 +398,6 @@ export class Wallet extends Signer {
     paymasterId?: string,
   ): Promise<TransactionResponse> {
     return this.sendTransaction(transactions, chainId, paymasterId)
-  }
-
-  // signTransactions will sign a Sequence transaction with the wallet signers
-  //
-  // NOTE: the txs argument of type Transactionish can accept one or many transactions.
-  async signTransactions(
-    txs1: Deferrable<Transactionish>,
-    chainId?: ChainIdLike
-  ): Promise<SignedTransaction> {
-    const entryPointAddress = await this.getEntrypointAddress();
-    const signChainId = await this.getChainIdNumber(chainId);
-    const txs = await resolveArrayProperties<Transactionish>(txs1);
-    if (!this.provider) {
-      throw new Error('missing provider');
-    }
-    return this.wallet4337API.signTransactions(entryPointAddress, txs, signChainId);
-  }
-
-  async sendSignedTransactions(
-    signedTxs: SignedTransaction,
-    chainId?: ChainIdLike,
-    paymasterId?: string
-  ): Promise<TransactionResponse> {
-    await this.getChainIdNumber(chainId)
-    const entryPointAddress = await this.getEntrypointAddress();
-    return this.wallet4337API.sendSignedTransaction(entryPointAddress, signedTxs);
   }
 
   // signMessage will sign a message for a particular chainId with the wallet signers
@@ -427,8 +414,10 @@ export class Wallet extends Signer {
       return localSigner.signMessage(ethers.utils.arrayify(signHash));
     }
 
+    /// TODO
+    /// Support check for non deployed wallets
     const sig = await localSigner.signMessage(data);
-    return sig + this.config.sodiumUserId;
+    return ethers.utils.hexConcat([sig, this.config.accountSlat]);
   }
 
   async signTypedData(
@@ -487,12 +476,7 @@ export class Wallet extends Signer {
       return await this.getChainId()
     }
 
-    const id = getChainId(chainId)
-
-    if (this.context.nonStrict) {
-      // in non-strict mode, just return the chainId from argument
-      return id
-    }
+    const id = getChainId(chainId);
 
     const connectedChainId = await this.getChainId()
     if (connectedChainId !== id) {

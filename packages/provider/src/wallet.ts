@@ -1,6 +1,6 @@
 import {
   NetworkConfig,
-  WalletContext,
+  SodiumContext,
   ChainIdLike,
   JsonRpcSender,
   JsonRpcRouter,
@@ -57,7 +57,7 @@ export interface WalletProvider {
   getProvider(chainId?: ChainIdLike): Web3Provider | undefined
   getSigner(chainId?: ChainIdLike): Web3Signer
 
-  getWalletContext(): Promise<WalletContext>
+  getWalletContext(): Promise<SodiumContext>
   getWalletConfig(chainId?: ChainIdLike): Promise<WalletConfig[]>
   getWalletState(chainId?: ChainIdLike): Promise<WalletState[]>
   isDeployed(chainId?: ChainIdLike): Promise<boolean>
@@ -106,7 +106,7 @@ export class Wallet implements WalletProvider {
     // which allows easy overriding and control of the config.
     this.config = { ...DefaultProviderConfig }
     if (config) {
-      this.config = { ...this.config, ...config }
+      this.config = { ...this.config, ...config } 
     }
     if (network) {
       this.config.defaultNetworkId = network
@@ -116,6 +116,10 @@ export class Wallet implements WalletProvider {
 
     if (config?.localStorage) {
       LocalStorage.use(config.localStorage)
+    }
+
+    if (config?.networks) {
+      // this.networks = config.networks
     }
 
     this.transport = {}
@@ -143,8 +147,8 @@ export class Wallet implements WalletProvider {
     }
     if (this.config.transports?.iframeTransport?.enabled) {
       this.transport.iframeMessageProvider = new IframeMessageProvider(
-        this.config.walletAppURL, 
-        this.config.transports.iframeTransport.getWindowSize ?? function() {
+        this.config.walletAppURL,
+        this.config.transports.iframeTransport.getWindowSize ?? function () {
           return { width: 450, height: 750 };
         }
       )
@@ -243,7 +247,7 @@ export class Wallet implements WalletProvider {
     })
 
     // below will update the wallet context automatically
-    this.transport.messageProvider.on('walletContext', (walletContext: WalletContext) => {
+    this.transport.messageProvider.on('walletContext', (walletContext: SodiumContext) => {
       this.useSession({ walletContext: walletContext }, true)
     })
   }
@@ -554,7 +558,7 @@ export class Wallet implements WalletProvider {
     return this.getSigner().getWalletState(chainId)
   }
 
-  getWalletContext(): Promise<WalletContext> {
+  getWalletContext(): Promise<SodiumContext> {
     return this.getSigner().getWalletContext()
   }
 
@@ -579,8 +583,8 @@ export class Wallet implements WalletProvider {
     if (!this.session) this.session = {}
 
     // setup wallet context
-    if (this.config.walletContext) {
-      this.session.walletContext = this.config.walletContext
+    if (this.config.sodiumContext) {
+      this.session.walletContext = this.config.sodiumContext
     } else if (session.walletContext) {
       this.session.walletContext = session.walletContext
     }
@@ -718,7 +722,7 @@ export interface ProviderConfig {
   // WalletContext used the one returned by the wallet app upon login.
   //
   // NOTE: do not use this option unless you know what you're doing
-  walletContext?: WalletContext
+  sodiumContext?: SodiumContext
 }
 
 export const DefaultProviderConfig: ProviderConfig = {

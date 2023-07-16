@@ -1,5 +1,6 @@
 import { ethers, BytesLike, BigNumberish } from 'ethers'
 import { Deferrable, resolveProperties } from '@ethersproject/properties'
+import { SecurityManager } from '@0xsodium/wallet-contracts/gen/typechain/contracts/base/SecurityManager';
 
 export async function resolveArrayProperties<T>(object: Readonly<Deferrable<T>> | Readonly<Deferrable<T>>[]): Promise<T> {
   if (Array.isArray(object)) {
@@ -24,4 +25,11 @@ export async function findLatestLog(provider: ethers.providers.Provider, filter:
     if (nhalf !== undefined) return nhalf
     return findLatestLog(provider, { ...filter, fromBlock: fromBlock, toBlock: pivot })
   }
+}
+
+
+export type SodiumNetworkAuthProof = {
+  addSessionStruct?: SecurityManager.AddSessionStruct
+  recoverStruct?: SecurityManager.RecoverStruct
+  authProof: string
 }

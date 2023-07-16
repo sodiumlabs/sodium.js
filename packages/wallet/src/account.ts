@@ -16,21 +16,22 @@ import {
 import {
   ChainIdLike,
   NetworkConfig,
-  WalletContext,
-  sodiumContext,
+  SodiumContext,
   mainnetNetworks,
   ensureValidNetworks,
   getChainId,
-  sortNetworks
+  sortNetworks,
+  createContext
 } from '@0xsodium/network';
 import { Wallet } from './wallet';
 import { encodeTypedDataDigest, encodeTypedDataHash } from '@0xsodium/utils';
-import { PaymasterInfo } from '@0xsodium/sdk4337';
+import { SodiumNetworkAuthProof } from './utils';
+import { IUserOperation } from 'userop';
+import { SodiumUserOpBuilder } from './userop';
 
 export interface AccountOptions {
   initialConfig: WalletConfig
   networks?: NetworkConfig[]
-  context?: WalletContext
 }
 
 // Account is an interface to a multi-network smart contract wallet.
@@ -42,7 +43,7 @@ export class Account extends Signer {
     network: NetworkConfig
   }[]
 
-  private _signers: (BytesLike | AbstractSigner)[]
+  private _signer: (BytesLike | AbstractSigner)
 
   // provider points at the main chain for compatability with the Signer.
   // Use getProvider(chainId) to get the provider for the respective network.
@@ -51,15 +52,15 @@ export class Account extends Signer {
   // memoized value
   private _chainId?: number
 
-  constructor(options: AccountOptions, ...signers: (BytesLike | AbstractSigner)[]) {
+  constructor(
+    options: AccountOptions,
+    signer: (BytesLike | AbstractSigner),
+    private sodiumNetworkAuthProof?: SodiumNetworkAuthProof
+  ) {
     super()
 
     this.options = options
-    this._signers = signers
-
-    if (!this.options.context) {
-      this.options.context = sodiumContext;
-    }
+    this._signer = signer
 
     // Network config, defaults will be used if none are provided
     if (this.options.networks) {
@@ -69,8 +70,9 @@ export class Account extends Signer {
     }
   }
 
-  async getWalletContext(): Promise<WalletContext> {
-    return this.options.context!
+  async getWalletContext(chainId?: ChainIdLike): Promise<SodiumContext> {
+    const wallet = chainId ? this.getWalletByNetwork(chainId).wallet : this.mainWallet().wallet
+    return wallet.getWalletContext(chainId);
   }
 
   // getWalletConfig builds a list of WalletConfigs across all networks.
@@ -111,11 +113,6 @@ export class Account extends Signer {
   // across all wallets on all different networks
   getAddress(): Promise<string> {
     return this._wallets[0].wallet.getAddress()
-  }
-
-  // getSigners returns the multi-sig signers with permission to control the wallet
-  async getSigners(): Promise<string[]> {
-    return this._wallets[0].wallet.getSigners()
   }
 
   async getProvider(chainId?: number): Promise<JsonRpcProvider | undefined> {
@@ -193,9 +190,22 @@ export class Account extends Signer {
     return wallet.sendTransaction(dtransactionish, chainId, paymasterId);
   }
 
-  waitForTransaction(transactionHash: string, confirmations?: number | undefined, timeout?: number | undefined, chainId?: ChainIdLike): Promise<TransactionReceipt> {
+  async sendUserOperationRaw(
+    userOp: IUserOperation,
+    chainId?: ChainIdLike,
+  ): Promise<TransactionResponse> {
     const wallet = chainId ? this.getWalletByNetwork(chainId).wallet : this.mainWallet().wallet
-    return wallet.waitForTransaction(transactionHash, confirmations, timeout);
+    return wallet.sendUserOperationRaw(userOp, chainId);
+  }
+
+  waitForUserOpHash(
+    userOpHash: string,
+    confirmations?: number | undefined,
+    timeout?: number | undefined,
+    chainId?: ChainIdLike
+  ): Promise<TransactionReceipt> {
+    const wallet = chainId ? this.getWalletByNetwork(chainId).wallet : this.mainWallet().wallet
+    return wallet.waitForUserOpHash(userOpHash, confirmations, timeout);
   }
 
   getBalance(chainId?: ChainIdLike, blockTag?: BlockTag | undefined): Promise<BigNumber> {
@@ -209,34 +219,19 @@ export class Account extends Signer {
     return wallet.getWalletUpgradeTransactions(chainId);
   }
 
+  async newUserOpBuilder(
+    chainId?: ChainIdLike,
+  ): Promise<SodiumUserOpBuilder> {
+    const wallet = chainId ? this.getWalletByNetwork(chainId).wallet : this.mainWallet().wallet
+    return wallet.newUserOpBuilder(chainId);
+  }
+
   async sendTransactionBatch(
     transactions: Deferrable<TransactionRequest[] | Transaction[]>,
     chainId?: ChainIdLike,
     paymasterId?: string,
   ): Promise<TransactionResponse> {
     return this.sendTransaction(transactions, chainId, paymasterId);
-  }
-
-  async signTransactions(
-    dtransactionish: Deferrable<Transactionish>,
-    chainId?: ChainIdLike
-  ): Promise<SignedTransaction> {
-    const wallet = chainId ? this.getWalletByNetwork(chainId).wallet : this.mainWallet().wallet
-    return wallet.signTransactions(dtransactionish, chainId)
-  }
-
-  async sendSignedTransactions(
-    signedTxs: SignedTransaction, 
-    chainId?: ChainIdLike,
-    paymasterId?: string,
-  ): Promise<TransactionResponse> {
-    const wallet = chainId ? this.getWalletByNetwork(chainId).wallet : this.mainWallet().wallet
-    return wallet.sendSignedTransactions(signedTxs, chainId, paymasterId);
-  }
-
-  getPaymasterInfos(transactions: TransactionRequest, chainId?: ChainIdLike): Promise<PaymasterInfo[]> {
-    const wallet = chainId ? this.getWalletByNetwork(chainId).wallet : this.mainWallet().wallet
-    return wallet.getPaymasterInfos(transactions, chainId)
   }
 
   async isDeployed(target?: Wallet | ChainIdLike): Promise<boolean> {
@@ -325,9 +320,10 @@ export class Account extends Signer {
       const wallet = new Wallet(
         {
           config: this.options.initialConfig,
-          context: this.options.context
+          context: network.context
         },
-        ...this._signers
+        this._signer,
+        this.sodiumNetworkAuthProof
       )
 
       if (network.provider) {
@@ -348,6 +344,9 @@ export class Account extends Signer {
         this._chainId = network.chainId
         this.provider = wallet.provider
       }
+
+      wallet.initEIP4337();
+
       return {
         network: network,
         wallet: wallet

@@ -1,10 +1,10 @@
-import { BigNumber, ethers, FixedNumber } from 'ethers'
-import { BytesLike, Bytes } from '@ethersproject/bytes'
-import { Web3Provider as EthersWeb3Provider, ExternalProvider, JsonRpcProvider, Networkish } from '@ethersproject/providers'
-import { TypedDataDomain, TypedDataField, TypedDataSigner } from '@ethersproject/abstract-signer'
+import { BigNumber, ethers, FixedNumber } from 'ethers';
+import { BytesLike, Bytes } from '@ethersproject/bytes';
+import { Web3Provider as EthersWeb3Provider, JsonRpcProvider } from '@ethersproject/providers';
+import { TypedDataDomain, TypedDataField, TypedDataSigner } from '@ethersproject/abstract-signer';
 import {
   NetworkConfig,
-  WalletContext,
+  SodiumContext,
   ChainIdLike,
   JsonRpcHandler,
   JsonRpcFetchFunc,
@@ -12,20 +12,26 @@ import {
   JsonRpcResponseCallback,
   maybeChainId,
   JsonRpcSender,
-} from '@0xsodium/network'
-import { resolveArrayProperties, Signer } from '@0xsodium/wallet'
-import { WalletConfig, WalletState } from '@0xsodium/config'
-import { Deferrable, shallowCopy, resolveProperties, Forbid, ERC20OrNativeTokenMetadata } from '@0xsodium/utils'
+} from '@0xsodium/network';
+import { resolveArrayProperties, Signer } from '@0xsodium/wallet';
+import { WalletConfig, WalletState } from '@0xsodium/config';
+import {
+  Deferrable,
+  shallowCopy,
+  resolveProperties,
+  Forbid,
+  ERC20OrNativeTokenMetadata
+} from '@0xsodium/utils';
 import {
   TransactionRequest,
   TransactionResponse,
   SignedTransaction,
   GasSuggest,
   Transaction
-} from '@0xsodium/transactions'
-import { WalletRequestHandler } from './transports/wallet-request-handler'
+} from '@0xsodium/transactions';
+import { WalletRequestHandler } from './transports/wallet-request-handler';
 import { UserTokenInfo } from '@0xsodium/graphquery';
-import { PaymasterInfo } from '@0xsodium/sdk4337';
+import { TransactionReceipt } from '@ethersproject/abstract-provider';
 
 export class Web3Provider extends EthersWeb3Provider implements JsonRpcHandler {
   static isSodiumProvider(cand: any): cand is Web3Provider {
@@ -40,7 +46,10 @@ export class Web3Provider extends EthersWeb3Provider implements JsonRpcHandler {
   // overridden by passing chainId argument to a specific request
   readonly _defaultChainId?: number
 
-  constructor(provider: JsonRpcProvider | JsonRpcHandler | JsonRpcFetchFunc, defaultChainId?: ChainIdLike) {
+  constructor(
+    provider: JsonRpcProvider | JsonRpcHandler | JsonRpcFetchFunc,
+    defaultChainId?: ChainIdLike
+  ) {
     const sender = new JsonRpcSender(provider, maybeChainId(defaultChainId))
     provider = sender
     super(provider, 'any')
@@ -96,9 +105,12 @@ export class LocalWeb3Provider extends Web3Provider {
 
 export class Web3Signer extends Signer implements TypedDataSigner {
   readonly provider: Web3Provider
-  readonly defaultChainId?: number
+  defaultChainId?: number
 
-  constructor(provider: Web3Provider, defaultChainId?: number) {
+  constructor(
+    provider: Web3Provider,
+    defaultChainId?: number
+  ) {
     super()
     this.provider = provider
     this.defaultChainId = defaultChainId
@@ -107,7 +119,7 @@ export class Web3Signer extends Signer implements TypedDataSigner {
   // memoized
   _address: string
   _index: number
-  _context: WalletContext
+  _context: SodiumContext
   _networks: NetworkConfig[]
   private _providers: { [key: number]: Web3Provider } = {}
 
@@ -119,9 +131,19 @@ export class Web3Signer extends Signer implements TypedDataSigner {
     return ethers.utils.getAddress(this._address)
   }
 
+  setDefaultChainId(chainId: number) {
+    this.defaultChainId = chainId
+  }
+
   signTransaction(transaction: Deferrable<TransactionRequest>): Promise<string> {
     // TODO .. since ethers isn't using this method, perhaps we will?
     throw new Error('signTransaction is unsupported, use signTransactions instead')
+  }
+
+  async newUserOpBuilder(
+    chainId?: ChainIdLike,
+  ): Promise<any> {
+    throw new Error('Method not implemented.')
   }
 
   connect(provider: ethers.providers.Provider): ethers.providers.JsonRpcSigner {
@@ -132,8 +154,21 @@ export class Web3Signer extends Signer implements TypedDataSigner {
     throw new Error('Method not implemented.')
   }
 
-  waitForTransaction(transactionHash: string, confirmations?: number | undefined, timeout?: number | undefined): Promise<ethers.providers.TransactionReceipt> {
-    throw new Error('Method not implemented.')
+  waitForUserOpHash(
+    userOpHash: string,
+    confirmations?: number | undefined,
+    timeout?: number | undefined,
+    chainId?: ChainIdLike | undefined
+  ): Promise<ethers.providers.TransactionReceipt> {
+    return this.provider.send(
+      'sodium_waitForUserOpHash',
+      [
+        userOpHash,
+        confirmations,
+        timeout,
+      ],
+      maybeChainId(chainId) || this.defaultChainId
+    )
   }
 
   getWalletUpgradeTransactions(chainId?: ChainIdLike | undefined): Promise<Transaction[]> {
@@ -174,7 +209,7 @@ export class Web3Signer extends Signer implements TypedDataSigner {
     return this._providers[chainId]
   }
 
-  async getWalletContext(): Promise<WalletContext> {
+  async getWalletContext(): Promise<SodiumContext> {
     if (!this._context) {
       this._context = await this.provider.send('sodium_getWalletContext', [])
     }
@@ -277,6 +312,13 @@ export class Web3Signer extends Signer implements TypedDataSigner {
     return await provider!.send('personal_sign', [ethers.utils.hexlify(data), address])
   }
 
+  sendUserOperationRaw(
+    userOp: any,
+    chainId?: ChainIdLike,
+  ): Promise<TransactionResponse> {
+    throw new Error('Method not implemented.')
+  }
+
   async getGasSuggest(): Promise<GasSuggest> {
     const feeData = await this.provider.getFeeData();
     const m = (v: BigNumber | null, mul: number, d: BigNumber): BigNumber => {
@@ -301,17 +343,6 @@ export class Web3Signer extends Signer implements TypedDataSigner {
         maxFeePerGas: m(feeData.maxPriorityFeePerGas, 2, BigNumber.from("1500000000").mul(2))
       }
     }
-  }
-
-  getPaymasterInfos(transactions: TransactionRequest, chainId?: ChainIdLike | undefined): Promise<PaymasterInfo[]> {
-    return this.provider.send(
-      'sodium_getPaymasterInfos',
-      [
-        transactions,
-        maybeChainId(chainId)
-      ],
-      maybeChainId(chainId) || this.defaultChainId
-    )
   }
 
   // async
@@ -341,25 +372,20 @@ export class Web3Signer extends Signer implements TypedDataSigner {
     transaction: Deferrable<TransactionRequest>,
     chainId?: ChainIdLike
   ): Promise<TransactionResponse> {
-    const provider = await this.getSender(maybeChainId(chainId) || this.defaultChainId)
-
+    const sender = await this.getAddress();
+    const waitUserOp = (userOpHash: string, confirmations?: number): Promise<TransactionReceipt> => {
+      return this.waitForUserOpHash(userOpHash, confirmations)
+    }
     const tx = this.sendUncheckedTransaction(transaction, chainId).then(hash => {
-      return ethers.utils
-        .poll(
-          () => {
-            return provider!.getTransaction(hash).then((tx: TransactionResponse) => {
-              if (tx === null) {
-                return undefined
-              }
-              return provider!._wrapTransaction(tx, hash)
-            })
-          },
-          { onceBlock: this.provider! }
-        )
-        .catch((error: Error) => {
-          ; (<any>error).transactionHash = hash
-          throw error
-        })
+      return {
+        hash: hash,
+
+        from: sender,
+
+        wait(confirmations?: number): Promise<TransactionReceipt> {
+          return waitUserOp(hash, confirmations);
+        }
+      } as TransactionResponse
     })
 
     // @ts-ignore
@@ -394,15 +420,12 @@ export class Web3Signer extends Signer implements TypedDataSigner {
     transaction: Deferrable<TransactionRequest>,
     chainId?: ChainIdLike
   ): Promise<SignedTransaction> {
-    transaction = shallowCopy(transaction)
-    // TODO: transaction argument..? make sure to resolve any properties and serialize property before sending over
-    // the wire.. see sendUncheckedTransaction and resolveProperties
+    transaction = shallowCopy(transaction);
     return this.provider.send('eth_signTransaction', [transaction], maybeChainId(chainId) || this.defaultChainId)
   }
 
   sendSignedTransactions(signedTxs: SignedTransaction, chainId?: ChainIdLike): Promise<TransactionResponse> {
-    // sequence_relay
-    throw new Error('TODO')
+    throw new Error('sendSignedTransactions method not implemented.')
   }
 
   async isDeployed(chainId?: ChainIdLike): Promise<boolean> {
@@ -436,20 +459,7 @@ export class Web3Signer extends Signer implements TypedDataSigner {
 
   async sendUncheckedTransaction(transaction: Deferrable<TransactionRequest>, chainId?: ChainIdLike): Promise<string> {
     transaction = shallowCopy(transaction)
-
     const fromAddress = this.getAddress()
-
-    // NOTE: we do not use provider estimation, and instead rely on our relayer to determine the gasLimit and gasPrice
-    //
-    // TODO: alternatively/one day, we could write a provider middleware to eth_estimateGas
-    // and send it to our relayer url instead for estimation..
-    //
-    // if (!transaction.gasLimit) {
-    //   const estimate = shallowCopy(transaction)
-    //   estimate.from = fromAddress
-    //   transaction.gasLimit = this.provider.estimateGas(estimate)
-    // }
-
     const provider = await this.getSender(maybeChainId(chainId) || this.defaultChainId)
 
     return resolveProperties({
@@ -464,10 +474,8 @@ export class Web3Signer extends Signer implements TypedDataSigner {
       } else {
         tx.from = sender
       }
-
       const hexTx = hexlifyTransaction(tx)
-
-      return provider!.send('eth_sendTransaction', [hexTx]).then(
+      return provider!.send('eth_sendTransaction', [hexTx], maybeChainId(chainId) || this.defaultChainId).then(
         hash => {
           return hash
         },

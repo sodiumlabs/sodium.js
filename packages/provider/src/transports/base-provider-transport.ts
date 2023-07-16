@@ -17,7 +17,7 @@ import {
   TypedEventEmitter
 } from '../types'
 
-import { NetworkConfig, WalletContext, JsonRpcRequest, JsonRpcResponseCallback, JsonRpcResponse } from '@0xsodium/network'
+import { NetworkConfig, SodiumContext, JsonRpcRequest, JsonRpcResponseCallback, JsonRpcResponse } from '@0xsodium/network'
 import { logger } from '@0xsodium/utils'
 import { ethers } from 'ethers'
 
@@ -39,7 +39,7 @@ export abstract class BaseProviderTransport implements ProviderTransport {
   protected connectPayload: ConnectDetails | undefined
   protected accountsChangedPayload: { accounts: string[]; origin?: string } | undefined
   protected networksPayload: NetworkConfig[] | undefined
-  protected walletContextPayload: WalletContext | undefined
+  protected walletContextPayload: SodiumContext | undefined
 
   protected _sessionId?: string
   protected _init: InitState

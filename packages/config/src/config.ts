@@ -1,5 +1,5 @@
 import { ethers, Signer } from 'ethers';
-import { WalletContext } from '@0xsodium/network';
+import { SodiumContext } from '@0xsodium/network';
 import { WalletContractBytecode } from './bytecode';
 import { cacheConfig } from './cache';
 import { Sodium__factory } from '@0xsodium/wallet-contracts';
@@ -9,14 +9,14 @@ export type Platform = 'web' | 'mobile' | 'pc';
 // WalletConfig is the configuration of key signers that can access
 // and control the wallet
 export interface WalletConfig {
-  address?: string
-  sodiumUserId: string
-  platform: Platform
+  address: string
+  accountSlat: string
+  isSafe: boolean
   chainId?: number
 }
 
 export interface WalletState {
-  context: WalletContext
+  context: SodiumContext
   config?: WalletConfig
 
   // the wallet address
@@ -35,56 +35,32 @@ export interface WalletState {
 
   // whether the wallet has been ever deployed
   deployed: boolean
-
-  // the imageHash of the `config` WalletConfig
-  imageHash: string
 }
 
 export const createWalletConfig = async (
-  sodiumUserId: string,
-  platform: Platform
+  address: string,
+  accountSlat: string,
+  isSafe: boolean
 ): Promise<WalletConfig> => {
   const config: WalletConfig = {
-    sodiumUserId,
-    platform
+    address,
+    accountSlat,
+    isSafe
   }
   return config;
 }
 
-export const getWalletInitCode = async (localSigner: Signer, config: WalletConfig, context: WalletContext) => {
-  const singletonInterface = Sodium__factory.createInterface();
-  const sodiumSetup = singletonInterface.encodeFunctionData("setup", [
-    await localSigner.getAddress(),
-    ethers.utils.hexDataSlice(ethers.utils.id(config.platform), 0, 4),
-    context.defaultHandlerAddress,
-  ]);
-  const salt = imageHash(config);
-  return `${context.genesisSingletonAddress}${salt.slice(2)}${sodiumSetup.slice(2)}`;
-}
-
-export const addressOf = (config: WalletConfig, context: WalletContext, ignoreAddress: boolean = false): string => {
-  if (config.address && !ignoreAddress) {
-    return config.address;
-  }
-  const salt = imageHash(config);
-  return addressOfSalt(salt, context);
-}
-
-export const addressOfSalt = (salt: string, context: WalletContext): string => {
-  const codeHash = ethers.utils.keccak256(
-    ethers.utils.solidityPack(['bytes', 'bytes32'], [WalletContractBytecode, ethers.utils.hexZeroPad(context.genesisSingletonAddress, 32)])
-  )
-  const hash = ethers.utils.keccak256(
-    ethers.utils.solidityPack(['bytes1', 'address', 'bytes32', 'bytes32'], ['0xff', context.walletCreatorAddress, salt, codeHash])
-  );
-  return ethers.utils.getAddress(ethers.utils.hexDataSlice(hash, 12))
-}
-
-export const imageHash = (config: WalletConfig): string => {
+export const accountSlat = (config: WalletConfig): string => {
   config = sortConfig(config);
-  const imageHash = ethers.utils.id(config.sodiumUserId);
+  const imageHash = config.accountSlat;
   cacheConfig(imageHash, config);
   return imageHash
+}
+
+export const calcAccountAddress = (accountSlat: string, factory: string): string => {
+  const salt = ethers.utils.arrayify(accountSlat);
+  const codeHash = ethers.utils.keccak256(WalletContractBytecode);
+  return ethers.utils.getCreate2Address(factory, salt, codeHash);
 }
 
 // sortConfig normalizes the list of signer addreses in a WalletConfig
@@ -93,7 +69,7 @@ export const sortConfig = (config: WalletConfig): WalletConfig => {
 }
 
 export const isConfigEqual = (a: WalletConfig, b: WalletConfig): boolean => {
-  return imageHash(a) === imageHash(b);
+  return accountSlat(a) === accountSlat(b);
 }
 
 export const compareAddr = (a: string, b: string): number => {

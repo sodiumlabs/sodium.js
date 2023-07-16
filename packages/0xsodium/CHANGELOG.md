@@ -1,5 +1,62 @@
 # 0xsodium
 
+## 1.19.0
+
+### Minor Changes
+
+- fix wait
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.20.0
+  - @0xsodium/auth@1.20.0
+  - @0xsodium/config@1.20.0
+  - @0xsodium/multicall@1.20.0
+  - @0xsodium/network@1.20.0
+  - @0xsodium/provider@1.20.0
+  - @0xsodium/transactions@1.20.0
+  - @0xsodium/utils@1.20.0
+  - @0xsodium/wallet@1.20.0
+
+## 1.18.0
+
+### Minor Changes
+
+- fix 4337
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.19.0
+  - @0xsodium/auth@1.19.0
+  - @0xsodium/config@1.19.0
+  - @0xsodium/multicall@1.19.0
+  - @0xsodium/network@1.19.0
+  - @0xsodium/provider@1.19.0
+  - @0xsodium/transactions@1.19.0
+  - @0xsodium/utils@1.19.0
+  - @0xsodium/wallet@1.19.0
+
+## 1.17.0
+
+### Minor Changes
+
+- 1.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/config@1.18.0
+  - @0xsodium/multicall@1.18.0
+  - @0xsodium/network@1.18.0
+  - @0xsodium/provider@1.18.0
+  - @0xsodium/transactions@1.18.0
+  - @0xsodium/utils@1.18.0
+  - @0xsodium/wallet@1.18.0
+  - @0xsodium/abi@1.18.0
+  - @0xsodium/auth@1.18.0
+
 ## 1.16.0
 
 ### Minor Changes

@@ -89,8 +89,6 @@
       "packages/multicall",
       "packages/network",
       "packages/provider",
-      "packages/sdk4337",
-      "packages/simulator",
       "packages/transactions",
       "packages/utils",
       "packages/wallet",

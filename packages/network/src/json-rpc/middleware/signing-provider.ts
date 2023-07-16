@@ -6,7 +6,7 @@ export const SignerJsonRpcMethods = [
   
   'sodium_getWalletContext', 'sodium_getWalletConfig', 'sodium_getWalletState', 'sodium_getNetworks',
   'sodium_updateConfig', 'sodium_publishConfig', 'sodium_gasRefundOptions',
-  'sodium_getNonce', 'sodium_relay', 'sodium_getPaymasterInfos',
+  'sodium_getNonce', 'sodium_relay', 'sodium_getPaymasterInfos', 'sodium_waitForUserOpHash',
 
   'eth_decrypt', 'eth_getEncryptionPublicKey',
   'wallet_addEthereumChain', 'wallet_switchEthereumChain',

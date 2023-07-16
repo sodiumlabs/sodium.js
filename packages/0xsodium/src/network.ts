@@ -12,5 +12,5 @@ export type {
   NetworkConfig,
   ChainId,
   ChainIdLike,
-  WalletContext
+  SodiumContext
 } from '@0xsodium/network'

@@ -1,6 +1,5 @@
 import { ethers, BigNumberish, BytesLike } from 'ethers'
-import { WalletContext, sodiumContext } from '@0xsodium/network'
-import { WalletConfig, addressOf, isConfigEqual } from '@0xsodium/config'
+import { SodiumContext } from '@0xsodium/network'
 import { packMessageData, encodeMessageDigest, TypedData, encodeTypedDataDigest } from '@0xsodium/utils'
 import { Web3Provider } from './provider'
 import { isValidSignature as _isValidSignature, Signer } from '@0xsodium/wallet'
@@ -31,7 +30,7 @@ export const isValidSignature = async (
   sig: string,
   provider: Web3Provider | ethers.providers.Web3Provider,
   chainId?: number,
-  walletContext?: WalletContext
+  walletContext?: SodiumContext
 ): Promise<boolean | undefined> => {
   if (!chainId) {
     chainId = (await provider.getNetwork())?.chainId
@@ -48,7 +47,7 @@ export const isValidMessageSignature = async (
   signature: string,
   provider: Web3Provider | ethers.providers.Web3Provider,
   chainId?: number,
-  walletContext?: WalletContext
+  walletContext?: SodiumContext
 ): Promise<boolean | undefined> => {
   const prefixed = prefixEIP191Message(message)
   const digest = encodeMessageDigest(prefixed)
@@ -61,7 +60,7 @@ export const isValidTypedDataSignature = (
   signature: string,
   provider: Web3Provider | ethers.providers.Web3Provider,
   chainId?: number,
-  walletContext?: WalletContext
+  walletContext?: SodiumContext
 ): Promise<boolean | undefined> => {
   return isValidSignature(address, encodeTypedDataDigest(typedData), signature, provider, chainId, walletContext)
 }
@@ -143,7 +142,7 @@ export const isWalletUpToDate = async (signer: Signer, chainId: number): Promise
     throw new Error(`isWalletUpToDate util: could not get config for chainId ${chainId}`)
   }
   let isUpToDate = true;
-
+  const sodiumContext = await signer.getWalletContext();
   if (
     walletStateForRequiredChain.singlotion.toLocaleLowerCase() 
     !== sodiumContext.singletonAddress.toLocaleLowerCase()
@@ -152,7 +151,7 @@ export const isWalletUpToDate = async (signer: Signer, chainId: number): Promise
   }
 
   if (walletStateForRequiredChain.handler.toLowerCase()
-    !== sodiumContext.defaultHandlerAddress.toLowerCase()
+    !== sodiumContext.fallbackHandlerAddress.toLowerCase()
   ) {
     isUpToDate = false;
   }

@@ -7,7 +7,7 @@ import {
 import { ETHAuth, Proof } from '@0xsequence/ethauth'
 // import { Indexer, SequenceIndexerClient } from '@0xsodium/indexer'
 // import { SequenceMetadataClient } from '@0xsodium/metadata'
-import { ChainIdLike, NetworkConfig, WalletContext, findNetworkConfig, getAuthNetwork } from '@0xsodium/network'
+import { ChainIdLike, NetworkConfig, SodiumContext, findNetworkConfig, getAuthNetwork } from '@0xsodium/network'
 import { jwtDecodeClaims } from '@0xsodium/utils'
 import { Account } from '@0xsodium/wallet'
 import { ethers, Signer as AbstractSigner } from 'ethers'
@@ -37,7 +37,7 @@ type ProofStringPromise = {
 
 export interface SessionDump {
   config: WalletConfig
-  context: WalletContext
+  context: SodiumContext
   jwt?: SessionJWT
   metadata: SessionMeta
 }
@@ -69,7 +69,7 @@ export class Session {
     public sequenceMetadataUrl: string,
     private networks: NetworkConfig[],
     public config: WalletConfig,
-    public context: WalletContext,
+    public context: SodiumContext,
     public account: Account,
     public metadata: SessionMeta,
     private readonly authProvider: ethers.providers.JsonRpcProvider,
@@ -489,10 +489,9 @@ export class Session {
       new Account(
         {
           initialConfig: dump.config,
-          context: dump.context,
           networks: networks
         },
-        ...signers
+        signers[0]
       ),
       dump.metadata,
       getAuthProvider(networks),

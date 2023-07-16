@@ -1,5 +1,44 @@
 # @0xsodium/transactions
 
+## 1.20.0
+
+### Minor Changes
+
+- fix wait
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.20.0
+  - @0xsodium/network@1.20.0
+  - @0xsodium/utils@1.20.0
+
+## 1.19.0
+
+### Minor Changes
+
+- fix 4337
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.19.0
+  - @0xsodium/network@1.19.0
+  - @0xsodium/utils@1.19.0
+
+## 1.18.0
+
+### Minor Changes
+
+- 1.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/network@1.18.0
+  - @0xsodium/utils@1.18.0
+  - @0xsodium/abi@1.18.0
+
 ## 1.17.0
 
 ### Minor Changes

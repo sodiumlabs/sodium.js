@@ -1,6 +1,6 @@
 import { ethers, BigNumberish, BytesLike } from 'ethers'
 import { TypedDataDomain, TypedDataField, TypedDataSigner } from '@ethersproject/abstract-signer'
-import { WalletContext, ChainIdLike } from '@0xsodium/network'
+import { SodiumContext, ChainIdLike } from '@0xsodium/network'
 import { encodeMessageDigest, TypedData, encodeTypedDataDigest } from '@0xsodium/utils'
 import { WalletConfig } from '@0xsodium/config'
 import { Wallet } from '../wallet'
@@ -58,7 +58,7 @@ export class WalletUtils {
     digest: Uint8Array,
     signature: string,
     chainId: number,
-    walletContext?: WalletContext
+    walletContext?: SodiumContext
   ): Promise<boolean | undefined> {
     const provider = this.wallet.getProvider(chainId)
     if (!provider) throw new Error(`unable to get provider for chainId ${chainId}`)
@@ -71,7 +71,7 @@ export class WalletUtils {
     message: string | Uint8Array,
     signature: string,
     chainId: number,
-    walletContext?: WalletContext
+    walletContext?: SodiumContext
   ): Promise<boolean | undefined> {
     const provider = this.wallet.getProvider(chainId)
     if (!provider) throw new Error(`unable to get provider for chainId ${chainId}`)
@@ -86,7 +86,7 @@ export class WalletUtils {
     typedData: TypedData,
     signature: string,
     chainId: number,
-    walletContext?: WalletContext
+    walletContext?: SodiumContext
   ): Promise<boolean | undefined> {
     return this.isValidSignature(address, encodeTypedDataDigest(typedData), signature, chainId, walletContext)
   }

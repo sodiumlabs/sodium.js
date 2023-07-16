@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import { JsonRpcHandlerFunc, JsonRpcRequest, JsonRpcResponseCallback, JsonRpcResponse, JsonRpcMiddlewareHandler } from '../types'
-import { WalletContext } from '../../context'
+import { SodiumContext } from '../../context'
 
 // EagerProvider will eagerly respond to a provider request from pre-initialized data values.
 //
@@ -10,7 +10,7 @@ import { WalletContext } from '../../context'
 export type EagerProviderProps = {
   accountAddress?: string,
   chainId?: number,
-  walletContext?: WalletContext
+  walletContext?: SodiumContext
 }
 
 export class EagerProvider implements JsonRpcMiddlewareHandler {

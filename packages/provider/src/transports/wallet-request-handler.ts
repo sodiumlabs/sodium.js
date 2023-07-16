@@ -20,7 +20,7 @@ import { ethers, utils } from 'ethers';
 import { ExternalProvider } from '@ethersproject/providers';
 import { NetworkConfig, JsonRpcHandler, JsonRpcRequest, JsonRpcResponseCallback, JsonRpcResponse } from '@0xsodium/network';
 import { Signer } from '@0xsodium/wallet';
-import { Transactionish, isSignedTransaction, flattenAuxTransactions } from '@0xsodium/transactions';
+import { Transactionish, flattenAuxTransactions } from '@0xsodium/transactions';
 import { signAuthorization, AuthorizationOptions } from '@0xsodium/auth';
 import { logger, TypedData, AddressZero, ERC20OrNativeTokenMetadata } from '@0xsodium/utils';
 import { prefixEIP191Message, isWalletUpToDate } from '../utils';
@@ -40,7 +40,6 @@ const getTokenPricesWithCache = moize(getTokenPrices, {
   // 30 seconds
   maxAge: 50 * 1000,
 });
-
 
 const SIGNER_READY_TIMEOUT = 10000
 
@@ -432,34 +431,21 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
             throw new Error('sender address does not match wallet')
           }
 
-          if (this.prompter === null) {
-            // The eth_signTransaction method expects a `string` return value we instead return a `SignedTransactions` object,
-            // this can only be broadcasted using an RPC provider with support for signed Sequence transactions, like this one.
-            //
-            // TODO: verify serializing / transporting the SignedTransaction object works as expected, most likely however
-            // we will want to resolveProperties the bignumber values to hex strings
-            response.result = await signer.signTransactions(transaction, chainId)
-          } else {
-            response.result = await this.prompter.promptSignTransaction(transaction, chainId, this.connectOptions)
-          }
-
-          break
+          throw new Error('eth_signTransaction is not supported')
+          // if (this.prompter === null) {
+          //   // The eth_signTransaction method expects a `string` return value we instead return a `SignedTransactions` object,
+          //   // this can only be broadcasted using an RPC provider with support for signed Sequence transactions, like this one.
+          //   //
+          //   // TODO: verify serializing / transporting the SignedTransaction object works as expected, most likely however
+          //   // we will want to resolveProperties the bignumber values to hex strings
+          //   response.result = await signer.signTransactions(transaction, chainId)
+          // } else {
+          //   response.result = await this.prompter.promptSignTransaction(transaction, chainId, this.connectOptions)
+          // }
         }
 
         case 'eth_sendRawTransaction': {
-          // NOTE: we're not using a prompter here as the transaction is already signed
-          // and would have prompted the user upon signing.
-
-          // https://eth.wiki/json-rpc/API#eth_sendRawTransaction
-          // TODO
-          if (isSignedTransaction(request.params![0])) {
-            const tx = await signer.sendSignedTransactions(request.params![0]);
-            response.result = (await tx).hash
-          } else {
-            const tx = await provider.sendTransaction(request.params![0])
-            response.result = tx.hash
-          }
-          break
+          throw new Error('eth_sendRawTransaction is not supported');
         }
 
         case 'eth_getTransactionCount': {
@@ -578,11 +564,7 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
                 name: network.name,
                 symbol: network.nativeTokenSymbol,
                 decimals: 18,
-                centerData: {
-                  website: "https://polygon.technology/",
-                  description: "Matic Network provides scalable, secure and instant Ethereum transactions. It is built on an implementation of the PLASMA framework and functions as an off chain scaling solution. Matic Network offers scalability solutions along with other tools to the developer ecosystem, which enable Matic to seamlessly integrate with dApps while helping developers create an enhanced user experience.",
-                  logoURI: "https://tokens.1inch.io/0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0.png"
-                },
+                centerData: network.centerData,
               },
               balance: nativeTokenBalance,
             }
@@ -651,12 +633,47 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
         }
 
         case 'sodium_getTokenRates': {
-          let [tokenAddressList, chainId] = request.params!
+          let [tokenAddressList, xchainId] = request.params!
 
-          // TODO
-          // cross chain support
-          if (chainId != 137) {
-            response.result = tokenAddressList.map((tokenAddress: string) => {
+          let chainId = parseInt(xchainId);
+
+          const chainmap: {
+            [keyof: number]: {
+              id: string,
+              wtoken: string,
+            }
+          } = {
+            137: {
+              id: "polygon-pos",
+              wtoken: "0x0000000000000000000000000000000000001010",
+            },
+            56: {
+              id: "binance-smart-chain",
+              wtoken: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+            },
+            1: {
+              id: "ethereum",
+              wtoken: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+            },
+            // arbitrum-one
+            42161: {
+              id: "ethereum",
+              wtoken: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+            },
+            31337: {
+              id: "ethereum",
+              wtoken: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+            },
+            // arbitrum-nova
+            42170: {
+              id: "ethereum",
+              wtoken: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+            },
+          };
+
+          const x = chainmap[chainId];
+          if (!x) {
+            response.result = tokenAddressList.map((_: string) => {
               return 0
             });
             break;
@@ -664,13 +681,12 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
 
           tokenAddressList = tokenAddressList.map((tokenAddress: string) => {
             if (tokenAddress === AddressZero) {
-              return "0x0000000000000000000000000000000000001010"
+              return chainmap[chainId].wtoken;
             }
             return tokenAddress;
           });
 
-          // default
-          let chain = "polygon-pos"
+          let chain = x.id;
           const prices = await getTokenPricesWithCache(chain, tokenAddressList);
           response.result = tokenAddressList.map((tokenAddress: string) => {
             const price = prices[tokenAddress.toLowerCase()]
@@ -695,15 +711,6 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
             centerData: tokenMetadata.centerData,
           }
           response.result = tokenInfo;
-          break;
-        }
-
-        case 'sodium_getPaymasterInfos': {
-          const [transactions, chainId] = request.params!
-
-          // testnet mock
-          // mainnet using https://www.coingecko.com/api/documentations/v3#/simple/get_simple_price
-          response.result = await signer.getPaymasterInfos(transactions, chainId);
           break;
         }
 
@@ -736,42 +743,6 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
           break
         }
 
-        // smart wallet method
-        case 'sodium_updateConfig': {
-          throw new Error('sequence_updateConfig method is not allowed from a dapp')
-          // NOTE: method is disabled as we don't need a dapp to request to update a config.
-          // However, if we ever want this, we can enable it but must also use the prompter
-          // for confirmation.
-          //
-          // const [newConfig] = request.params
-          // response.result = await signer.updateConfig(newConfig)
-          break
-        }
-
-        // smart wallet method
-        case 'sodium_publishConfig': {
-          throw new Error('sodium_publishConfig method is not allowed from a dapp')
-          break
-        }
-
-        // relayer method
-        case 'sodium_gasRefundOptions': {
-          // TODO
-          break
-        }
-
-        // relayer method
-        case 'sodium_getNonce': {
-          // TODO
-          break
-        }
-
-        // relayer method
-        case 'sodium_relay': {
-          // TODO
-          break
-        }
-
         // set default network of wallet
         case 'sodium_setDefaultNetwork': {
           const [defaultNetworkId] = request.params!
@@ -788,10 +759,14 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
           break
         }
 
-        case 'sodium_waitForTransaction': {
-          const [txHash, confirmations, timeout] = request.params!
-          const result = await signer.waitForTransaction(txHash, confirmations, timeout);
-          response.result = result;
+        case 'sodium_waitForUserOpHash': {
+          const [
+            userOpHash,
+            confirmations,
+            timeout,
+          ] = request.params!
+          const tr = await signer.waitForUserOpHash(userOpHash, confirmations, timeout, chainId);
+          response.result = tr;
           break
         }
 

@@ -1,6 +1,7 @@
 import { BigNumberish } from 'ethers'
 import { JsonRpcProvider } from '@ethersproject/providers'
 import { stringTemplate, validateAndSortNetworks } from './utils'
+import { SodiumContext } from './context'
 
 export enum ChainId {
   // Ethereum
@@ -50,6 +51,8 @@ export interface NetworkConfig {
   name: string
   nativeTokenSymbol: string
   chainId: number
+  context?: Partial<SodiumContext>
+  blockTime?: number
   subgraphHost?: string
   testnet?: boolean
   blockExplorer?: BlockExplorerConfig
@@ -66,7 +69,7 @@ export interface NetworkConfig {
   isAuthChain?: boolean
   // Disabled / deprecated chain
   disabled?: boolean
-  centerData?: {
+  centerData: {
     logoURI?: string;
     website?: string;
     description?: string;
@@ -93,6 +96,9 @@ export const networks: Record<ChainId, NetworkConfig> = {
     blockExplorer: {
       name: 'Etherscan',
       rootUrl: 'https://etherscan.io/'
+    },
+    centerData: {
+
     }
   },
   [ChainId.ROPSTEN]: {
@@ -104,6 +110,9 @@ export const networks: Record<ChainId, NetworkConfig> = {
     blockExplorer: {
       name: 'Etherscan (Ropsten)',
       rootUrl: 'https://ropsten.etherscan.io/'
+    },
+    centerData: {
+      
     }
   },
   [ChainId.RINKEBY]: {
@@ -116,7 +125,10 @@ export const networks: Record<ChainId, NetworkConfig> = {
       name: 'Etherscan (Rinkeby)',
       rootUrl: 'https://rinkeby.etherscan.io/'
     },
-    disabled: true
+    disabled: true,
+    centerData: {
+      
+    }
   },
   [ChainId.GOERLI]: {
     chainId: ChainId.GOERLI,
@@ -127,6 +139,9 @@ export const networks: Record<ChainId, NetworkConfig> = {
     blockExplorer: {
       name: 'Etherscan (Goerli)',
       rootUrl: 'https://goerli.etherscan.io/'
+    },
+    centerData: {
+      
     }
   },
   [ChainId.KOVAN]: {
@@ -138,6 +153,9 @@ export const networks: Record<ChainId, NetworkConfig> = {
     blockExplorer: {
       name: 'Etherscan (Kovan)',
       rootUrl: 'https://kovan.etherscan.io/'
+    },
+    centerData: {
+      
     }
   },
   [ChainId.POLYGON]: {
@@ -148,6 +166,9 @@ export const networks: Record<ChainId, NetworkConfig> = {
     blockExplorer: {
       name: 'Polygonscan',
       rootUrl: 'https://polygonscan.com/'
+    },
+    centerData: {
+      
     }
   },
   [ChainId.POLYGON_MUMBAI]: {
@@ -159,6 +180,9 @@ export const networks: Record<ChainId, NetworkConfig> = {
     blockExplorer: {
       name: 'Polygonscan (Mumbai)',
       rootUrl: 'https://mumbai.polygonscan.com/'
+    },
+    centerData: {
+      
     }
   },
   [ChainId.BSC]: {
@@ -169,6 +193,9 @@ export const networks: Record<ChainId, NetworkConfig> = {
     blockExplorer: {
       name: 'BSCScan',
       rootUrl: 'https://bscscan.com/'
+    },
+    centerData: {
+      
     }
   },
   [ChainId.BSC_TESTNET]: {
@@ -180,6 +207,9 @@ export const networks: Record<ChainId, NetworkConfig> = {
     blockExplorer: {
       name: 'BSCScan (Testnet)',
       rootUrl: 'https://testnet.bscscan.com/'
+    },
+    centerData: {
+      
     }
   },
   [ChainId.OPTIMISM]: {
@@ -190,6 +220,9 @@ export const networks: Record<ChainId, NetworkConfig> = {
     blockExplorer: {
       name: 'Etherscan (Optimism)',
       rootUrl: 'https://optimistic.etherscan.io/'
+    },
+    centerData: {
+      
     }
   },
   [ChainId.OPTIMISM_TESTNET]: {
@@ -201,6 +234,9 @@ export const networks: Record<ChainId, NetworkConfig> = {
     blockExplorer: {
       name: 'Etherscan (Optimism Testnet)',
       rootUrl: 'https://kovan-optimistic.etherscan.io/'
+    },
+    centerData: {
+      
     }
   },
   [ChainId.ARBITRUM]: {
@@ -211,6 +247,9 @@ export const networks: Record<ChainId, NetworkConfig> = {
     blockExplorer: {
       name: 'Arbiscan',
       rootUrl: 'https://arbiscan.io/'
+    },
+    centerData: {
+      
     }
   },
   [ChainId.ARBITRUM_TESTNET]: {
@@ -222,6 +261,9 @@ export const networks: Record<ChainId, NetworkConfig> = {
     blockExplorer: {
       name: 'Arbiscan (Testnet)',
       rootUrl: 'https://testnet.arbiscan.io/'
+    },
+    centerData: {
+      
     }
   },
   [ChainId.ARBITRUM_NOVA]: {
@@ -232,6 +274,9 @@ export const networks: Record<ChainId, NetworkConfig> = {
     blockExplorer: {
       name: 'Nova Explorer',
       rootUrl: 'https://nova-explorer.arbitrum.io/'
+    },
+    centerData: {
+      
     }
   },
   [ChainId.AVALANCHE]: {
@@ -242,6 +287,9 @@ export const networks: Record<ChainId, NetworkConfig> = {
     blockExplorer: {
       name: 'Snowtrace',
       rootUrl: 'https://snowtrace.io/'
+    },
+    centerData: {
+      
     }
   },
   [ChainId.AVALANCHE_TESTNET]: {
@@ -253,6 +301,9 @@ export const networks: Record<ChainId, NetworkConfig> = {
     blockExplorer: {
       name: 'Snowtrace (Testnet)',
       rootUrl: 'https://testnet.snowtrace.io/'
+    },
+    centerData: {
+      
     }
   },
   [ChainId.FANTOM]: {
@@ -263,6 +314,9 @@ export const networks: Record<ChainId, NetworkConfig> = {
     blockExplorer: {
       name: 'FTMScan',
       rootUrl: 'https://ftmscan.com/'
+    },
+    centerData: {
+      
     }
   },
   [ChainId.FANTOM_TESTNET]: {
@@ -274,6 +328,9 @@ export const networks: Record<ChainId, NetworkConfig> = {
     blockExplorer: {
       name: 'FTMScan (Testnet)',
       rootUrl: 'https://testnet.ftmscan.com/'
+    },
+    centerData: {
+      
     }
   },
   [ChainId.GNOSIS]: {
@@ -284,6 +341,9 @@ export const networks: Record<ChainId, NetworkConfig> = {
     blockExplorer: {
       name: 'Gnosis Chain Explorer',
       rootUrl: 'https://blockscout.com/xdai/mainnet/'
+    },
+    centerData: {
+      
     }
   },
   [ChainId.AURORA]: {
@@ -294,6 +354,9 @@ export const networks: Record<ChainId, NetworkConfig> = {
     blockExplorer: {
       name: 'Aurora Explorer',
       rootUrl: 'https://aurorascan.dev/'
+    },
+    centerData: {
+      
     }
   },
   [ChainId.AURORA_TESTNET]: {
@@ -304,6 +367,9 @@ export const networks: Record<ChainId, NetworkConfig> = {
     blockExplorer: {
       name: 'Aurora Explorer (Testnet)',
       rootUrl: 'https://testnet.aurorascan.dev/'
+    },
+    centerData: {
+      
     }
   }
 }

@@ -90,6 +90,9 @@ export async function toSodiumTransaction(
   if (isSodiumTransaction(tx)) {
     return tx as Transaction
   }
+
+  console.debug("toSodiumTransaction", tx);
+
   const txGas = tx.gasLimit === undefined ? (<any>tx).gas : tx.gasLimit;
   if (!tx.to) {
     throw new Error("tx to invalid");

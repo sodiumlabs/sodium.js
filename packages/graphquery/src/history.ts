@@ -78,25 +78,25 @@ export const getHistories = async (
   provider: Provider,
   tokenAddress?: string
 ): Promise<TransactionHistory[]> => {
-  const client = new GraphQLClient(`${subgraphHost}/subgraphs/name/alberthuang24/sodium${chainId}erc20transfer`)
+  // const client = new GraphQLClient(`${subgraphHost}/subgraphs/name/alberthuang24/sodium${chainId}erc20transfer`)
   let result: {
     transfers: TransferEvent[],
     receives: TransferEvent[]
   };
-  if (tokenAddress) {
-    result = await client.request(tokenDocument, {
-      accountId: account.toLowerCase(),
-      first: first,
-      skip,
-      tokenAddress,
-    })
-  } else {
-    result = await client.request(allDocument, {
-      accountId: account.toLowerCase(),
-      first: first,
-      skip,
-    })
-  }
+  // if (tokenAddress) {
+  //   result = await client.request(tokenDocument, {
+  //     accountId: account.toLowerCase(),
+  //     first: first,
+  //     skip,
+  //     tokenAddress,
+  //   })
+  // } else {
+  //   result = await client.request(allDocument, {
+  //     accountId: account.toLowerCase(),
+  //     first: first,
+  //     skip,
+  //   })
+  // }
 
   const mapx: {
     [key: string]: Promise<TransactionHistory>
@@ -134,17 +134,17 @@ export const getHistories = async (
     }
   }
 
-  result.transfers.forEach(a => {
-    if (!mapx[a.blockNumber]) {
-      mapx[a.blockNumber] = convertTransferEvent2TransactionHistory(a, "sent")
-    }
-  });
+  // result.transfers.forEach(a => {
+  //   if (!mapx[a.blockNumber]) {
+  //     mapx[a.blockNumber] = convertTransferEvent2TransactionHistory(a, "sent")
+  //   }
+  // });
 
-  result.receives.forEach(a => {
-    if (!mapx[a.blockNumber]) {
-      mapx[a.blockNumber] = convertTransferEvent2TransactionHistory(a, "received");
-    }
-  });
+  // result.receives.forEach(a => {
+  //   if (!mapx[a.blockNumber]) {
+  //     mapx[a.blockNumber] = convertTransferEvent2TransactionHistory(a, "received");
+  //   }
+  // });
 
   const histories = await Promise.all(Object.values(mapx));
   // order by block number desc

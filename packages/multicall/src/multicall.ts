@@ -3,7 +3,7 @@ import { walletContracts } from '@0xsodium/abi'
 import { JsonRpcMethod } from './constants'
 import { BlockTag, eqBlockTag, parseBlockTag, partition, safeSolve } from './utils'
 import { promisify, getRandomInt } from '@0xsodium/utils'
-import { JsonRpcVersion, JsonRpcRequest, JsonRpcResponseCallback, JsonRpcHandlerFunc, sodiumContext } from "@0xsodium/network"
+import { JsonRpcVersion, JsonRpcRequest, JsonRpcResponseCallback, JsonRpcHandlerFunc } from "@0xsodium/network"
 
 export type MulticallOptions = {
   // number of calls to enqueue before calling.
@@ -31,12 +31,13 @@ type QueueEntry = {
 const DefaultMulticallOptions = {
   batchSize: 50,
   timeWindow: 50,
-  contract: sodiumContext.modules.multicall,
+  // TODO
+  contract: "",
   verbose: false
 }
 
 export class Multicall {
-  public static DefaultOptions = { ... DefaultMulticallOptions }
+  public static DefaultOptions = { ...DefaultMulticallOptions }
 
   readonly batchableJsonRpcMethods = [
     JsonRpcMethod.ethCall,
@@ -129,7 +130,7 @@ export class Multicall {
               item.request.params![0].gasPrice ||
               item.request.params![0].value
             ) {
-              return false  
+              return false
             }
           case JsonRpcMethod.ethGetBalance:
           case JsonRpcMethod.ethGetCode:
@@ -190,11 +191,11 @@ export class Multicall {
             }
           default:
             return null
-          }
-        } catch {
-          return null
         }
+      } catch {
+        return null
       }
+    }
     )
 
     // Filter calls with enconding errors and forward items
@@ -234,7 +235,7 @@ export class Multicall {
           value: 0,
           data: encodedCall!
         }, BigNumber.isBigNumber(blockTag) ? blockTag.toNumber() : blockTag]
-      // @ts-ignore
+        // @ts-ignore
       }), (e) => ({
         jsonrpc: JsonRpcVersion!,
         id: reqId!,
@@ -242,7 +243,7 @@ export class Multicall {
         error: e!
       })
     )
-    
+
     // Error calling multicall
     // Forward all calls to middleware
     // @ts-ignore

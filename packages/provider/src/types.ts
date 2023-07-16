@@ -1,4 +1,4 @@
-import { NetworkConfig, WalletContext, JsonRpcRequest, JsonRpcResponse, JsonRpcHandler } from '@0xsodium/network';
+import { NetworkConfig, SodiumContext, JsonRpcRequest, JsonRpcResponse, JsonRpcHandler } from '@0xsodium/network';
 import { TypedData } from '@0xsodium/utils';
 export * from '@0xsodium/graphquery';
 
@@ -118,7 +118,7 @@ export interface WalletEventTypes {
   chainChanged: (chainIdHex: string) => void
 
   networks: (networks: NetworkConfig[]) => void
-  walletContext: (walletContext: WalletContext) => void
+  walletContext: (walletContext: SodiumContext) => void
 }
 
 export interface ProviderEventTypes extends WalletEventTypes {
@@ -278,7 +278,7 @@ export interface ETHAuthProof {
 
 export interface WalletSession {
   // Wallet context
-  walletContext?: WalletContext
+  walletContext?: SodiumContext
 
   // Account address of the wallet
   accountAddress?: string

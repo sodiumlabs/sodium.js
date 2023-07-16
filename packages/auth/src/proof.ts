@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import { Proof, ValidatorFunc, IsValidSignatureBytes32MagicValue } from '@0xsequence/ethauth'
-import { sodiumContext, WalletContext } from '@0xsodium/network'
+import { SodiumContext, createContext } from '@0xsodium/network'
 import { isValidSodiumUndeployedWalletSignature } from '@0xsodium/wallet'
 
 export const ValidateSodiumDeployedWalletProof: ValidatorFunc = async (provider: ethers.providers.JsonRpcProvider, chainId: number, proof: Proof): Promise<{ isValid: boolean, address?: string }> => {
@@ -32,7 +32,7 @@ export const ValidateSodiumDeployedWalletProof: ValidatorFunc = async (provider:
   }
 }
 
-export const ValidateSodiumUndeployedWalletProof = (context?: WalletContext): ValidatorFunc => {
+export const ValidateSodiumUndeployedWalletProof = (context?: SodiumContext): ValidatorFunc => {
   return async (
     provider: ethers.providers.JsonRpcProvider,
     chainId: number,
@@ -56,7 +56,7 @@ export const ValidateSodiumUndeployedWalletProof = (context?: WalletContext): Va
       proof.address,
       digest,
       proof.signature,
-      context ? context : sodiumContext,
+      createContext(context),
       provider,
       chainId
     )

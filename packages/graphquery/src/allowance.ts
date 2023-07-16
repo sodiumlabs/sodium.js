@@ -26,6 +26,8 @@ export const getTokenAllowances = async (
   skip: number = 0,
   provider: Provider
 ): Promise<Allowance[]> => {
+  // TODO
+  return [];
   const client = new GraphQLClient(`${subgraphHost}/subgraphs/name/alberthuang24/sodium${chainId}erc20approve`)
   const result = await client.request<{
     tokenApprovals: {

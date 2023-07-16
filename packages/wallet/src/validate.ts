@@ -1,16 +1,15 @@
 import { ethers, providers } from 'ethers'
-import { WalletContext } from '@0xsodium/network'
+import { SodiumContext } from '@0xsodium/network'
 import { walletContracts } from '@0xsodium/abi'
 import { packMessageData } from '@0xsodium/utils'
-import { isDecodedEOASigner, isDecodedFullSigner, decodeSignature, compareAddr, addressOfSalt } from '@0xsodium/config'
-// import { recoverConfigFromDigest } from './config'
+import { isDecodedEOASigner, isDecodedFullSigner, decodeSignature, compareAddr } from '@0xsodium/config'
 
 export async function isValidSignature(
   address: string,
   digest: Uint8Array,
   sig: string,
   provider?: providers.Provider,
-  walletContext?: WalletContext,
+  walletContext?: SodiumContext,
   chainId?: number
 ) {
   // Check if valid EOA signature
@@ -101,15 +100,12 @@ export async function isValidSodiumUndeployedWalletSignature(
   address: string,
   digest: Uint8Array,
   sig: string,
-  walletContext?: WalletContext,
+  walletContext?: SodiumContext,
   provider?: providers.Provider,
   chainId?: number
 ) {
   if (!provider && !chainId) return undefined // Signature validity can't be determined
   if (!walletContext) return undefined // Signature validity can't be determined
-  // latest 66 bytes of signature is the salt
-  const salt = sig.slice(-66)
-  addressOfSalt(salt, walletContext)
   // TODO
   // Check mpc signature
   return false;
