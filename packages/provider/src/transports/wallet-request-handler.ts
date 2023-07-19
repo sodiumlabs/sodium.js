@@ -247,7 +247,6 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
     try {
       // only allow public json rpc method to the provider when user is not logged in, aka signer is not set
       if ((!this.signer || this.signer === null) && !permittedJsonRpcMethods.includes(request.method)) {
-        // throw new Error(`not logged in. ${request.method} is unavailable`)
         throw ErrSignedInRequired
       }
 
