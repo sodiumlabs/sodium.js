@@ -144,6 +144,7 @@ export class IframeMessageProvider extends BaseProviderTransport {
     iframe.style.display = 'block';
     iframe.style.zIndex = '10000';
     iframe.title = 'sodium.app';
+    iframe.style.borderRadius = '15px';
     this.iframe = iframe;
     this.setIframeSizeAndPosition();
     document.body.appendChild(iframe);
