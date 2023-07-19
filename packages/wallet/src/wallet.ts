@@ -31,6 +31,7 @@ import { resolveArrayProperties } from './utils';
 import { Signer } from './signer';
 import {
   CompatibilityFallbackHandler__factory,
+  EntryPoint__factory,
   Sodium__factory
 } from '@0xsodium/wallet-contracts';
 import { AbiCoder, defaultAbiCoder } from '@ethersproject/abi';
@@ -368,6 +369,20 @@ export class Wallet extends Signer {
         return this.waitForUserOpHash(response.userOpHash, confirmations, 0, chainId);
       }
     } as TransactionResponse;
+  }
+
+  async simulateHandleOp(userOp: IUserOperation, target: string, data: string): Promise<boolean> {
+    const entryPointAddress = await this.getEntrypointAddress();
+    const entryPoint = EntryPoint__factory.connect(entryPointAddress, this.provider);
+    try {
+      await entryPoint.callStatic.simulateHandleOp(userOp, target, data);
+    } catch (e) {
+      if (e.errorName != "ExecutionResult") {
+        throw e;
+      }
+      return e.errorArgs[4];
+    }
+    return false;
   }
 
   async sendUserOperationRaw(

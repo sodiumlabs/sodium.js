@@ -198,6 +198,11 @@ export class Account extends Signer {
     return wallet.sendUserOperationRaw(userOp, chainId);
   }
 
+  async simulateHandleOp(userOp: IUserOperation, target: string, data: string, chainId?: ChainIdLike): Promise<boolean> {
+    const wallet = chainId ? this.getWalletByNetwork(chainId).wallet : this.mainWallet().wallet
+    return wallet.simulateHandleOp(userOp, target, data);
+  }
+
   waitForUserOpHash(
     userOpHash: string,
     confirmations?: number | undefined,

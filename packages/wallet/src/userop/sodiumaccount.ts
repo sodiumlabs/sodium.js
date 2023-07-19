@@ -41,6 +41,17 @@ const estimateCreationGas = async (
     });
 };
 
+// export const simulateHandleOp = (provider: ethers.providers.JsonRpcProvider): UserOperationMiddlewareFn => async (ctx) => {
+//     const entryPoint = EntryPoint__factory.connect(ctx.entryPoint, provider);
+//     try {
+//         await entryPoint.callStatic.simulateHandleOp(ctx.op, ethers.constants.AddressZero, "0x");
+//     } catch (error) {
+//         if (error.errorName != "ExecutionResult") {
+//             throw error;
+//         }
+//     }
+// };
+
 // const txs = await toSodiumTransactions(flattenAuxTransactions(transactions));
 export const estimateUserOperationGas =
     (provider: ethers.providers.JsonRpcProvider): UserOperationMiddlewareFn =>
@@ -51,21 +62,30 @@ export const estimateUserOperationGas =
                 ).add(await estimateCreationGas(provider, ctx.op.initCode));
             }
 
+            if (ethers.BigNumber.from(ctx.chainId).eq(31337)) {
+                const callDataLimit = await provider.estimateGas({
+                    from: ctx.entryPoint,
+                    to: ctx.op.sender,
+                    data: ctx.op.callData,
+                });
+
+                ctx.op.preVerificationGas = ethers.BigNumber.from(60000).add(3000);
+                ctx.op.verificationGasLimit = ethers.BigNumber.from(ctx.op.verificationGasLimit).add(30000);
+                ctx.op.callGasLimit = ethers.BigNumber.from(callDataLimit).add(100000);
+                return;
+            }
+
             const est = (await provider.send("eth_estimateUserOperationGas", [
                 Utils.OpToJSON(ctx.op),
                 ctx.entryPoint,
             ])) as GasEstimate;
 
-            // if (ctx.op.paymasterAndData.length > 2) {
-            //     ctx.op.preVerificationGas = ethers.BigNumber.from(est.preVerificationGas).mul(3);
-            //     ctx.op.verificationGasLimit = ethers.BigNumber.from(est.verificationGas).mul(3);
-            // } else {
-                ctx.op.preVerificationGas = ethers.BigNumber.from(est.preVerificationGas).add(3000);
-                ctx.op.verificationGasLimit = ethers.BigNumber.from(est.verificationGas).add(3000);
-            // }
-
-            ctx.op.callGasLimit = ethers.BigNumber.from(est.callGasLimit).add(100000);
+            ctx.op.preVerificationGas = ethers.BigNumber.from(est.preVerificationGas).add(3000);
+            ctx.op.verificationGasLimit = ethers.BigNumber.from(est.verificationGas).add(3000);
+            ctx.op.callGasLimit = ethers.BigNumber.from(est.callGasLimit);
         };
+
+
 
 export async function getWalletInitCode(
     sodiumContext: SodiumContext,
@@ -286,6 +306,7 @@ export class SodiumUserOpBuilder extends UserOperationBuilder {
             .useMiddleware(EOACallData(instance, signer))
             .useMiddleware(instance.paymasterMiddleware())
             .useMiddleware(estimateUserOperationGas(instance.provider))
+            // .useMiddleware(simulateHandleOp(provider))
         // return base.useMiddleware(Presets.Middleware.EOASignature(instance.signer));
     }
 
@@ -358,6 +379,7 @@ export class SodiumUserOpBuilder extends UserOperationBuilder {
             .useMiddleware(SodiumCallData(instance, signer))
             .useMiddleware(instance.paymasterMiddleware())
             .useMiddleware(estimateUserOperationGas(instance.provider))
+            // .useMiddleware(simulateHandleOp(provider))
         // return base.useMiddleware(Presets.Middleware.EOASignature(instance.signer));
     }
 
@@ -366,12 +388,6 @@ export class SodiumUserOpBuilder extends UserOperationBuilder {
         this.txns = sodiumTxAbiEncode(txs);
         if (paymasterId) {
             this.paymasterId = paymasterId;
-            // this.setVerificationGasLimit(
-            //     200000 * 100
-            // );
-            // this.setPreVerificationGas(
-            //     21000 * 100
-            // );
         }
     }
 

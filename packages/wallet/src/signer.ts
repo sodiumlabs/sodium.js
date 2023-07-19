@@ -11,7 +11,7 @@ import { JsonRpcProvider, TransactionResponse, TransactionReceipt, BlockTag } fr
 import { BytesLike } from '@ethersproject/bytes';
 import { WalletConfig, WalletState } from '@0xsodium/config';
 import { Deferrable } from '@0xsodium/utils';
-import { IUserOperation, IUserOperationBuilder } from 'userop';
+import { IUserOperation } from 'userop';
 import { SodiumUserOpBuilder } from './userop';
 
 export abstract class Signer extends AbstractSigner {
@@ -51,6 +51,9 @@ export abstract class Signer extends AbstractSigner {
     chainId?: ChainIdLike,
     paymasterId?: string
   ): Promise<TransactionResponse>
+
+  // opInfo.preOpGas, paid, data.validAfter, data.validUntil, targetSuccess, targetResult
+  abstract simulateHandleOp(userOp: IUserOperation, target: string, data: string, chainId?: ChainIdLike): Promise<boolean>
 
   abstract sendUserOperationRaw(
     userOp: IUserOperation,

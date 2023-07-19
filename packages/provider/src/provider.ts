@@ -171,6 +171,10 @@ export class Web3Signer extends Signer implements TypedDataSigner {
     )
   }
 
+  async simulateHandleOp(userOp: any, target: string, data: string, chainId?: ChainIdLike): Promise<boolean> {
+    throw new Error('Method not implemented.')
+  }
+
   getWalletUpgradeTransactions(chainId?: ChainIdLike | undefined): Promise<Transaction[]> {
     throw new Error('Method not implemented.')
   }
