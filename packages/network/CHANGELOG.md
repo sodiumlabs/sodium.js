@@ -1,5 +1,16 @@
 # @0xsodium/network
 
+## 1.26.0
+
+### Minor Changes
+
+- fix: userOp emulate
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/utils@1.26.0
+
 ## 1.25.0
 
 ### Minor Changes

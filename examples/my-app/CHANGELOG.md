@@ -1,5 +1,16 @@
 # my-app
 
+## 1.25.0
+
+### Minor Changes
+
+- fix: userOp emulate
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.26.0
+
 ## 1.24.0
 
 ### Minor Changes
