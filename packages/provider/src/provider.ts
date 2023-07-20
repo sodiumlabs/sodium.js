@@ -1,4 +1,4 @@
-import { BigNumber, ethers, FixedNumber } from 'ethers';
+import { ethers } from 'ethers';
 import { BytesLike, Bytes } from '@ethersproject/bytes';
 import { Web3Provider as EthersWeb3Provider, JsonRpcProvider } from '@ethersproject/providers';
 import { TypedDataDomain, TypedDataField, TypedDataSigner } from '@ethersproject/abstract-signer';
@@ -12,8 +12,9 @@ import {
   JsonRpcResponseCallback,
   maybeChainId,
   JsonRpcSender,
+  createContext,
 } from '@0xsodium/network';
-import { resolveArrayProperties, Signer } from '@0xsodium/wallet';
+import { resolveArrayProperties, Signer, Client } from '@0xsodium/wallet';
 import { WalletConfig, WalletState } from '@0xsodium/config';
 import {
   Deferrable,
@@ -26,7 +27,6 @@ import {
   TransactionRequest,
   TransactionResponse,
   SignedTransaction,
-  GasSuggest,
   Transaction
 } from '@0xsodium/transactions';
 import { WalletRequestHandler } from './transports/wallet-request-handler';
@@ -154,21 +154,32 @@ export class Web3Signer extends Signer implements TypedDataSigner {
     throw new Error('Method not implemented.')
   }
 
-  waitForUserOpHash(
+  async waitForUserOpHash(
     userOpHash: string,
     confirmations?: number | undefined,
     timeout?: number | undefined,
-    chainId?: ChainIdLike | undefined
+    chainIdLike?: ChainIdLike | undefined
   ): Promise<ethers.providers.TransactionReceipt> {
-    return this.provider.send(
-      'sodium_waitForUserOpHash',
-      [
-        userOpHash,
-        confirmations,
-        timeout,
-      ],
-      maybeChainId(chainId) || this.defaultChainId
-    )
+    const chainId = maybeChainId(chainIdLike) || this.defaultChainId;
+    const networks = await this.getNetworks();
+    const network = networks.find(n => n.chainId === chainId);
+
+    if (!network) {
+      throw new Error(`chainId ${chainId} not found in networks`)
+    }
+
+    const ctx = createContext(network?.context);
+    const client = await Client.init(
+      network.bundlerUrl!,
+      network.rpcUrl!,
+      ctx.entryPointAddress,
+    );
+
+    return client.waitUserOp(
+      userOpHash,
+      confirmations,
+      timeout,
+    );
   }
 
   async simulateHandleOp(userOp: any, target: string, data: string, chainId?: ChainIdLike): Promise<boolean> {
@@ -321,32 +332,6 @@ export class Web3Signer extends Signer implements TypedDataSigner {
     chainId?: ChainIdLike,
   ): Promise<TransactionResponse> {
     throw new Error('Method not implemented.')
-  }
-
-  async getGasSuggest(): Promise<GasSuggest> {
-    const feeData = await this.provider.getFeeData();
-    const m = (v: BigNumber | null, mul: number, d: BigNumber): BigNumber => {
-      if (v == null) {
-        return d;
-      }
-      const r = FixedNumber.from(v.toString()).mulUnsafe(FixedNumber.fromString(`${mul}`)).round().toString();
-      const rv = r.split(".")[0];
-      return BigNumber.from(rv);
-    }
-    return {
-      standard: {
-        maxPriorityFeePerGas: m(feeData.maxPriorityFeePerGas, 1, BigNumber.from("1500000000")),
-        maxFeePerGas: m(feeData.maxPriorityFeePerGas, 1, BigNumber.from("1500000000").mul(2))
-      },
-      fast: {
-        maxPriorityFeePerGas: m(feeData.maxPriorityFeePerGas, 1.5, BigNumber.from("1500000000")),
-        maxFeePerGas: m(feeData.maxPriorityFeePerGas, 1.5, BigNumber.from("1500000000").mul(2))
-      },
-      rapid: {
-        maxPriorityFeePerGas: m(feeData.maxPriorityFeePerGas, 2, BigNumber.from("1500000000")),
-        maxFeePerGas: m(feeData.maxPriorityFeePerGas, 2, BigNumber.from("1500000000").mul(2))
-      }
-    }
   }
 
   // async

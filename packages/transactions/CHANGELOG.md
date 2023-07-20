@@ -1,5 +1,18 @@
 # @0xsodium/transactions
 
+## 1.23.0
+
+### Minor Changes
+
+- fix wait user op
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.23.0
+  - @0xsodium/network@1.23.0
+  - @0xsodium/utils@1.23.0
+
 ## 1.22.0
 
 ### Minor Changes

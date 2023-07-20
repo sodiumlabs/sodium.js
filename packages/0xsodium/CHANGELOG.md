@@ -1,5 +1,24 @@
 # 0xsodium
 
+## 1.22.0
+
+### Minor Changes
+
+- fix wait user op
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.23.0
+  - @0xsodium/abi@1.23.0
+  - @0xsodium/auth@1.23.0
+  - @0xsodium/config@1.23.0
+  - @0xsodium/multicall@1.23.0
+  - @0xsodium/network@1.23.0
+  - @0xsodium/transactions@1.23.0
+  - @0xsodium/utils@1.23.0
+  - @0xsodium/wallet@1.23.0
+
 ## 1.21.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # @0xsodium/abi
 
+## 1.23.0
+
+### Minor Changes
+
+- fix wait user op
+
 ## 1.22.0
 
 ### Minor Changes

@@ -1,5 +1,16 @@
 # my-app
 
+## 1.22.0
+
+### Minor Changes
+
+- fix wait user op
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.23.0
+
 ## 1.21.0
 
 ### Minor Changes
