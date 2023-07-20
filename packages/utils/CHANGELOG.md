@@ -1,5 +1,11 @@
 # @0xsodium/utils
 
+## 1.24.0
+
+### Minor Changes
+
+- fix open wallet
+
 ## 1.23.0
 
 ### Minor Changes

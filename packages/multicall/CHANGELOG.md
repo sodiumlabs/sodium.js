@@ -1,5 +1,18 @@
 # @0xsodium/multicall
 
+## 1.24.0
+
+### Minor Changes
+
+- fix open wallet
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.24.0
+  - @0xsodium/network@1.24.0
+  - @0xsodium/utils@1.24.0
+
 ## 1.23.0
 
 ### Minor Changes

@@ -85,10 +85,15 @@ export class IframeMessageProvider extends BaseProviderTransport {
     const windowSize = this.getWindowSize();
     const sessionId = `${performance.now()}`
     if (this.iframe) {
-      this.iframe.style.display = 'block';
+      // 延迟显示，防止闪烁
+      setTimeout(() => {
+        if (this.iframe && this.state == OpenState.OPENED) {
+          this.iframe.style.display = 'block';
+        }
+      }, 200);
       this.setIframeSizeAndPosition();
       this.iframe.focus()
-      this.state = OpenState.OPENING;
+      this.state = OpenState.OPENED;
       this.sendMessage({
         idx: -1, type: EventType.OPEN, data: {
           path, intent, networkId, sessionId
