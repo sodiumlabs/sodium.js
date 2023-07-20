@@ -133,8 +133,8 @@ export const SodiumCallData = (
                 ctx.op.callData = sodiumInterface.encodeFunctionData("execute", [
                     txns,
                 ])
+                return;
             }
-            return;
         }
         ctx.op.callData = sodiumInterface.encodeFunctionData("executeWithSodiumAuthSession", [
             sessionProof.struct,

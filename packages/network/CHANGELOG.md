@@ -1,5 +1,16 @@
 # @0xsodium/network
 
+## 1.25.0
+
+### Minor Changes
+
+- fix sodium auth calldata
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/utils@1.25.0
+
 ## 1.24.0
 
 ### Minor Changes

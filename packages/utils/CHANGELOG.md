@@ -1,5 +1,11 @@
 # @0xsodium/utils
 
+## 1.25.0
+
+### Minor Changes
+
+- fix sodium auth calldata
+
 ## 1.24.0
 
 ### Minor Changes
