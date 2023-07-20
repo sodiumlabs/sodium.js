@@ -1,5 +1,18 @@
 # @0xsodium/transactions
 
+## 1.22.0
+
+### Minor Changes
+
+- fix 4337 bugs
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.22.0
+  - @0xsodium/network@1.22.0
+  - @0xsodium/utils@1.22.0
+
 ## 1.21.0
 
 ### Minor Changes

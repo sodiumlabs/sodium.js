@@ -1,5 +1,11 @@
 # @0xsodium/utils
 
+## 1.22.0
+
+### Minor Changes
+
+- fix 4337 bugs
+
 ## 1.21.0
 
 ### Minor Changes
