@@ -159,6 +159,9 @@ export class IframeMessageProvider extends BaseProviderTransport {
     this.close()
     if (this.iframe) {
       this.iframe.style.display = 'none';
+      this.sendMessage({
+        idx: -1, type: EventType.CLOSE, data: null
+      })
     }
   }
 
