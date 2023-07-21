@@ -85,8 +85,6 @@ export class Client implements IClient {
       );
       if (events.length > 0) {
         const ev = events[0];
-
-        console.log(`User operation ${userOpHash} ${ev.args.success ? "succeeded" : "failed"}`)
         if (!ev.args.success) {
           const revertEvents = await this.entryPoint.queryFilter(
             this.entryPoint.filters.UserOperationRevertReason(userOpHash),

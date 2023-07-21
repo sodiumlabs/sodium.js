@@ -84,8 +84,6 @@ export const estimateUserOperationGas =
             ctx.op.callGasLimit = ethers.BigNumber.from(est.callGasLimit);
         };
 
-
-
 export async function getWalletInitCode(
     sodiumContext: SodiumContext,
     accountSlat: string,
@@ -305,7 +303,7 @@ export class SodiumUserOpBuilder extends UserOperationBuilder {
             .useMiddleware(EOACallData(instance, signer))
             .useMiddleware(instance.paymasterMiddleware())
             .useMiddleware(estimateUserOperationGas(instance.provider))
-            // .useMiddleware(simulateHandleOp(provider))
+        // .useMiddleware(simulateHandleOp(provider))
         // return base.useMiddleware(Presets.Middleware.EOASignature(instance.signer));
     }
 
@@ -378,7 +376,7 @@ export class SodiumUserOpBuilder extends UserOperationBuilder {
             .useMiddleware(SodiumCallData(instance, signer))
             .useMiddleware(instance.paymasterMiddleware())
             .useMiddleware(estimateUserOperationGas(instance.provider))
-            // .useMiddleware(simulateHandleOp(provider))
+        // .useMiddleware(simulateHandleOp(provider))
         // return base.useMiddleware(Presets.Middleware.EOASignature(instance.signer));
     }
 
@@ -397,9 +395,6 @@ export class SodiumUserOpBuilder extends UserOperationBuilder {
 
     public async signUserOp(userOp: IUserOperation): Promise<IUserOperation> {
         const signMiddleware = Presets.Middleware.EOASignature(this.signer);
-
-        console.log("signing user op", userOp, this.entryPoint.address, this.chainId)
-
         const ctx = new UserOperationMiddlewareCtx(
             userOp,
             this.entryPoint.address,
