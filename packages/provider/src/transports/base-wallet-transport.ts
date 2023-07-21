@@ -408,11 +408,12 @@ export abstract class BaseWalletTransport implements WalletTransport {
 
         try {
           const connectDetails = await this.walletRequestHandler.promptConnect(intent.options)
-          if (connectDetails.connected) {
-            this.walletRequestHandler.notifyConnect(connectDetails)
-          }
+          this.walletRequestHandler.notifyConnect(connectDetails);
         } catch (err) {
-          logger.warn('promptConnect not connected:', err)
+          this.walletRequestHandler.notifyConnect({
+            connected: false,
+            error: err.message
+          });
         } finally {
           // auto-close by default, unless intent is to keep open
           if (!intent.options || intent.options.keepWalletOpened !== true) {

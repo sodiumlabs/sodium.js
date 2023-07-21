@@ -1,5 +1,43 @@
 # 0xsodium
 
+## 1.29.0
+
+### Minor Changes
+
+- fix: notify connect failed
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.30.0
+  - @0xsodium/auth@1.30.0
+  - @0xsodium/config@1.30.0
+  - @0xsodium/multicall@1.30.0
+  - @0xsodium/network@1.30.0
+  - @0xsodium/provider@1.30.0
+  - @0xsodium/transactions@1.30.0
+  - @0xsodium/utils@1.30.0
+  - @0xsodium/wallet@1.30.0
+
+## 1.28.0
+
+### Minor Changes
+
+- show connect error
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.29.0
+  - @0xsodium/abi@1.29.0
+  - @0xsodium/auth@1.29.0
+  - @0xsodium/config@1.29.0
+  - @0xsodium/multicall@1.29.0
+  - @0xsodium/network@1.29.0
+  - @0xsodium/transactions@1.29.0
+  - @0xsodium/utils@1.29.0
+  - @0xsodium/wallet@1.29.0
+
 ## 1.27.0
 
 ### Minor Changes

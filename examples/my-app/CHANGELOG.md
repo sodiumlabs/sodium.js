@@ -1,5 +1,27 @@
 # my-app
 
+## 1.29.0
+
+### Minor Changes
+
+- fix: notify connect failed
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.30.0
+
+## 1.28.0
+
+### Minor Changes
+
+- show connect error
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.29.0
+
 ## 1.27.0
 
 ### Minor Changes

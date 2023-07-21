@@ -1,6 +1,6 @@
 {
   "name": "@0xsodium/abi",
-  "version": "1.28.0",
+  "version": "1.30.0",
   "description": "abi sub-package for Sequence",
   "repository": "https://github.com/sodiumlabs/sodium.js/tree/main/packages/abi",
   "source": "src/index.ts",

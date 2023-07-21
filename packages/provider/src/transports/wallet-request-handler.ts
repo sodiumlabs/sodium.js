@@ -200,8 +200,8 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
       // if prompter is null, we'll auto connect
       return this.connect(options)
     }
-    const promptConnectDetails = await this.prompter.promptConnect(options || this._connectOptions).catch(_ => {
-      return { connected: false } as ConnectDetails
+    const promptConnectDetails = await this.prompter.promptConnect(options || this._connectOptions).catch(error => {
+      return { connected: false, error: error.message } as ConnectDetails
     })
     const connectDetails: ConnectDetails = promptConnectDetails
     if (connectDetails.connected && !connectDetails.session) {

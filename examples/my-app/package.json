@@ -1,6 +1,6 @@
 {
   "name": "my-app",
-  "version": "1.27.0",
+  "version": "1.29.0",
   "main": "index.js",
   "scripts": {
     "start": "expo start",
@@ -9,7 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@0xsodium/provider": "^1.28.0",
+    "@0xsodium/provider": "^1.30.0",
     "@ethersproject/shims": "^5.7.0",
     "@react-native-async-storage/async-storage": "^1.17.11",
     "expo": "~47.0.12",

@@ -1,5 +1,17 @@
 # @0xsodium/graphquery
 
+## 1.30.0
+
+### Minor Changes
+
+- fix: notify connect failed
+
+## 1.29.0
+
+### Minor Changes
+
+- show connect error
+
 ## 1.28.0
 
 ### Minor Changes
