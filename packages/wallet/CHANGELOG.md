@@ -1,5 +1,20 @@
 # @0xsodium/wallet
 
+## 1.27.0
+
+### Minor Changes
+
+- emit wallet close
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.27.0
+  - @0xsodium/config@1.27.0
+  - @0xsodium/network@1.27.0
+  - @0xsodium/transactions@1.27.0
+  - @0xsodium/utils@1.27.0
+
 ## 1.26.0
 
 ### Minor Changes

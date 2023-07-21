@@ -296,8 +296,8 @@ export class Wallet implements WalletProvider {
     }
 
     await this.openWallet(undefined, { type: 'connect', options })
-    const connectDetails = await this.transport.messageProvider!.waitUntilConnected().catch(_ => {
-      return { connected: false } as ConnectDetails
+    const connectDetails = await this.transport.messageProvider!.waitUntilConnected().catch(e => {
+      return { connected: false, error: e.message } as ConnectDetails
     })
 
     if (connectDetails.connected) {

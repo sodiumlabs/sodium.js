@@ -1,5 +1,16 @@
 # my-app
 
+## 1.26.0
+
+### Minor Changes
+
+- emit wallet close
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.27.0
+
 ## 1.25.0
 
 ### Minor Changes
