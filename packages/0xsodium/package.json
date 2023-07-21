@@ -1,6 +1,6 @@
 {
   "name": "0xsodium",
-  "version": "1.26.0",
+  "version": "1.27.0",
   "description": "Sodium: simple & powerful Ethereum development library and Web-based smart wallet",
   "repository": "https://github.com/sodiumlabs/sodium.js",
   "source": "src/index.ts",
@@ -26,16 +26,16 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@0xsodium/abi": "^1.27.0",
-    "@0xsodium/auth": "^1.27.0",
-    "@0xsodium/config": "^1.27.0",
+    "@0xsodium/abi": "^1.28.0",
+    "@0xsodium/auth": "^1.28.0",
+    "@0xsodium/config": "^1.28.0",
     "@0xsodium/guard": "^1.17.0",
-    "@0xsodium/multicall": "^1.27.0",
-    "@0xsodium/network": "^1.27.0",
-    "@0xsodium/provider": "^1.27.0",
-    "@0xsodium/transactions": "^1.27.0",
-    "@0xsodium/utils": "^1.27.0",
-    "@0xsodium/wallet": "^1.27.0",
+    "@0xsodium/multicall": "^1.28.0",
+    "@0xsodium/network": "^1.28.0",
+    "@0xsodium/provider": "^1.28.0",
+    "@0xsodium/transactions": "^1.28.0",
+    "@0xsodium/utils": "^1.28.0",
+    "@0xsodium/wallet": "^1.28.0",
     "ethers": "^5.7.0"
   },
   "devDependencies": {

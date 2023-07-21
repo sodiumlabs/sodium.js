@@ -1,5 +1,11 @@
 # @0xsodium/graphquery
 
+## 1.28.0
+
+### Minor Changes
+
+- chore: add error message when connect catch
+
 ## 1.27.0
 
 ### Minor Changes

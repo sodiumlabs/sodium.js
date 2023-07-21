@@ -1,5 +1,16 @@
 # @0xsodium/network
 
+## 1.28.0
+
+### Minor Changes
+
+- chore: add error message when connect catch
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/utils@1.28.0
+
 ## 1.27.0
 
 ### Minor Changes

@@ -1,5 +1,16 @@
 # my-app
 
+## 1.27.0
+
+### Minor Changes
+
+- chore: add error message when connect catch
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.28.0
+
 ## 1.26.0
 
 ### Minor Changes
