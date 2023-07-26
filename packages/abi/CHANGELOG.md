@@ -1,5 +1,11 @@
 # @0xsodium/abi
 
+## 1.31.0
+
+### Minor Changes
+
+- fix fallback handler address
+
 ## 1.30.0
 
 ### Minor Changes

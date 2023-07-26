@@ -70,7 +70,7 @@ export const estimateUserOperationGas =
             if (ethers.BigNumber.from(ctx.chainId).eq(31337)) {
                 ctx.op.preVerificationGas = ethers.BigNumber.from(60000).add(3000);
                 ctx.op.verificationGasLimit = ethers.BigNumber.from(ctx.op.verificationGasLimit).add(30000);
-                ctx.op.callGasLimit = ethers.BigNumber.from(callDataLimit).add(100000);
+                ctx.op.callGasLimit = ethers.BigNumber.from(callDataLimit).add(200000);
                 return;
             }
 

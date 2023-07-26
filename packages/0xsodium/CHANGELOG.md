@@ -1,5 +1,24 @@
 # 0xsodium
 
+## 1.30.0
+
+### Minor Changes
+
+- fix fallback handler address
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.31.0
+  - @0xsodium/auth@1.31.0
+  - @0xsodium/config@1.31.0
+  - @0xsodium/multicall@1.31.0
+  - @0xsodium/network@1.31.0
+  - @0xsodium/provider@1.31.0
+  - @0xsodium/transactions@1.31.0
+  - @0xsodium/utils@1.31.0
+  - @0xsodium/wallet@1.31.0
+
 ## 1.29.0
 
 ### Minor Changes

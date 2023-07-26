@@ -1,5 +1,16 @@
 # @0xsodium/network
 
+## 1.31.0
+
+### Minor Changes
+
+- fix fallback handler address
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/utils@1.31.0
+
 ## 1.30.0
 
 ### Minor Changes

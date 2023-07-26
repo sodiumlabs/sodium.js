@@ -1,5 +1,16 @@
 # my-app
 
+## 1.30.0
+
+### Minor Changes
+
+- fix fallback handler address
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.31.0
+
 ## 1.29.0
 
 ### Minor Changes
