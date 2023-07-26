@@ -27,7 +27,7 @@ import {
 } from '@0xsodium/config';
 import { encodeTypedDataDigest, subDigestOf } from '@0xsodium/utils';
 import { RemoteSigner } from './remote-signers';
-import { resolveArrayProperties } from './utils';
+import { resolveArrayProperties, SodiumNetworkAuthProof } from './utils';
 import { Signer } from './signer';
 import {
   CompatibilityFallbackHandler__factory,
@@ -40,7 +40,6 @@ import {
   IClient,
   Client
 } from './userop';
-import { SodiumNetworkAuthProof } from './utils';
 import { IUserOperation, IUserOperationBuilder } from 'userop';
 // Wallet is a signer interface to a Smart Contract based Ethereum account.
 //
@@ -209,7 +208,7 @@ export class Wallet extends Signer {
     chainId?: ChainIdLike,
   ): Promise<SodiumUserOpBuilder> {
     let opBuilderPromise: Promise<SodiumUserOpBuilder>;
-    let isDeployed = await this.isDeployed();
+    const isDeployed = await this.isDeployed();
     if (this.sodiumNetworkAuthProof) {
       opBuilderPromise = SodiumUserOpBuilder.initWithSession(
         this.context,

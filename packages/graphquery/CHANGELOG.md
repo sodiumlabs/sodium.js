@@ -1,5 +1,11 @@
 # @0xsodium/graphquery
 
+## 1.32.0
+
+### Minor Changes
+
+- fix error response
+
 ## 1.31.0
 
 ### Minor Changes

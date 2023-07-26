@@ -1,5 +1,16 @@
 # my-app
 
+## 1.31.0
+
+### Minor Changes
+
+- fix error response
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.32.0
+
 ## 1.30.0
 
 ### Minor Changes

@@ -1,5 +1,16 @@
 # @0xsodium/network
 
+## 1.32.0
+
+### Minor Changes
+
+- fix error response
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/utils@1.32.0
+
 ## 1.31.0
 
 ### Minor Changes

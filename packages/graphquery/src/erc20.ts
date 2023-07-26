@@ -3,7 +3,7 @@ import { UserTokenInfo } from './types';
 import { IERC20Metadata__factory } from '@0xsodium/wallet-contracts';
 import { Provider } from '@ethersproject/abstract-provider';
 
-let providerTokenMetadataCaches: {
+const providerTokenMetadataCaches: {
   [chainId: number]: {
     [address: string]: {
       name: Promise<string>;

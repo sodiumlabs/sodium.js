@@ -805,6 +805,12 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
       }
     }
 
+    if (response.error
+      && response.error.message === 'user cancel'
+    ) {
+      response.error.code = 4003;
+    }
+
     callback(undefined, response)
   }
 
