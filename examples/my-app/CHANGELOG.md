@@ -1,5 +1,27 @@
 # my-app
 
+## 1.33.0
+
+### Minor Changes
+
+- fix gas estimate
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.34.0
+
+## 1.32.0
+
+### Minor Changes
+
+- fix testnet gas
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.33.0
+
 ## 1.31.0
 
 ### Minor Changes

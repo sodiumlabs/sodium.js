@@ -1,5 +1,17 @@
 # @0xsodium/utils
 
+## 1.34.0
+
+### Minor Changes
+
+- fix gas estimate
+
+## 1.33.0
+
+### Minor Changes
+
+- fix testnet gas
+
 ## 1.32.0
 
 ### Minor Changes

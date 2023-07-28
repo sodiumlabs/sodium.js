@@ -62,18 +62,6 @@ export const estimateUserOperationGas =
                 ).add(await estimateCreationGas(provider, ctx.op.initCode));
             }
 
-            const callDataLimit = await provider.estimateGas({
-                from: ctx.entryPoint,
-                to: ctx.op.sender,
-                data: ctx.op.callData,
-            });
-            if (ethers.BigNumber.from(ctx.chainId).eq(31337)) {
-                ctx.op.preVerificationGas = ethers.BigNumber.from(60000).add(3000);
-                ctx.op.verificationGasLimit = ethers.BigNumber.from(ctx.op.verificationGasLimit).add(30000);
-                ctx.op.callGasLimit = ethers.BigNumber.from(callDataLimit).add(200000);
-                return;
-            }
-
             const est = (await provider.send("eth_estimateUserOperationGas", [
                 Utils.OpToJSON(ctx.op),
                 ctx.entryPoint,

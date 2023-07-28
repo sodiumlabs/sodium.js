@@ -1,5 +1,31 @@
 # @0xsodium/transactions
 
+## 1.34.0
+
+### Minor Changes
+
+- fix gas estimate
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.34.0
+  - @0xsodium/network@1.34.0
+  - @0xsodium/utils@1.34.0
+
+## 1.33.0
+
+### Minor Changes
+
+- fix testnet gas
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.33.0
+  - @0xsodium/network@1.33.0
+  - @0xsodium/utils@1.33.0
+
 ## 1.32.0
 
 ### Minor Changes

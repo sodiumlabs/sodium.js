@@ -1,5 +1,43 @@
 # 0xsodium
 
+## 1.33.0
+
+### Minor Changes
+
+- fix gas estimate
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.34.0
+  - @0xsodium/auth@1.34.0
+  - @0xsodium/config@1.34.0
+  - @0xsodium/multicall@1.34.0
+  - @0xsodium/network@1.34.0
+  - @0xsodium/provider@1.34.0
+  - @0xsodium/transactions@1.34.0
+  - @0xsodium/utils@1.34.0
+  - @0xsodium/wallet@1.34.0
+
+## 1.32.0
+
+### Minor Changes
+
+- fix testnet gas
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/wallet@1.33.0
+  - @0xsodium/abi@1.33.0
+  - @0xsodium/auth@1.33.0
+  - @0xsodium/config@1.33.0
+  - @0xsodium/multicall@1.33.0
+  - @0xsodium/network@1.33.0
+  - @0xsodium/provider@1.33.0
+  - @0xsodium/transactions@1.33.0
+  - @0xsodium/utils@1.33.0
+
 ## 1.31.0
 
 ### Minor Changes
