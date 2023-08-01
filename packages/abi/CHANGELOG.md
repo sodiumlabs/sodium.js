@@ -1,5 +1,11 @@
 # @0xsodium/abi
 
+## 1.35.0
+
+### Minor Changes
+
+- fix: eth_estimateUserOperationGas
+
 ## 1.34.0
 
 ### Minor Changes

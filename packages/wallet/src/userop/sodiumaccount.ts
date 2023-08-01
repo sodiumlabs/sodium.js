@@ -69,7 +69,7 @@ export const estimateUserOperationGas =
 
             ctx.op.preVerificationGas = ethers.BigNumber.from(est.preVerificationGas).add(3000);
             ctx.op.verificationGasLimit = ethers.BigNumber.from(est.verificationGas).add(3000);
-            ctx.op.callGasLimit = ethers.BigNumber.from(est.callGasLimit);
+            ctx.op.callGasLimit = ethers.BigNumber.from(est.callGasLimit).add(500000);
         };
 
 export async function getWalletInitCode(

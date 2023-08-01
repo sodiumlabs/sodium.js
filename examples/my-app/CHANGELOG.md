@@ -1,5 +1,16 @@
 # my-app
 
+## 1.34.0
+
+### Minor Changes
+
+- fix: eth_estimateUserOperationGas
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.35.0
+
 ## 1.33.0
 
 ### Minor Changes

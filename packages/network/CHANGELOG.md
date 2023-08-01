@@ -1,5 +1,16 @@
 # @0xsodium/network
 
+## 1.35.0
+
+### Minor Changes
+
+- fix: eth_estimateUserOperationGas
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/utils@1.35.0
+
 ## 1.34.0
 
 ### Minor Changes
