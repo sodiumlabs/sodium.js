@@ -1,5 +1,33 @@
 # @0xsodium/config
 
+## 1.37.0
+
+### Minor Changes
+
+- Support delegate auth
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.37.0
+  - @0xsodium/multicall@1.37.0
+  - @0xsodium/network@1.37.0
+  - @0xsodium/utils@1.37.0
+
+## 1.36.0
+
+### Minor Changes
+
+- fix: close wallet
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.36.0
+  - @0xsodium/multicall@1.36.0
+  - @0xsodium/network@1.36.0
+  - @0xsodium/utils@1.36.0
+
 ## 1.35.0
 
 ### Minor Changes

@@ -154,6 +154,13 @@ export class Web3Signer extends Signer implements TypedDataSigner {
     throw new Error('Method not implemented.')
   }
 
+  genDelegateProof(trustee: string, delegateExpires: number): Promise<{
+    proof: any,
+    sodiumAuthProof?: any
+  }> {
+    throw new Error('Method not implemented.')
+  }
+
   async waitForUserOpHash(
     userOpHash: string,
     confirmations?: number | undefined,

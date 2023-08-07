@@ -1,6 +1,6 @@
 {
   "name": "@0xsodium/utils",
-  "version": "1.35.0",
+  "version": "1.37.0",
   "description": "utils sub-package for Sodium",
   "repository": "https://github.com/sodiumlabs/sodium.js/tree/main/packages/utils",
   "source": "src/index.ts",

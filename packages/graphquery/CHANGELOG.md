@@ -1,5 +1,17 @@
 # @0xsodium/graphquery
 
+## 1.37.0
+
+### Minor Changes
+
+- Support delegate auth
+
+## 1.36.0
+
+### Minor Changes
+
+- fix: close wallet
+
 ## 1.35.0
 
 ### Minor Changes

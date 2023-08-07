@@ -1,8 +1,8 @@
 import { Provider, BlockTag, JsonRpcProvider as EthJsonRpcProvider, TransactionResponse, TransactionReceipt } from '@ethersproject/providers'
-import { BigNumber, BigNumberish, ethers, Signer as AbstractSigner } from 'ethers';
+import { BigNumber, ethers, Signer as AbstractSigner } from 'ethers';
 import { TypedDataDomain, TypedDataField } from '@ethersproject/abstract-signer';
 import { BytesLike } from '@ethersproject/bytes';
-import { Deferrable, resolveProperties } from '@ethersproject/properties';
+import { Deferrable } from '@ethersproject/properties';
 import { ConnectionInfo } from '@ethersproject/web';
 import {
   Transactionish,
@@ -26,21 +26,28 @@ import {
   sortConfig,
 } from '@0xsodium/config';
 import { encodeTypedDataDigest, subDigestOf } from '@0xsodium/utils';
-import { RemoteSigner } from './remote-signers';
-import { resolveArrayProperties, SodiumNetworkAuthProof } from './utils';
+import {
+  resolveArrayProperties,
+  SodiumNetworkAuthProof,
+  DelegateProof,
+  signType2,
+  signType1,
+  genDelegateProof,
+  TypedDataSigner
+} from './utils';
 import { Signer } from './signer';
 import {
   CompatibilityFallbackHandler__factory,
   EntryPoint__factory,
   Sodium__factory
 } from '@0xsodium/wallet-contracts';
-import { AbiCoder, defaultAbiCoder } from '@ethersproject/abi';
+import { defaultAbiCoder } from '@ethersproject/abi';
 import {
   SodiumUserOpBuilder,
   IClient,
   Client
 } from './userop';
-import { IUserOperation, IUserOperationBuilder } from 'userop';
+import { IUserOperation } from 'userop';
 // Wallet is a signer interface to a Smart Contract based Ethereum account.
 //
 // Wallet allows managing the account/wallet sub-keys, wallet address, signing
@@ -66,7 +73,7 @@ export class Wallet extends Signer {
   readonly context: SodiumContext
   readonly config: WalletConfig
 
-  private readonly _signer: AbstractSigner
+  private readonly _signer: TypedDataSigner
 
   // provider is an Ethereum Json RPC provider that is connected to a particular network (aka chain)
   // and access to the signer for signing transactions.
@@ -94,8 +101,9 @@ export class Wallet extends Signer {
 
   constructor(
     options: WalletOptions,
-    signer: (BytesLike | AbstractSigner),
-    private sodiumNetworkAuthProof?: SodiumNetworkAuthProof
+    signer: (BytesLike | TypedDataSigner),
+    private sodiumNetworkAuthProof?: SodiumNetworkAuthProof,
+    private delegateProof?: DelegateProof,
   ) {
     super()
 
@@ -103,7 +111,7 @@ export class Wallet extends Signer {
 
     this.context = createContext(context)
     this.config = sortConfig(config)
-    this._signer = AbstractSigner.isSigner(signer) ? signer : new ethers.Wallet(signer)
+    this._signer = TypedDataSigner.isTypedDataSigner(signer) ? signer : new ethers.Wallet(signer)
   }
 
   getUserOpBuilder(): Promise<SodiumUserOpBuilder> {
@@ -218,7 +226,8 @@ export class Wallet extends Signer {
         this.sodiumNetworkAuthProof.authProof,
         this.bundlerURL,
         this.provider.connection.url,
-        isDeployed
+        isDeployed,
+        this.isDelegate(),
       );
     } else {
       opBuilderPromise = SodiumUserOpBuilder.initWithEOA(
@@ -227,10 +236,24 @@ export class Wallet extends Signer {
         this._signer,
         this.bundlerURL,
         this.provider.connection.url,
-        isDeployed
+        isDeployed,
+        this.isDelegate(),
       );
     }
-    return opBuilderPromise;
+
+    const opBuilder = await opBuilderPromise;
+
+    if (this.isDelegate()) {
+      const signerAddress = await this._signer.getAddress();
+      const trusteeAddress = this.delegateProof!.trustee;
+      if (signerAddress.toLowerCase() !== trusteeAddress.toLowerCase()) {
+        throw new Error(`Signer address ${signerAddress} does not match trustee address ${trusteeAddress}`);
+      }
+    }
+
+    opBuilder.setSignFunc(this.sodiumInternalSignature.bind(this));
+
+    return opBuilder;
   }
 
   async getWalletUpgradeTransactions(_?: ChainIdLike): Promise<Transaction[]> {
@@ -414,6 +437,32 @@ export class Wallet extends Signer {
     return this.sendTransaction(transactions, chainId, paymasterId)
   }
 
+  private async sodiumInternalSignature(message: ethers.utils.Bytes): Promise<string> {
+    if (this.delegateProof) {
+      return signType2(this._signer, message, this.delegateProof);
+    }
+    return signType1(this._signer, message);
+  }
+
+  async genDelegateProof(trustee: string, delegateExpires: number): Promise<{
+    proof: DelegateProof,
+    sodiumAuthProof?: SodiumNetworkAuthProof,
+    chainId?: ChainIdLike
+  }> {
+    const address = await this.getAddress();
+    const proof = await genDelegateProof(
+      address,
+      this.config.accountSlat,
+      trustee,
+      this._signer,
+      delegateExpires
+    );
+    return {
+      proof,
+      sodiumAuthProof: this.sodiumNetworkAuthProof
+    };
+  }
+
   // signMessage will sign a message for a particular chainId with the wallet signers
   // NOTE: signMessage(message: Bytes | string): Promise<string> is defined on AbstractSigner
   async signMessage(message: BytesLike): Promise<string> {
@@ -425,11 +474,12 @@ export class Wallet extends Signer {
     if (isDeployed) {
       const cfh = CompatibilityFallbackHandler__factory.connect(address, this.provider);
       const signHash = await cfh.getMessageHash(data);
-      return localSigner.signMessage(ethers.utils.arrayify(signHash));
+      const hash = ethers.utils.arrayify(signHash);
+      return this.sodiumInternalSignature(hash);
     }
 
-    /// TODO
-    /// Support check for non deployed wallets
+    // / TODO
+    // / Support check for non deployed wallets
     const sig = await localSigner.signMessage(data);
     return ethers.utils.hexConcat([sig, this.config.accountSlat]);
   }
@@ -479,6 +529,10 @@ export class Wallet extends Signer {
       return true;
     }
     return false;
+  }
+
+  isDelegate(): boolean {
+    return this.delegateProof !== undefined;
   }
 
   // getChainIdFromArgument will return the chainId of the argument, as well as ensure

@@ -17,7 +17,10 @@ export interface AuthorizationOptions {
 
 // signAuthorization will perform an EIP712 typed-data message signing of ETHAuth domain via the provided
 // Signer and authorization options.
-export const signAuthorization = async (signer: Signer, options: AuthorizationOptions): Promise<ETHAuthProof> => {
+export const signAuthorization = async (
+  signer: Signer, 
+  options: AuthorizationOptions
+): Promise<ETHAuthProof> => {
   const chainId = await signer.getChainId()
 
   const address = ethers.utils.getAddress(await signer.getAddress())

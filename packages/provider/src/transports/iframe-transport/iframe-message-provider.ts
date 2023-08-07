@@ -45,9 +45,7 @@ export class IframeMessageProvider extends BaseProviderTransport {
 
     // close clean up
     this.on('close', () => {
-      if (this.iframe) {
-        this.iframe.style.display = 'none';
-      }
+      this.closeWallet();
     })
 
     this._registered = true

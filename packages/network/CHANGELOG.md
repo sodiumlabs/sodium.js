@@ -1,5 +1,27 @@
 # @0xsodium/network
 
+## 1.37.0
+
+### Minor Changes
+
+- Support delegate auth
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/utils@1.37.0
+
+## 1.36.0
+
+### Minor Changes
+
+- fix: close wallet
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/utils@1.36.0
+
 ## 1.35.0
 
 ### Minor Changes

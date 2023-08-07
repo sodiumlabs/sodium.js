@@ -13,6 +13,7 @@ import { WalletConfig, WalletState } from '@0xsodium/config';
 import { Deferrable } from '@0xsodium/utils';
 import { IUserOperation } from 'userop';
 import { SodiumUserOpBuilder } from './userop';
+import { DelegateProof, SodiumNetworkAuthProof } from './utils';
 
 export abstract class Signer extends AbstractSigner {
   abstract getProvider(chainId?: number): Promise<JsonRpcProvider | undefined>
@@ -28,9 +29,6 @@ export abstract class Signer extends AbstractSigner {
     chainId?: ChainIdLike | undefined
   ): Promise<TransactionReceipt>;
   abstract getWalletUpgradeTransactions(chainId?: ChainIdLike): Promise<Transaction[]>;
-  // getSigners returns a list of available / attached signers to the interface. Note: you need
-  // enough signers in order to meet the signing threshold that satisfies a wallet config.
-  // abstract getSigners(): Promise<string[]>
 
   // signMessage .....
   abstract signMessage(message: BytesLike, chainId?: ChainIdLike, allSigners?: boolean, isDigest?: boolean): Promise<string>
@@ -72,23 +70,13 @@ export abstract class Signer extends AbstractSigner {
     chainId?: ChainIdLike,
   ): Promise<SodiumUserOpBuilder>
 
-  // Low-level methods to sign and send/relayer signed transactions separately. The combination of these methods
-  // is like calling just sendTransaction(..) above. Also note that sendSignedTransactions is identical
-  // to calling getRelayer().relay(signedTxs), but included in this interface for convenience.
-  // abstract signTransactions(
-  //   txs: Deferrable<Transactionish>,
-  //   chainId?: ChainIdLike,
-  //   allSigners?: boolean
-  // ): Promise<SignedTransaction>
-
-  // abstract sendSignedTransactions(
-  //   signedTxs: SignedTransaction,
-  //   chainId?: ChainIdLike,
-  //   paymasterId?: string
-  // ): Promise<TransactionResponse>
-
   // isDeployed ..
   abstract isDeployed(chainId?: ChainIdLike): Promise<boolean>
+
+  abstract genDelegateProof(trustee: string, delegateExpires: number): Promise<{
+    proof: DelegateProof,
+    sodiumAuthProof?: SodiumNetworkAuthProof
+  }>
 }
 
 // TODO: move to error.ts, along with others..

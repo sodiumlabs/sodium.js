@@ -21,6 +21,7 @@ import { SodiumContext } from '@0xsodium/network';
 import { Transactionish, TransactionEncoded, toSodiumTransactions, flattenAuxTransactions, sodiumTxAbiEncode } from '@0xsodium/transactions';
 import { WalletConfig } from '@0xsodium/config';
 import { keccak256 } from 'ethers/lib/utils';
+import { SignFunc } from '../utils';
 
 interface GasEstimate {
     preVerificationGas: ethers.BigNumberish;
@@ -67,9 +68,17 @@ export const estimateUserOperationGas =
                 ctx.entryPoint,
             ])) as GasEstimate;
 
-            ctx.op.preVerificationGas = ethers.BigNumber.from(est.preVerificationGas).add(3000);
-            ctx.op.verificationGasLimit = ethers.BigNumber.from(est.verificationGas).add(3000);
+            ctx.op.preVerificationGas = ethers.BigNumber.from(est.preVerificationGas).add(30000);
+            ctx.op.verificationGasLimit = ethers.BigNumber.from(est.verificationGas).add(30000);
             ctx.op.callGasLimit = ethers.BigNumber.from(est.callGasLimit).add(500000);
+        };
+
+export const SodiumSignatureMiddleware =
+    (signFunc: SignFunc): UserOperationMiddlewareFn =>
+        async (ctx) => {
+            ctx.op.signature = await signFunc(
+                ethers.utils.arrayify(ctx.getUserOpHash())
+            );
         };
 
 export async function getWalletInitCode(
@@ -173,7 +182,9 @@ export class SodiumUserOpBuilder extends UserOperationBuilder {
     private factory: Factory;
 
     /// sodium network auth proof
-    private sodiumAddSession: SodiumAddSession
+    private sodiumAddSession: SodiumAddSession;
+
+    private _signFunc: SignFunc;
 
     private constructor(
         signer: ethers.Signer,
@@ -195,6 +206,10 @@ export class SodiumUserOpBuilder extends UserOperationBuilder {
             ethers.constants.AddressZero,
             this.provider
         );
+    }
+
+    public setSignFunc(signFunc: SignFunc) {
+        this._signFunc = signFunc;
     }
 
     public resolveAccount: UserOperationMiddlewareFn = async (ctx) => {
@@ -237,10 +252,11 @@ export class SodiumUserOpBuilder extends UserOperationBuilder {
         ERC4337BundlerRpc: string,
         ERC4337NodeRpc: string,
         isDeployed: boolean,
+        isDelegate: boolean = false,
     ): Promise<SodiumUserOpBuilder> {
         const singerAddress = await signer.getAddress();
 
-        if (!eqf(keccak256(singerAddress), sodiumConfig.accountSlat)) {
+        if (!eqf(keccak256(singerAddress), sodiumConfig.accountSlat) && isDelegate == false) {
             throw new Error(`signer address ${singerAddress} not match account slat ${sodiumConfig.accountSlat}`);
         }
 
@@ -304,10 +320,11 @@ export class SodiumUserOpBuilder extends UserOperationBuilder {
         ERC4337BundlerRpc: string,
         ERC4337NodeRpc: string,
         isDeployed: boolean,
+        isDelegate: boolean = false,
     ): Promise<SodiumUserOpBuilder> {
         const sessionKey = await addSessionStruct.sessionKey;
         const singerAddress = await signer.getAddress();
-        if (!eqf(sessionKey, singerAddress)) {
+        if (!eqf(sessionKey, singerAddress) && isDelegate == false) {
             throw new Error("session key and signer address are the same");
         }
 
@@ -316,7 +333,7 @@ export class SodiumUserOpBuilder extends UserOperationBuilder {
             ERC4337BundlerRpc,
             ERC4337NodeRpc,
             sodiumContext.entryPointAddress,
-            sodiumContext.factoryAddress
+            sodiumContext.factoryAddress,
         );
 
         instance.sodiumAddSession = {
@@ -382,7 +399,7 @@ export class SodiumUserOpBuilder extends UserOperationBuilder {
     }
 
     public async signUserOp(userOp: IUserOperation): Promise<IUserOperation> {
-        const signMiddleware = Presets.Middleware.EOASignature(this.signer);
+        const signMiddleware = SodiumSignatureMiddleware(this._signFunc);
         const ctx = new UserOperationMiddlewareCtx(
             userOp,
             this.entryPoint.address,

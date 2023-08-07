@@ -24,8 +24,7 @@ import {
   createContext
 } from '@0xsodium/network';
 import { Wallet } from './wallet';
-import { encodeTypedDataDigest, encodeTypedDataHash } from '@0xsodium/utils';
-import { SodiumNetworkAuthProof } from './utils';
+import { SodiumNetworkAuthProof, DelegateProof, TypedDataSigner } from './utils';
 import { IUserOperation } from 'userop';
 import { SodiumUserOpBuilder } from './userop';
 
@@ -43,7 +42,7 @@ export class Account extends Signer {
     network: NetworkConfig
   }[]
 
-  private _signer: (BytesLike | AbstractSigner)
+  private _signer: (BytesLike | TypedDataSigner)
 
   // provider points at the main chain for compatability with the Signer.
   // Use getProvider(chainId) to get the provider for the respective network.
@@ -54,8 +53,9 @@ export class Account extends Signer {
 
   constructor(
     options: AccountOptions,
-    signer: (BytesLike | AbstractSigner),
-    private sodiumNetworkAuthProof?: SodiumNetworkAuthProof
+    signer: (BytesLike | TypedDataSigner),
+    private sodiumNetworkAuthProof?: SodiumNetworkAuthProof,
+    private delegateProof?: DelegateProof,
   ) {
     super()
 
@@ -73,6 +73,13 @@ export class Account extends Signer {
   async getWalletContext(chainId?: ChainIdLike): Promise<SodiumContext> {
     const wallet = chainId ? this.getWalletByNetwork(chainId).wallet : this.mainWallet().wallet
     return wallet.getWalletContext(chainId);
+  }
+
+  async genDelegateProof(trustee: string, delegateExpires: number): Promise<{
+    proof: DelegateProof,
+    sodiumAuthProof?: SodiumNetworkAuthProof
+  }> {
+    return this.mainWallet().wallet.genDelegateProof(trustee, delegateExpires);
   }
 
   // getWalletConfig builds a list of WalletConfigs across all networks.
@@ -328,7 +335,8 @@ export class Account extends Signer {
           context: network.context
         },
         this._signer,
-        this.sodiumNetworkAuthProof
+        this.sodiumNetworkAuthProof,
+        this.delegateProof
       )
 
       if (network.provider) {
