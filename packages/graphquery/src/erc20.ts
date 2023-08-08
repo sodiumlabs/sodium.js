@@ -227,6 +227,17 @@ async function fallbackLocalHardhat(
       },
       balance: BigNumber.from(0)
     },
+    {
+      token: {
+        chainId: chainId,
+        address: "0x7f90122bf0700f9e7e1f688fe926940e8839f353",
+        symbol: "2CRV",
+        decimals: 18,
+        name: "Curve 2CRV",
+        centerData: {},
+      },
+      balance: BigNumber.from(0)
+    },
   ];
 
   const coins = await Promise.all(tokens.map(async t => {

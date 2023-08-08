@@ -1,5 +1,38 @@
 # my-app
 
+## 1.39.0
+
+### Minor Changes
+
+- Support legacyTransactionHash
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.40.0
+
+## 1.38.0
+
+### Minor Changes
+
+- fix allowed transaction keys
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.39.0
+
+## 1.37.0
+
+### Minor Changes
+
+- Add testnetwork coin
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.38.0
+
 ## 1.36.0
 
 ### Minor Changes

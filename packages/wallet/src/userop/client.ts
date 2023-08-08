@@ -12,6 +12,10 @@ import { SodiumJsonRpcProvider } from "./jsonrpc";
 import { TransactionReceipt } from '@ethersproject/abstract-provider';
 import { hexValue } from "ethers/lib/utils";
 
+export interface AATransactionReceipt extends TransactionReceipt {
+  legacyTransactionHash: string;
+}
+
 export interface IUserOperation extends OriginIUserOperation {
 
 }
@@ -29,7 +33,7 @@ export interface ISendUserOperationResponse {
 }
 
 export interface IClient {
-  waitUserOp: (userOpHash: string, confirmations?: number | undefined, timeout?: number | undefined) => Promise<TransactionReceipt>;
+  waitUserOp: (userOpHash: string, confirmations?: number | undefined, timeout?: number | undefined) => Promise<AATransactionReceipt>;
   sendUserOperation: (builder: IUserOperationBuilder, opts?: ISendUserOperationOpts) => Promise<ISendUserOperationResponse>;
   buildUserOperation: (builder: IUserOperationBuilder) => Promise<IUserOperation>;
   sendUserOperationRaw(
@@ -74,7 +78,7 @@ export class Client implements IClient {
     return builder.buildOp(this.entryPoint.address, this.chainId);
   }
 
-  async waitUserOp(userOpHash: string, confirmations?: number | undefined, timeout?: number | undefined): Promise<TransactionReceipt> {
+  async waitUserOp(userOpHash: string, confirmations?: number | undefined, timeout?: number | undefined): Promise<AATransactionReceipt> {
     const end = Date.now() + (timeout ? timeout : this.waitTimeoutMs);
     const block = await this.provider.getBlock("latest");
     console.log("Waiting for user operation", userOpHash);
@@ -99,11 +103,15 @@ export class Client implements IClient {
         }
 
         const rp = await events[0].getTransactionReceipt();
+        const aarp: AATransactionReceipt = {
+          ...rp,
+          legacyTransactionHash: rp.transactionHash,
+        }
 
         /// 这里可能会有一些不兼容问题
         /// 比如开发者可能会将transactionHash存储到数据库中
-        rp.transactionHash = userOpHash;
-        return rp;
+        aarp.transactionHash = userOpHash;
+        return aarp;
       }
       await new Promise((resolve) =>
         setTimeout(resolve, this.waitIntervalMs)

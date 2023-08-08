@@ -5,7 +5,6 @@ import { Deferrable } from '@ethersproject/properties';
 import { Signer } from './signer';
 import {
   Transactionish,
-  SignedTransaction,
   Transaction,
   TransactionRequest
 } from '@0xsodium/transactions';
@@ -26,7 +25,7 @@ import {
 import { Wallet } from './wallet';
 import { SodiumNetworkAuthProof, DelegateProof, TypedDataSigner } from './utils';
 import { IUserOperation } from 'userop';
-import { SodiumUserOpBuilder } from './userop';
+import { SodiumUserOpBuilder, AATransactionReceipt } from './userop';
 
 export interface AccountOptions {
   initialConfig: WalletConfig
@@ -215,7 +214,7 @@ export class Account extends Signer {
     confirmations?: number | undefined,
     timeout?: number | undefined,
     chainId?: ChainIdLike
-  ): Promise<TransactionReceipt> {
+  ): Promise<AATransactionReceipt> {
     const wallet = chainId ? this.getWalletByNetwork(chainId).wallet : this.mainWallet().wallet
     return wallet.waitForUserOpHash(userOpHash, confirmations, timeout);
   }

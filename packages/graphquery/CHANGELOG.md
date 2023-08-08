@@ -1,5 +1,23 @@
 # @0xsodium/graphquery
 
+## 1.40.0
+
+### Minor Changes
+
+- Support legacyTransactionHash
+
+## 1.39.0
+
+### Minor Changes
+
+- fix allowed transaction keys
+
+## 1.38.0
+
+### Minor Changes
+
+- Add testnetwork coin
+
 ## 1.37.0
 
 ### Minor Changes

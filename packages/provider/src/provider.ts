@@ -14,7 +14,7 @@ import {
   JsonRpcSender,
   createContext,
 } from '@0xsodium/network';
-import { resolveArrayProperties, Signer, Client } from '@0xsodium/wallet';
+import { resolveArrayProperties, Signer, Client, AATransactionReceipt } from '@0xsodium/wallet';
 import { WalletConfig, WalletState } from '@0xsodium/config';
 import {
   Deferrable,
@@ -166,7 +166,7 @@ export class Web3Signer extends Signer implements TypedDataSigner {
     confirmations?: number | undefined,
     timeout?: number | undefined,
     chainIdLike?: ChainIdLike | undefined
-  ): Promise<ethers.providers.TransactionReceipt> {
+  ): Promise<AATransactionReceipt> {
     const chainId = maybeChainId(chainIdLike) || this.defaultChainId;
     const networks = await this.getNetworks();
     const network = networks.find(n => n.chainId === chainId);
@@ -501,6 +501,7 @@ const allowedTransactionKeys: { [key: string]: boolean } = {
   data: true,
   gasLimit: true,
   gasPrice: true,
+  gas: true,
   nonce: true,
   to: true,
   value: true,

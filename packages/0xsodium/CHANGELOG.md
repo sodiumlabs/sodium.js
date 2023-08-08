@@ -1,5 +1,62 @@
 # 0xsodium
 
+## 1.39.0
+
+### Minor Changes
+
+- Support legacyTransactionHash
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.40.0
+  - @0xsodium/auth@1.40.0
+  - @0xsodium/config@1.40.0
+  - @0xsodium/multicall@1.40.0
+  - @0xsodium/network@1.40.0
+  - @0xsodium/provider@1.40.0
+  - @0xsodium/transactions@1.40.0
+  - @0xsodium/utils@1.40.0
+  - @0xsodium/wallet@1.40.0
+
+## 1.38.0
+
+### Minor Changes
+
+- fix allowed transaction keys
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.39.0
+  - @0xsodium/auth@1.39.0
+  - @0xsodium/config@1.39.0
+  - @0xsodium/multicall@1.39.0
+  - @0xsodium/network@1.39.0
+  - @0xsodium/provider@1.39.0
+  - @0xsodium/transactions@1.39.0
+  - @0xsodium/utils@1.39.0
+  - @0xsodium/wallet@1.39.0
+
+## 1.37.0
+
+### Minor Changes
+
+- Add testnetwork coin
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.38.0
+  - @0xsodium/auth@1.38.0
+  - @0xsodium/config@1.38.0
+  - @0xsodium/multicall@1.38.0
+  - @0xsodium/network@1.38.0
+  - @0xsodium/provider@1.38.0
+  - @0xsodium/transactions@1.38.0
+  - @0xsodium/utils@1.38.0
+  - @0xsodium/wallet@1.38.0
+
 ## 1.36.0
 
 ### Minor Changes

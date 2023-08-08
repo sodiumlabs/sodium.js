@@ -45,7 +45,8 @@ import { defaultAbiCoder } from '@ethersproject/abi';
 import {
   SodiumUserOpBuilder,
   IClient,
-  Client
+  Client,
+  AATransactionReceipt,
 } from './userop';
 import { IUserOperation } from 'userop';
 // Wallet is a signer interface to a Smart Contract based Ethereum account.
@@ -363,7 +364,7 @@ export class Wallet extends Signer {
     return 0;
   }
 
-  async waitForUserOpHash(userOpHash: string, confirmations?: number | undefined, timeout?: number | undefined, chainId?: ChainIdLike): Promise<TransactionReceipt> {
+  async waitForUserOpHash(userOpHash: string, confirmations?: number | undefined, timeout?: number | undefined, chainId?: ChainIdLike): Promise<AATransactionReceipt> {
     const client = await this.opClientPromise;
     return client.waitUserOp(userOpHash, confirmations, timeout);
   }

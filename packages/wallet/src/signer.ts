@@ -2,7 +2,6 @@ import { BigNumber, Signer as AbstractSigner } from 'ethers';
 import { TypedDataDomain, TypedDataField } from '@ethersproject/abstract-signer';
 import { NetworkConfig, ChainIdLike, SodiumContext } from '@0xsodium/network';
 import {
-  SignedTransaction,
   Transactionish,
   TransactionRequest,
   Transaction
@@ -12,7 +11,7 @@ import { BytesLike } from '@ethersproject/bytes';
 import { WalletConfig, WalletState } from '@0xsodium/config';
 import { Deferrable } from '@0xsodium/utils';
 import { IUserOperation } from 'userop';
-import { SodiumUserOpBuilder } from './userop';
+import { SodiumUserOpBuilder, AATransactionReceipt } from './userop';
 import { DelegateProof, SodiumNetworkAuthProof } from './utils';
 
 export abstract class Signer extends AbstractSigner {
@@ -27,7 +26,7 @@ export abstract class Signer extends AbstractSigner {
     confirmations?: number,
     timeout?: number,
     chainId?: ChainIdLike | undefined
-  ): Promise<TransactionReceipt>;
+  ): Promise<AATransactionReceipt>;
   abstract getWalletUpgradeTransactions(chainId?: ChainIdLike): Promise<Transaction[]>;
 
   // signMessage .....
