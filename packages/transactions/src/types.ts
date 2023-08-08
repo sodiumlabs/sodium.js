@@ -1,5 +1,5 @@
 import { BigNumber, BigNumberish, BytesLike } from 'ethers';
-import { TransactionRequest as EthersTransactionRequest, TransactionResponse as EthersTransactionResponse } from '@ethersproject/providers';
+import { TransactionRequest as EthersTransactionRequest, TransactionResponse as EthersTransactionResponse, TransactionReceipt } from '@ethersproject/providers';
 import { UserOperationStruct } from '@0xsodium/wallet-contracts/gen/adapter/contracts/eip4337/interfaces/IAccount';
 import { TransactionStruct } from '@0xsodium/wallet-contracts/gen/adapter/contracts/Sodium';
 
@@ -21,6 +21,11 @@ export interface TransactionEncoded extends TransactionStruct {
   data: BytesLike
 }
 
+
+export interface AATransactionReceipt extends TransactionReceipt {
+  legacyTransactionHash: string;
+}
+
 export interface TransactionRequest extends EthersTransactionRequest {
   auxiliary?: Transactionish[]
 }
@@ -39,6 +44,8 @@ export type Transactionish = TransactionRequest | TransactionRequest[] | Transac
 
 export interface TransactionResponse<R = any> extends EthersTransactionResponse {
   receipt?: R
+
+  wait: (confirmations?: number) => Promise<AATransactionReceipt>
 }
 
 export type GasPrice = {

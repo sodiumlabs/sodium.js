@@ -6,7 +6,8 @@ import { Signer } from './signer';
 import {
   Transactionish,
   Transaction,
-  TransactionRequest
+  TransactionRequest,
+  AATransactionReceipt
 } from '@0xsodium/transactions';
 import {
   WalletConfig,
@@ -25,7 +26,7 @@ import {
 import { Wallet } from './wallet';
 import { SodiumNetworkAuthProof, DelegateProof, TypedDataSigner } from './utils';
 import { IUserOperation } from 'userop';
-import { SodiumUserOpBuilder, AATransactionReceipt } from './userop';
+import { SodiumUserOpBuilder } from './userop';
 
 export interface AccountOptions {
   initialConfig: WalletConfig

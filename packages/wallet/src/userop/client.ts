@@ -8,13 +8,10 @@ import {
   ISendUserOperationOpts,
   IUserOperation as OriginIUserOperation,
 } from "userop";
+import { AATransactionReceipt } from '@0xsodium/transactions';
 import { SodiumJsonRpcProvider } from "./jsonrpc";
 import { TransactionReceipt } from '@ethersproject/abstract-provider';
 import { hexValue } from "ethers/lib/utils";
-
-export interface AATransactionReceipt extends TransactionReceipt {
-  legacyTransactionHash: string;
-}
 
 export interface IUserOperation extends OriginIUserOperation {
 

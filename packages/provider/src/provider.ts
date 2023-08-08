@@ -14,7 +14,7 @@ import {
   JsonRpcSender,
   createContext,
 } from '@0xsodium/network';
-import { resolveArrayProperties, Signer, Client, AATransactionReceipt } from '@0xsodium/wallet';
+import { resolveArrayProperties, Signer, Client } from '@0xsodium/wallet';
 import { WalletConfig, WalletState } from '@0xsodium/config';
 import {
   Deferrable,
@@ -27,7 +27,8 @@ import {
   TransactionRequest,
   TransactionResponse,
   SignedTransaction,
-  Transaction
+  Transaction,
+  AATransactionReceipt
 } from '@0xsodium/transactions';
 import { WalletRequestHandler } from './transports/wallet-request-handler';
 import { UserTokenInfo } from '@0xsodium/graphquery';
@@ -369,7 +370,7 @@ export class Web3Signer extends Signer implements TypedDataSigner {
     chainId?: ChainIdLike
   ): Promise<TransactionResponse> {
     const sender = await this.getAddress();
-    const waitUserOp = (userOpHash: string, confirmations?: number): Promise<TransactionReceipt> => {
+    const waitUserOp = (userOpHash: string, confirmations?: number): Promise<AATransactionReceipt> => {
       return this.waitForUserOpHash(userOpHash, confirmations)
     }
     const tx = this.sendUncheckedTransaction(transaction, chainId).then(hash => {
@@ -378,13 +379,12 @@ export class Web3Signer extends Signer implements TypedDataSigner {
 
         from: sender,
 
-        wait(confirmations?: number): Promise<TransactionReceipt> {
+        wait(confirmations?: number): Promise<AATransactionReceipt> {
           return waitUserOp(hash, confirmations);
         }
       } as TransactionResponse
     })
 
-    // @ts-ignore
     return tx
   }
 

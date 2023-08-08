@@ -9,16 +9,16 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "0xsodium@workspace:packages/0xsodium"
   dependencies:
-    "@0xsodium/abi": ^1.31.0
-    "@0xsodium/auth": ^1.31.0
-    "@0xsodium/config": ^1.31.0
+    "@0xsodium/abi": ^1.40.0
+    "@0xsodium/auth": ^1.40.0
+    "@0xsodium/config": ^1.40.0
     "@0xsodium/guard": ^1.17.0
-    "@0xsodium/multicall": ^1.31.0
-    "@0xsodium/network": ^1.31.0
-    "@0xsodium/provider": ^1.31.0
-    "@0xsodium/transactions": ^1.31.0
-    "@0xsodium/utils": ^1.31.0
-    "@0xsodium/wallet": ^1.31.0
+    "@0xsodium/multicall": ^1.40.0
+    "@0xsodium/network": ^1.40.0
+    "@0xsodium/provider": ^1.40.0
+    "@0xsodium/transactions": ^1.40.0
+    "@0xsodium/utils": ^1.40.0
+    "@0xsodium/wallet": ^1.40.0
     "@babel/plugin-transform-runtime": ^7.16.10
     babel-loader: ^8.2.3
     ethers: ^5.7.0
@@ -41,22 +41,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@0xsodium/abi@^1.31.0, @0xsodium/abi@workspace:packages/abi":
+"@0xsodium/abi@^1.40.0, @0xsodium/abi@workspace:packages/abi":
   version: 0.0.0-use.local
   resolution: "@0xsodium/abi@workspace:packages/abi"
   languageName: unknown
   linkType: soft
 
-"@0xsodium/auth@^1.31.0, @0xsodium/auth@workspace:packages/auth":
+"@0xsodium/auth@^1.40.0, @0xsodium/auth@workspace:packages/auth":
   version: 0.0.0-use.local
   resolution: "@0xsodium/auth@workspace:packages/auth"
   dependencies:
     "@0xsequence/ethauth": ^0.8.1
-    "@0xsodium/abi": ^1.31.0
-    "@0xsodium/config": ^1.31.0
-    "@0xsodium/network": ^1.31.0
-    "@0xsodium/utils": ^1.31.0
-    "@0xsodium/wallet": ^1.31.0
+    "@0xsodium/abi": ^1.40.0
+    "@0xsodium/config": ^1.40.0
+    "@0xsodium/network": ^1.40.0
+    "@0xsodium/utils": ^1.40.0
+    "@0xsodium/wallet": ^1.40.0
     concurrently: ^6.5.0
     ethers: ^5.7.0
     hardhat: 2.1.2
@@ -64,20 +64,20 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@0xsodium/config@^1.31.0, @0xsodium/config@workspace:packages/config":
+"@0xsodium/config@^1.40.0, @0xsodium/config@workspace:packages/config":
   version: 0.0.0-use.local
   resolution: "@0xsodium/config@workspace:packages/config"
   dependencies:
-    "@0xsodium/abi": ^1.31.0
-    "@0xsodium/multicall": ^1.31.0
-    "@0xsodium/network": ^1.31.0
-    "@0xsodium/utils": ^1.31.0
+    "@0xsodium/abi": ^1.40.0
+    "@0xsodium/multicall": ^1.40.0
+    "@0xsodium/network": ^1.40.0
+    "@0xsodium/utils": ^1.40.0
     "@0xsodium/wallet-contracts": 0.0.8-beta
     ethers: ^5.7.0
   languageName: unknown
   linkType: soft
 
-"@0xsodium/graphquery@^1.31.0, @0xsodium/graphquery@workspace:packages/graphquery":
+"@0xsodium/graphquery@^1.40.0, @0xsodium/graphquery@workspace:packages/graphquery":
   version: 0.0.0-use.local
   resolution: "@0xsodium/graphquery@workspace:packages/graphquery"
   dependencies:
@@ -100,13 +100,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@0xsodium/multicall@^1.31.0, @0xsodium/multicall@workspace:packages/multicall":
+"@0xsodium/multicall@^1.40.0, @0xsodium/multicall@workspace:packages/multicall":
   version: 0.0.0-use.local
   resolution: "@0xsodium/multicall@workspace:packages/multicall"
   dependencies:
-    "@0xsodium/abi": ^1.31.0
-    "@0xsodium/network": ^1.31.0
-    "@0xsodium/utils": ^1.31.0
+    "@0xsodium/abi": ^1.40.0
+    "@0xsodium/network": ^1.40.0
+    "@0xsodium/utils": ^1.40.0
     "@0xsodium/wallet-contracts": 0.0.8-beta
     "@ethersproject/providers": ^5.7.0
     "@types/web3-provider-engine": ^14.0.1
@@ -118,28 +118,28 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@0xsodium/network@^1.31.0, @0xsodium/network@workspace:packages/network":
+"@0xsodium/network@^1.40.0, @0xsodium/network@workspace:packages/network":
   version: 0.0.0-use.local
   resolution: "@0xsodium/network@workspace:packages/network"
   dependencies:
-    "@0xsodium/utils": ^1.31.0
+    "@0xsodium/utils": ^1.40.0
     "@ethersproject/providers": ^5.7.0
     ethers: ^5.7.0
   languageName: unknown
   linkType: soft
 
-"@0xsodium/provider@^1.31.0, @0xsodium/provider@workspace:packages/provider":
+"@0xsodium/provider@^1.40.0, @0xsodium/provider@workspace:packages/provider":
   version: 0.0.0-use.local
   resolution: "@0xsodium/provider@workspace:packages/provider"
   dependencies:
-    "@0xsodium/abi": ^1.31.0
-    "@0xsodium/auth": ^1.31.0
-    "@0xsodium/config": ^1.31.0
-    "@0xsodium/graphquery": ^1.31.0
-    "@0xsodium/network": ^1.31.0
-    "@0xsodium/transactions": ^1.31.0
-    "@0xsodium/utils": ^1.31.0
-    "@0xsodium/wallet": ^1.31.0
+    "@0xsodium/abi": ^1.40.0
+    "@0xsodium/auth": ^1.40.0
+    "@0xsodium/config": ^1.40.0
+    "@0xsodium/graphquery": ^1.40.0
+    "@0xsodium/network": ^1.40.0
+    "@0xsodium/transactions": ^1.40.0
+    "@0xsodium/utils": ^1.40.0
+    "@0xsodium/wallet": ^1.40.0
     "@0xsodium/wallet-contracts": 0.0.8-beta
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/hash": ^5.7.0
@@ -152,20 +152,20 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@0xsodium/transactions@^1.31.0, @0xsodium/transactions@workspace:packages/transactions":
+"@0xsodium/transactions@^1.40.0, @0xsodium/transactions@workspace:packages/transactions":
   version: 0.0.0-use.local
   resolution: "@0xsodium/transactions@workspace:packages/transactions"
   dependencies:
-    "@0xsodium/abi": ^1.31.0
-    "@0xsodium/network": ^1.31.0
-    "@0xsodium/utils": ^1.31.0
+    "@0xsodium/abi": ^1.40.0
+    "@0xsodium/network": ^1.40.0
+    "@0xsodium/utils": ^1.40.0
     "@0xsodium/wallet-contracts": 0.0.8-beta
     "@ethersproject/abi": ^5.7.0
     ethers: ^5.7.0
   languageName: unknown
   linkType: soft
 
-"@0xsodium/utils@^1.31.0, @0xsodium/utils@workspace:packages/utils":
+"@0xsodium/utils@^1.40.0, @0xsodium/utils@workspace:packages/utils":
   version: 0.0.0-use.local
   resolution: "@0xsodium/utils@workspace:packages/utils"
   dependencies:
@@ -187,16 +187,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@0xsodium/wallet@^1.31.0, @0xsodium/wallet@workspace:packages/wallet":
+"@0xsodium/wallet@^1.40.0, @0xsodium/wallet@workspace:packages/wallet":
   version: 0.0.0-use.local
   resolution: "@0xsodium/wallet@workspace:packages/wallet"
   dependencies:
-    "@0xsodium/abi": ^1.31.0
-    "@0xsodium/config": ^1.31.0
+    "@0xsodium/abi": ^1.40.0
+    "@0xsodium/config": ^1.40.0
     "@0xsodium/guard": ^1.17.0
-    "@0xsodium/network": ^1.31.0
-    "@0xsodium/transactions": ^1.31.0
-    "@0xsodium/utils": ^1.31.0
+    "@0xsodium/network": ^1.40.0
+    "@0xsodium/transactions": ^1.40.0
+    "@0xsodium/utils": ^1.40.0
     "@0xsodium/wallet-contracts": 0.0.8-beta
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/properties": ^5.7.0
@@ -20120,7 +20120,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "my-app@workspace:examples/my-app"
   dependencies:
-    "@0xsodium/provider": ^1.31.0
+    "@0xsodium/provider": ^1.40.0
     "@babel/core": ^7.12.9
     "@ethersproject/shims": ^5.7.0
     "@react-native-async-storage/async-storage": ^1.17.11

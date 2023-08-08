@@ -7,7 +7,8 @@ import { ConnectionInfo } from '@ethersproject/web';
 import {
   Transactionish,
   TransactionRequest,
-  Transaction
+  Transaction,
+  AATransactionReceipt,
 } from '@0xsodium/transactions';
 
 import {
@@ -46,7 +47,6 @@ import {
   SodiumUserOpBuilder,
   IClient,
   Client,
-  AATransactionReceipt,
 } from './userop';
 import { IUserOperation } from 'userop';
 // Wallet is a signer interface to a Smart Contract based Ethereum account.

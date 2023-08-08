@@ -4,14 +4,15 @@ import { NetworkConfig, ChainIdLike, SodiumContext } from '@0xsodium/network';
 import {
   Transactionish,
   TransactionRequest,
-  Transaction
+  Transaction,
+  AATransactionReceipt,
 } from '@0xsodium/transactions';
-import { JsonRpcProvider, TransactionResponse, TransactionReceipt, BlockTag } from '@ethersproject/providers';
+import { JsonRpcProvider, TransactionResponse, BlockTag } from '@ethersproject/providers';
 import { BytesLike } from '@ethersproject/bytes';
 import { WalletConfig, WalletState } from '@0xsodium/config';
 import { Deferrable } from '@0xsodium/utils';
 import { IUserOperation } from 'userop';
-import { SodiumUserOpBuilder, AATransactionReceipt } from './userop';
+import { SodiumUserOpBuilder } from './userop';
 import { DelegateProof, SodiumNetworkAuthProof } from './utils';
 
 export abstract class Signer extends AbstractSigner {

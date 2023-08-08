@@ -1,5 +1,11 @@
 # @0xsodium/abi
 
+## 1.41.0
+
+### Minor Changes
+
+- fix bugs
+
 ## 1.40.0
 
 ### Minor Changes
