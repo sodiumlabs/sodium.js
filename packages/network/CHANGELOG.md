@@ -1,5 +1,16 @@
 # @0xsodium/network
 
+## 1.42.0
+
+### Minor Changes
+
+- fix send transaction bugs
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/utils@1.42.0
+
 ## 1.41.0
 
 ### Minor Changes

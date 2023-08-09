@@ -1,5 +1,16 @@
 # my-app
 
+## 1.41.0
+
+### Minor Changes
+
+- fix send transaction bugs
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.42.0
+
 ## 1.40.0
 
 ### Minor Changes

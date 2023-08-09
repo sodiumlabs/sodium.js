@@ -463,8 +463,7 @@ export class Web3Signer extends Signer implements TypedDataSigner {
       sender: await fromAddress
     }).then(({ tx, sender }) => {
       if (tx.from != null) {
-        if (ethers.utils.getAddress(tx.from) !== sender) {
-          // logger.throwArgumentError("from address mismatch", "transaction", transaction)
+        if (ethers.utils.getAddress(tx.from).toLowerCase() !== sender.toLowerCase()) {
           throw new Error(`from address mismatch for transaction ${transaction}`)
         }
       } else {

@@ -1,5 +1,19 @@
 # @0xsodium/config
 
+## 1.42.0
+
+### Minor Changes
+
+- fix send transaction bugs
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.42.0
+  - @0xsodium/multicall@1.42.0
+  - @0xsodium/network@1.42.0
+  - @0xsodium/utils@1.42.0
+
 ## 1.41.0
 
 ### Minor Changes

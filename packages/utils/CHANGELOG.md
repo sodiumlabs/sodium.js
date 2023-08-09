@@ -1,5 +1,11 @@
 # @0xsodium/utils
 
+## 1.42.0
+
+### Minor Changes
+
+- fix send transaction bugs
+
 ## 1.41.0
 
 ### Minor Changes
