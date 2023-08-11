@@ -1,5 +1,11 @@
 # @0xsodium/graphquery
 
+## 1.43.0
+
+### Minor Changes
+
+- fix singer timeout
+
 ## 1.42.0
 
 ### Minor Changes

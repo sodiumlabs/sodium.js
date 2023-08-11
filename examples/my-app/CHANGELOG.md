@@ -1,5 +1,16 @@
 # my-app
 
+## 1.42.0
+
+### Minor Changes
+
+- fix singer timeout
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.43.0
+
 ## 1.41.0
 
 ### Minor Changes

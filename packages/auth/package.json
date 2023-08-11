@@ -1,6 +1,6 @@
 {
   "name": "@0xsodium/auth",
-  "version": "1.42.0",
+  "version": "1.43.0",
   "description": "auth sub-package for Sequence",
   "repository": "https://github.com/sodiumlabs/sodium.js/tree/main/packages/auth",
   "source": "src/index.ts",
@@ -18,11 +18,11 @@
   },
   "dependencies": {
     "@0xsequence/ethauth": "^0.8.1",
-    "@0xsodium/abi": "^1.42.0",
-    "@0xsodium/config": "^1.42.0",
-    "@0xsodium/network": "^1.42.0",
-    "@0xsodium/utils": "^1.42.0",
-    "@0xsodium/wallet": "^1.42.0",
+    "@0xsodium/abi": "^1.43.0",
+    "@0xsodium/config": "^1.43.0",
+    "@0xsodium/network": "^1.43.0",
+    "@0xsodium/utils": "^1.43.0",
+    "@0xsodium/wallet": "^1.43.0",
     "ethers": "^5.7.0"
   },
   "devDependencies": {

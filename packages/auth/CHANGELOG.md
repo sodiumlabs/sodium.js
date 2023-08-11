@@ -1,5 +1,20 @@
 # @0xsodium/auth
 
+## 1.43.0
+
+### Minor Changes
+
+- fix singer timeout
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.43.0
+  - @0xsodium/config@1.43.0
+  - @0xsodium/network@1.43.0
+  - @0xsodium/utils@1.43.0
+  - @0xsodium/wallet@1.43.0
+
 ## 1.42.0
 
 ### Minor Changes

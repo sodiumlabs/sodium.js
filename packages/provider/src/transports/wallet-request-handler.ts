@@ -41,7 +41,7 @@ const getTokenPricesWithCache = moize(getTokenPrices, {
   maxAge: 50 * 1000,
 });
 
-const SIGNER_READY_TIMEOUT = 10000
+const SIGNER_READY_TIMEOUT = 1000 * 60 * 5 // 5 minutes
 
 export interface WalletSignInOptions {
   connect?: boolean
