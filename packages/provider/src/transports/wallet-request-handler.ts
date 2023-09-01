@@ -686,7 +686,16 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
           });
 
           let chain = x.id;
-          const prices = await getTokenPricesWithCache(chain, tokenAddressList);
+          const prices = await getTokenPricesWithCache(chain, tokenAddressList).catch((err) => {
+            console.warn(err);
+            let m: { [key: string]: { usd: number } } = {};
+            tokenAddressList.forEach((tokenAddress: string) => {
+              m[tokenAddress.toLowerCase()] = {
+                usd: 0
+              };
+            });
+            return tokenAddressList;
+          });
           response.result = tokenAddressList.map((tokenAddress: string) => {
             const price = prices[tokenAddress.toLowerCase()]
             return price ? price.usd : 0
@@ -910,6 +919,10 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
     if (connectDetails.session?.accountAddress) {
       this.events.emit('accountsChanged', [connectDetails.session?.accountAddress], origin)
     }
+  }
+
+  notifyAccountChange(account: string, origin?: string) {
+    this.events.emit('accountsChanged', [account], origin)
   }
 
   notifyDisconnect(origin?: string) {

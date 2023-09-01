@@ -17,11 +17,11 @@ import {
   TypedEventEmitter
 } from '../types'
 
-import { NetworkConfig, SodiumContext, JsonRpcRequest, JsonRpcResponseCallback, JsonRpcResponse } from '@0xsodium/network'
+import { NetworkConfig, SodiumContext, JsonRpcRequest, JsonRpcResponseCallback } from '@0xsodium/network'
 import { logger } from '@0xsodium/utils'
 import { ethers } from 'ethers'
 
-export const PROVIDER_OPEN_TIMEOUT = 30000 // in ms
+export const PROVIDER_OPEN_TIMEOUT = 1000 * 60 * 5 // in ms
 
 let _messageIdx = 0
 

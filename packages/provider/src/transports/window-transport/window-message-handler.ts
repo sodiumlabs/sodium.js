@@ -10,7 +10,7 @@ import {
 } from '../../types'
 import { WalletRequestHandler } from '../wallet-request-handler'
 import { BaseWalletTransport } from '../base-wallet-transport'
-import { logger, sanitizeNumberString, base64DecodeObject } from '@0xsodium/utils'
+import { logger, base64DecodeObject } from '@0xsodium/utils'
 
 export class WindowMessageHandler extends BaseWalletTransport {
   protected parentWindow: Window
