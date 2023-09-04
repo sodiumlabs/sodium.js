@@ -1,5 +1,16 @@
 # my-app
 
+## 1.43.0
+
+### Minor Changes
+
+- fix lumidev
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.44.0
+
 ## 1.42.0
 
 ### Minor Changes

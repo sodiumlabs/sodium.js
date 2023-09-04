@@ -121,7 +121,7 @@ export const getTokenMetadataByAddress = async (address: string, chainId: number
 
 export const getUserERC20Tokens = async (subgraphHost: string, account: string, chainId: number, first: number = 10, provider: Provider): Promise<UserTokenInfo[]> => {
   const queue = [
-    fallbackLocalHardhat,
+    fallbackAribOne,
     fallbackServer
   ];
 
@@ -138,15 +138,15 @@ export const getUserERC20Tokens = async (subgraphHost: string, account: string, 
   throw new Error("getUserERC20Tokens failed")
 }
 
-async function fallbackLocalHardhat(
+async function fallbackAribOne(
   subgraphHost: string,
   account: string,
   chainId: number,
   first: number = 10,
   provider: Provider
 ): Promise<UserTokenInfo[]> {
-  if (chainId !== 31337) {
-    throw new Error(`fallbackLocalHardhat only support chainId 31377:${chainId}`);
+  if (chainId !== 42161 && chainId !== 31337) {
+    throw new Error(`fallbackLocalHardhat only support chainId 31377 or 42161:${chainId}`);
   }
 
   const tokens: UserTokenInfo[] = [

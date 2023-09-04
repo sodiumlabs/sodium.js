@@ -1,5 +1,11 @@
 # @0xsodium/graphquery
 
+## 1.44.0
+
+### Minor Changes
+
+- fix lumidev
+
 ## 1.43.0
 
 ### Minor Changes
