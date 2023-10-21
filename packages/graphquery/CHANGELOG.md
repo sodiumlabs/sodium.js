@@ -1,5 +1,11 @@
 # @0xsodium/graphquery
 
+## 1.45.0
+
+### Minor Changes
+
+- fix sign message
+
 ## 1.44.0
 
 ### Minor Changes

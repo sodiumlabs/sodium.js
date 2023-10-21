@@ -82,6 +82,9 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
 
   async signIn(signer: Signer | null, options: WalletSignInOptions = {}) {
     this.setSigner(signer)
+    const address = await this.getAddress();
+
+    this.notifyAccountChange(address);
 
     const { connect, mainnetNetworks, testnetNetworks, defaultNetworkId } = options
 
@@ -126,6 +129,7 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
   signOut() {
     // signed out state
     this.setSigner(null)
+    this.notifyDisconnect();
   }
 
   signerReset() {
@@ -971,12 +975,16 @@ export class WalletRequestHandler implements ExternalProvider, JsonRpcHandler, P
 
   setSigner(signer: Signer | null | undefined) {
     this.signer = signer
-
     if (signer !== undefined) {
       for (let i = 0; i < this.signerReadyCallbacks.length; i++) {
         this.signerReadyCallbacks[i]()
       }
       this.signerReadyCallbacks = []
+    }
+    if (signer === null) {
+      this.notifyDisconnect()
+    } else {
+
     }
   }
 

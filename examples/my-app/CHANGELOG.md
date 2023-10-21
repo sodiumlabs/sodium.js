@@ -1,5 +1,16 @@
 # my-app
 
+## 1.44.0
+
+### Minor Changes
+
+- fix sign message
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/provider@1.45.0
+
 ## 1.43.0
 
 ### Minor Changes

@@ -1,5 +1,16 @@
 # @0xsodium/network
 
+## 1.45.0
+
+### Minor Changes
+
+- fix sign message
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/utils@1.45.0
+
 ## 1.44.0
 
 ### Minor Changes

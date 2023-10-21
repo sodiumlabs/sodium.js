@@ -21,6 +21,7 @@ import { NetworkConfig, SodiumContext, JsonRpcRequest, JsonRpcResponseCallback }
 import { logger } from '@0xsodium/utils'
 import { ethers } from 'ethers'
 
+// 5 minutes
 export const PROVIDER_OPEN_TIMEOUT = 1000 * 60 * 5 // in ms
 
 let _messageIdx = 0
@@ -328,7 +329,7 @@ export abstract class BaseProviderTransport implements ProviderTransport {
     return this.events.emit(event, ...(args as any))
   }
 
-  waitUntilOpened = async (openTimeout = PROVIDER_OPEN_TIMEOUT): Promise<WalletSession | undefined> => {
+  waitUntilOpened = async (): Promise<WalletSession | undefined> => {
     let opened = false
     return Promise.race([
       new Promise<WalletSession | undefined>((_, reject) => {
@@ -340,7 +341,7 @@ export abstract class BaseProviderTransport implements ProviderTransport {
             this.events.emit('close', { code: 1005, message: 'opening wallet timed out' } as ProviderRpcError)
           }
           reject(new Error('opening wallet timed out'))
-        }, openTimeout)
+        }, PROVIDER_OPEN_TIMEOUT)
       }),
       new Promise<WalletSession | undefined>(resolve => {
         if (this.isOpened()) {

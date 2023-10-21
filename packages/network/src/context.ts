@@ -6,7 +6,7 @@ export interface SodiumContext {
   opValidatorAddress: string;
   entryPointAddress: string;
 }
-
+// 0x5Eb4bcAEB78a7a765FA3F7285eE6B3E08CCB2c09
 const defaultSodiumContext: SodiumContext = {
   factoryAddress: "0x5Eb4bcAEB78a7a765FA3F7285eE6B3E08CCB2c09",
   sodiumAuthAddress: "0x8987ECEa30337FD2ebC5A07Da0cc6EFFCc051BE6",

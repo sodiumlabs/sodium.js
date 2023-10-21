@@ -1,5 +1,20 @@
 # @0xsodium/wallet
 
+## 1.45.0
+
+### Minor Changes
+
+- fix sign message
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/network@1.45.0
+  - @0xsodium/abi@1.45.0
+  - @0xsodium/config@1.45.0
+  - @0xsodium/transactions@1.45.0
+  - @0xsodium/utils@1.45.0
+
 ## 1.44.0
 
 ### Minor Changes

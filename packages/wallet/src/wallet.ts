@@ -474,7 +474,7 @@ export class Wallet extends Signer {
 
     if (isDeployed) {
       const cfh = CompatibilityFallbackHandler__factory.connect(address, this.provider);
-      const signHash = await cfh.getMessageHash(data);
+      const signHash = await cfh.getMessageHashForSodium(address, data);
       const hash = ethers.utils.arrayify(signHash);
       return this.sodiumInternalSignature(hash);
     }
