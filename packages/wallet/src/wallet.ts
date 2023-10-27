@@ -241,16 +241,14 @@ export class Wallet extends Signer {
         this.isDelegate(),
       );
     }
-
     const opBuilder = await opBuilderPromise;
-
-    if (this.isDelegate()) {
-      const signerAddress = await this._signer.getAddress();
-      const trusteeAddress = this.delegateProof!.trustee;
-      if (signerAddress.toLowerCase() !== trusteeAddress.toLowerCase()) {
-        throw new Error(`Signer address ${signerAddress} does not match trustee address ${trusteeAddress}`);
-      }
-    }
+    // if (this.isDelegate()) {
+    //   const signerAddress = await this._signer.getAddress();
+    //   const trusteeAddress = this.delegateProof!.trustee;
+    //   if (signerAddress.toLowerCase() !== trusteeAddress.toLowerCase()) {
+    //     throw new Error(`Signer address ${signerAddress} does not match trustee address ${trusteeAddress}`);
+    //   }
+    // }
 
     opBuilder.setSignFunc(this.sodiumInternalSignature.bind(this));
 

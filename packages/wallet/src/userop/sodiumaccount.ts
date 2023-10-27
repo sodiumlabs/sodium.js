@@ -1,11 +1,11 @@
 import {
-    UserOperationBuilder,
     UserOperationMiddlewareFn,
     Presets,
     IUserOperation,
     UserOperationMiddlewareCtx,
     Utils
 } from 'userop';
+import { UserOperationBuilder } from './builder';
 import {
     EntryPoint__factory,
     EntryPoint,
@@ -25,7 +25,8 @@ import { SignFunc } from '../utils';
 
 interface GasEstimate {
     preVerificationGas: ethers.BigNumberish;
-    verificationGas: ethers.BigNumberish;
+    verificationGas?: ethers.BigNumberish;
+    verificationGasLimit: ethers.BigNumberish;
     callGasLimit: ethers.BigNumberish;
 }
 
@@ -57,20 +58,14 @@ const estimateCreationGas = async (
 export const estimateUserOperationGas =
     (provider: ethers.providers.JsonRpcProvider): UserOperationMiddlewareFn =>
         async (ctx) => {
-            if (ethers.BigNumber.from(ctx.op.nonce).isZero()) {
-                ctx.op.verificationGasLimit = ethers.BigNumber.from(
-                    ctx.op.verificationGasLimit
-                ).add(await estimateCreationGas(provider, ctx.op.initCode));
-            }
-
             const est = (await provider.send("eth_estimateUserOperationGas", [
                 Utils.OpToJSON(ctx.op),
                 ctx.entryPoint,
             ])) as GasEstimate;
 
-            ctx.op.preVerificationGas = ethers.BigNumber.from(est.preVerificationGas).add(30000);
-            ctx.op.verificationGasLimit = ethers.BigNumber.from(est.verificationGas).add(30000);
-            ctx.op.callGasLimit = ethers.BigNumber.from(est.callGasLimit).add(500000);
+            ctx.op.preVerificationGas = est.preVerificationGas;
+            ctx.op.verificationGasLimit = est.verificationGas || est.verificationGasLimit
+            ctx.op.callGasLimit = est.callGasLimit;
         };
 
 export const SodiumSignatureMiddleware =
@@ -302,10 +297,10 @@ export class SodiumUserOpBuilder extends UserOperationBuilder {
                 verificationGasLimit: 200000,
                 preVerificationGas: 21000
             })
-            .useMiddleware(instance.resolveAccount)
-            .useMiddleware(Presets.Middleware.getGasPrice(provider))
+            .useAsyncMiddleware(instance.resolveAccount)
+            .useAsyncMiddleware(Presets.Middleware.getGasPrice(provider))
+            .useAsyncMiddleware(instance.paymasterMiddleware())
             .useMiddleware(EOACallData(instance, signer))
-            .useMiddleware(instance.paymasterMiddleware())
             .useMiddleware(estimateUserOperationGas(instance.provider))
         // .useMiddleware(simulateHandleOp(provider))
         // return base.useMiddleware(Presets.Middleware.EOASignature(instance.signer));
@@ -376,10 +371,10 @@ export class SodiumUserOpBuilder extends UserOperationBuilder {
                 verificationGasLimit: 200000,
                 preVerificationGas: 21000
             })
-            .useMiddleware(instance.resolveAccount)
-            .useMiddleware(Presets.Middleware.getGasPrice(provider))
+            .useAsyncMiddleware(instance.resolveAccount)
+            .useAsyncMiddleware(Presets.Middleware.getGasPrice(provider))
+            .useAsyncMiddleware(instance.paymasterMiddleware())
             .useMiddleware(SodiumCallData(instance, signer))
-            .useMiddleware(instance.paymasterMiddleware())
             .useMiddleware(estimateUserOperationGas(instance.provider))
         // .useMiddleware(simulateHandleOp(provider))
         // return base.useMiddleware(Presets.Middleware.EOASignature(instance.signer));

@@ -28,11 +28,13 @@
     "@ethersproject/properties": "^5.7.0",
     "@ethersproject/providers": "^5.7.0",
     "ethers": "^5.7.0",
+    "ethers-multicall-provider": "^3.1.1",
     "fetch-ponyfill": "^7.1.0",
     "userop": "^0.2.0"
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
+    "@types/lodash": "^4.14.200",
     "ganache-core": "^2.13.2",
     "web3": "^1.7.0"
   },
