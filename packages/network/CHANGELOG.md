@@ -1,5 +1,16 @@
 # @0xsodium/network
 
+## 1.46.0
+
+### Minor Changes
+
+- 338a735: fix 4337 Estimate Gas
+
+### Patch Changes
+
+- Updated dependencies [338a735]
+  - @0xsodium/utils@1.46.0
+
 ## 1.45.0
 
 ### Minor Changes

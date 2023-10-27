@@ -1,6 +1,6 @@
 {
   "name": "@0xsodium/wallet",
-  "version": "1.45.0",
+  "version": "1.46.0",
   "description": "wallet sub-package for sodium",
   "repository": "https://github.com/sodiumlabs/sodium.js/tree/main/packages/wallet",
   "source": "src/index.ts",
@@ -17,12 +17,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@0xsodium/abi": "^1.45.0",
-    "@0xsodium/config": "^1.45.0",
+    "@0xsodium/abi": "^1.46.0",
+    "@0xsodium/config": "^1.46.0",
     "@0xsodium/guard": "^1.17.0",
-    "@0xsodium/network": "^1.45.0",
-    "@0xsodium/transactions": "^1.45.0",
-    "@0xsodium/utils": "^1.45.0",
+    "@0xsodium/network": "^1.46.0",
+    "@0xsodium/transactions": "^1.46.0",
+    "@0xsodium/utils": "^1.46.0",
     "@0xsodium/wallet-contracts": "0.0.8-beta",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/properties": "^5.7.0",
