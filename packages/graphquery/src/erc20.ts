@@ -145,7 +145,7 @@ async function fallbackAribOne(
   first: number = 10,
   provider: Provider
 ): Promise<UserTokenInfo[]> {
-  if (chainId !== 42161 && chainId !== 31337) {
+  if (chainId !== 31337) {
     throw new Error(`fallbackLocalHardhat only support chainId 31377 or 42161:${chainId}`);
   }
 
