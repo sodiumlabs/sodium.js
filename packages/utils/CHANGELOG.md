@@ -1,5 +1,17 @@
 # @0xsodium/utils
 
+## 1.48.0
+
+### Minor Changes
+
+- fix bugs
+
+## 1.47.0
+
+### Minor Changes
+
+- fix xax gas price multiplier
+
 ## 1.46.0
 
 ### Minor Changes

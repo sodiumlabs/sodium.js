@@ -31,8 +31,6 @@ export class MuxMessageProvider implements ProviderTransport {
     // or maybe its not. What should happen is when a dapp makes a request, it will call openWallet
     // below, in which case one of the events will register. So perhaps this is fine.
     this.messageProviders.forEach(m => {
-      m.register()
-
       m.once('open', () => {
         // the first one to open is the winner, and others will be unregistered
         if (!this.provider) {
@@ -45,7 +43,8 @@ export class MuxMessageProvider implements ProviderTransport {
             }
           })
         }
-      })
+      });
+      m.register()
     })
   }
 

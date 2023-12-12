@@ -1,5 +1,31 @@
 # @0xsodium/multicall
 
+## 1.48.0
+
+### Minor Changes
+
+- fix bugs
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/abi@1.48.0
+  - @0xsodium/network@1.48.0
+  - @0xsodium/utils@1.48.0
+
+## 1.47.0
+
+### Minor Changes
+
+- fix xax gas price multiplier
+
+### Patch Changes
+
+- Updated dependencies
+  - @0xsodium/network@1.47.0
+  - @0xsodium/abi@1.47.0
+  - @0xsodium/utils@1.47.0
+
 ## 1.46.0
 
 ### Minor Changes

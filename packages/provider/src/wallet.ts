@@ -726,7 +726,7 @@ export interface ProviderConfig {
 }
 
 export const DefaultProviderConfig: ProviderConfig = {
-  walletAppURL: 'https://sodium-two.vercel.app',
+  walletAppURL: 'https://wallet.sodiums.org/',
   transports: {
     windowTransport: { enabled: false },
     iframeTransport: { enabled: true },

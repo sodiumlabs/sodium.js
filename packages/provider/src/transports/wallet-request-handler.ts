@@ -30,7 +30,16 @@ const getTokenPrices = async (chain: string, tokenAddressList: string[]): Promis
   const query = `vs_currencies=usd&contract_addresses=${tokenAddressList.join(",")}`
   const requestURL = `https://api.coingecko.com/api/v3/simple/token_price/${chain}?${query}`
   const coingeckoRes = await fetch(requestURL)
-  const prices = await coingeckoRes.json()
+  const prices = await coingeckoRes.json().catch((err) => {
+    console.warn(err);
+    let m: { [key: string]: { usd: number } } = {};
+    tokenAddressList.forEach((tokenAddress: string) => {
+      m[tokenAddress.toLowerCase()] = {
+        usd: 0
+      };
+    });
+    return m;
+  });
   return prices;
 }
 

@@ -17,11 +17,12 @@ import {
 import { SecurityManager } from '@0xsodium/wallet-contracts/gen/typechain/contracts/base/SecurityManager';
 import * as ethers from 'ethers';
 import { SodiumJsonRpcProvider } from './jsonrpc';
-import { SodiumContext } from '@0xsodium/network';
+import { NetworkConfig, SodiumContext } from '@0xsodium/network';
 import { Transactionish, TransactionEncoded, toSodiumTransactions, flattenAuxTransactions, sodiumTxAbiEncode } from '@0xsodium/transactions';
 import { WalletConfig } from '@0xsodium/config';
 import { keccak256 } from 'ethers/lib/utils';
 import { SignFunc } from '../utils';
+import { getGasPrice } from './gasPrice';
 
 interface GasEstimate {
     preVerificationGas: ethers.BigNumberish;
@@ -29,19 +30,6 @@ interface GasEstimate {
     verificationGasLimit: ethers.BigNumberish;
     callGasLimit: ethers.BigNumberish;
 }
-
-const estimateCreationGas = async (
-    provider: ethers.providers.JsonRpcProvider,
-    initCode: ethers.BytesLike
-): Promise<ethers.BigNumber> => {
-    const initCodeHex = ethers.utils.hexlify(initCode);
-    const factory = initCodeHex.substring(0, 42);
-    const callData = "0x" + initCodeHex.substring(42);
-    return await provider.estimateGas({
-        to: factory,
-        data: callData,
-    });
-};
 
 // export const simulateHandleOp = (provider: ethers.providers.JsonRpcProvider): UserOperationMiddlewareFn => async (ctx) => {
 //     const entryPoint = EntryPoint__factory.connect(ctx.entryPoint, provider);
@@ -241,6 +229,7 @@ export class SodiumUserOpBuilder extends UserOperationBuilder {
     }
 
     public static async initWithEOA(
+        network: NetworkConfig,
         sodiumContext: SodiumContext,
         sodiumConfig: WalletConfig,
         signer: ethers.Signer,
@@ -298,7 +287,7 @@ export class SodiumUserOpBuilder extends UserOperationBuilder {
                 preVerificationGas: 21000
             })
             .useAsyncMiddleware(instance.resolveAccount)
-            .useAsyncMiddleware(Presets.Middleware.getGasPrice(provider))
+            .useAsyncMiddleware(getGasPrice(provider, network))
             .useAsyncMiddleware(instance.paymasterMiddleware())
             .useMiddleware(EOACallData(instance, signer))
             .useMiddleware(estimateUserOperationGas(instance.provider))
@@ -307,6 +296,7 @@ export class SodiumUserOpBuilder extends UserOperationBuilder {
     }
 
     public static async initWithSession(
+        network: NetworkConfig,
         sodiumContext: SodiumContext,
         sodiumConfig: WalletConfig,
         signer: ethers.Signer,
@@ -372,7 +362,7 @@ export class SodiumUserOpBuilder extends UserOperationBuilder {
                 preVerificationGas: 21000
             })
             .useAsyncMiddleware(instance.resolveAccount)
-            .useAsyncMiddleware(Presets.Middleware.getGasPrice(provider))
+            .useAsyncMiddleware(getGasPrice(provider, network))
             .useAsyncMiddleware(instance.paymasterMiddleware())
             .useMiddleware(SodiumCallData(instance, signer))
             .useMiddleware(estimateUserOperationGas(instance.provider))

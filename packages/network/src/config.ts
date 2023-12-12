@@ -69,6 +69,8 @@ export interface NetworkConfig {
   isAuthChain?: boolean
   // Disabled / deprecated chain
   disabled?: boolean
+  maxGasPriceMultiplier?: number;
+  maxPriorityFeePerGasBuffer?: number;
   centerData: {
     logoURI?: string;
     website?: string;

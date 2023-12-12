@@ -220,6 +220,7 @@ export class Wallet extends Signer {
     const isDeployed = await this.isDeployed();
     if (this.sodiumNetworkAuthProof) {
       opBuilderPromise = SodiumUserOpBuilder.initWithSession(
+        this.network,
         this.context,
         this.config,
         this._signer,
@@ -232,6 +233,7 @@ export class Wallet extends Signer {
       );
     } else {
       opBuilderPromise = SodiumUserOpBuilder.initWithEOA(
+        this.network,
         this.context,
         this.config,
         this._signer,

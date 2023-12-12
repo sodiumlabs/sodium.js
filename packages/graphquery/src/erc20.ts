@@ -259,7 +259,7 @@ async function fallbackServer(
   first: number = 10,
   provider: Provider
 ): Promise<UserTokenInfo[]> {
-  const res = await fetch(`https://subgraph-fallback.vercel.app/api/balances?chainId=${chainId}&walletAddress=${account}`);
+  const res = await fetch(`https://indexer.sodiums.org/api/balances?chainId=${chainId}&walletAddress=${account}`);
   const result: {
     tokenAddress: string;
     balance: string;
