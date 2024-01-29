@@ -420,6 +420,7 @@ export class Wallet extends Signer {
     const opBuilder = await this.opBuilderPromise;
     const opClient = await this.opClientPromise;
     const signedUserOp = await opBuilder.signUserOp(userOp);
+
     const response = await opClient.sendUserOperationRaw(signedUserOp);
     return {
       ...response,
